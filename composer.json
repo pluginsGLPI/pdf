@@ -1,6 +1,20 @@
 {
     "require": {
-        "tecnickcom/tcpdf": "^6.4",
-        "glpi-project/tools": "^0.7.4"
+        "php": ">=7.4",
+        "symfony/yaml": "^5.4",
+        "tecnickcom/tcpdf": "^6.4"
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^3.64",
+        "glpi-project/tools": "^0.7.4",
+        "php-parallel-lint/php-parallel-lint": "^1.4",
+        "phpstan/phpstan": "^1.12"
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "platform": {
+            "php": "7.4.0"
+        },
+        "sort-packages": true
     }
 }
