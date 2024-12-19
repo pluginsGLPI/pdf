@@ -1,5 +1,6 @@
 {
     "require": {
-        "tecnickcom/tcpdf": "^6.4"
+        "tecnickcom/tcpdf": "^6.4",
+        "glpi-project/tools": "^0.7.4"
     }
 }
