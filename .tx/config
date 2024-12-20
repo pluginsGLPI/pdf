@@ -1,7 +1,7 @@
 [main]
 host = https://www.transifex.com
 
-[o:teclib:p:glpi-project-plugin-pdf:r:pdf-pot]
+[o:teclib:p:glpi-project-plugin-pdf:r:pdfpot]
 file_filter = locales/<lang>.po
 source_file = locales/pdf.pot
 source_lang = en
