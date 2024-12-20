@@ -13,12 +13,6 @@ This plugin allow you to select and export informations of an equipment to PDF f
 - additional data from some plugins
 - one or many object(s) in a file
 
-Configuration :
-- International currency
-- Text to be added at the end of the PDF
-
-![Screenshot](./docs/screenshots/config.png)
-
 ## Download
 
 Releases can be donwloaded on [GitHub](https://github.com/PluginsGLPI/pdf/releases).
