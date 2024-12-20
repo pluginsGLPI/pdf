@@ -1,65 +1,80 @@
 <?php
 
 /**
- *  * @version $Id: HEADER 15930 2011-10-25 10:47:55Z jmd $
- *  -------------------------------------------------------------------------
- *  pdf - Export to PDF plugin for GLPI
- *  Copyright (C) 2003-2011 by the pdf Development Team.
+ * ---------------------------------------------------------------------
  *
- *  https://forge.indepnet.net/projects/pdf
- *  -------------------------------------------------------------------------
+ * GLPI - Gestionnaire Libre de Parc Informatique
  *
- *  LICENSE
+ * http://glpi-project.org
  *
- *  This file is part of pdf.
+ * @author    Nelly Mahu-Lasson, Remi Collet, Teclib
+ * @copyright 2015-2024 Teclib' and contributors.
+ * @copyright 2003-2014 by the INDEPNET Development Team.
+ * @copyright Copyright (c) 2009-2022 PDF plugin team
+ * @licence   https://www.gnu.org/licenses/gpl-3.0.html
+ * @license   AGPL License 3.0 or (at your option) any later version
+ * @link      https://github.com/pluginsGLPI/pdf/
+ * @link      http://www.glpi-project.org/
+ * @package   pdf
+ * @since     2009
  *
- *  pdf is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
- *  (at your option) any later version.
+ * ---------------------------------------------------------------------
  *
- *  pdf is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * LICENSE
  *
- *  You should have received a copy of the GNU General Public License
- *  along with pdf. If not, see <http://www.gnu.org/licenses/>.
- *  --------------------------------------------------------------------------
+ * This file is part of GLPI.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ * ---------------------------------------------------------------------
  */
 
-function plugin_init_pdf() {
-   global $PLUGIN_HOOKS, $PDF_DEVICES;
+function plugin_init_pdf()
+{
+    global $PLUGIN_HOOKS, $PDF_DEVICES;
 
-   $PLUGIN_HOOKS['csrf_compliant']['pdf'] = true;
+    $PLUGIN_HOOKS['csrf_compliant']['pdf'] = true;
 
    // manage autoload of tcppdf (glpi core now use mdpdf)
-   include_once(Plugin::getPhpDir('pdf') . "/vendor/autoload.php");
+    include_once(Plugin::getPhpDir('pdf') . "/vendor/autoload.php");
 
-   Plugin::registerClass('PluginPdfConfig', ['addtabon' => 'Config']);
-   $PLUGIN_HOOKS['config_page']['pdf'] = 'front/config.form.php';
+    Plugin::registerClass('PluginPdfConfig', ['addtabon' => 'Config']);
+    $PLUGIN_HOOKS['config_page']['pdf'] = 'front/config.form.php';
 
-   include_once(Plugin::getPhpDir('pdf')."/inc/config.class.php");
-   $PDF_DEVICES = PluginPdfConfig::currency();
+    include_once(Plugin::getPhpDir('pdf') . "/inc/config.class.php");
+    $PDF_DEVICES = PluginPdfConfig::currency();
 
-   Plugin::registerClass('PluginPdfProfile', ['addtabon' => 'Profile']);
-   $PLUGIN_HOOKS['change_profile']['pdf'] = ['PluginPdfProfile','initProfile'];
+    Plugin::registerClass('PluginPdfProfile', ['addtabon' => 'Profile']);
+    $PLUGIN_HOOKS['change_profile']['pdf'] = ['PluginPdfProfile','initProfile'];
 
-   if (Session::haveRight('plugin_pdf', READ)) {
-      Plugin::registerClass('PluginPdfPreference', ['addtabon' => 'Preference']);
-   }
+    if (Session::haveRight('plugin_pdf', READ)) {
+        Plugin::registerClass('PluginPdfPreference', ['addtabon' => 'Preference']);
+    }
 
-   if (Session::getLoginUserID()
-       && Session::haveRight('plugin_pdf', READ)) {
-      $PLUGIN_HOOKS['use_massive_action']['pdf'] = 1;
-   }
+    if (
+        Session::getLoginUserID()
+        && Session::haveRight('plugin_pdf', READ)
+    ) {
+        $PLUGIN_HOOKS['use_massive_action']['pdf'] = 1;
+    }
 
-   $plugin = new Plugin();
-   if ($plugin->isActivated("datainjection")) {
-      $PLUGIN_HOOKS['menu_entry']['pdf'] = 'front/preference.form.php';
-   } elseif ($plugin->isActivated("geststock")) {
-      $PLUGIN_HOOKS['menu_entry']['pdf'] = 'front/preference.form.php';
-   }
+    $plugin = new Plugin();
+    if ($plugin->isActivated("datainjection")) {
+        $PLUGIN_HOOKS['menu_entry']['pdf'] = 'front/preference.form.php';
+    } elseif ($plugin->isActivated("geststock")) {
+        $PLUGIN_HOOKS['menu_entry']['pdf'] = 'front/preference.form.php';
+    }
 
 
       // Define the type for which we know how to generate PDF :
@@ -93,15 +108,18 @@ function plugin_init_pdf() {
 }
 
 
-function plugin_version_pdf() {
+function plugin_version_pdf()
+{
 
-   return ['name'           => __('Print to pdf', 'pdf'),
-           'version'        => '3.0.0',
-           'author'         => 'Remi Collet, Nelly Mahu-Lasson',
-           'license'        => 'GPLv3+',
-           'homepage'       => 'https://github.com/yllen/pdf',
-           'minGlpiVersion' => '10.0.0',
-           'requirements'   => ['glpi' => ['min' => '10.0.0',
-                                           'max' => '10.1.0']]];
-
+    return ['name'           => __('Print to pdf', 'pdf'),
+        'version'        => '3.0.0',
+        'author'         => 'Remi Collet, Nelly Mahu-Lasson',
+        'license'        => 'GPLv3+',
+        'homepage'       => 'https://github.com/yllen/pdf',
+        'minGlpiVersion' => '10.0.0',
+        'requirements'   => ['glpi' => ['min' => '10.0.0',
+            'max' => '10.1.0'
+        ]
+        ]
+    ];
 }
