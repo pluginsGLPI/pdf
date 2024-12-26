@@ -1,30 +1,33 @@
 <?php
-/*
- * @version $Id: move_to_po.php 17149 2012-01-24 11:12:05Z moyo $
- -------------------------------------------------------------------------
- GLPI - Gestionnaire Libre de Parc Informatique
- Copyright (C) 2003-2012 by the INDEPNET Development Team.
 
- http://indepnet.net/   http://glpi-project.org
- -------------------------------------------------------------------------
-
- LICENSE
-
- This file is part of GLPI.
-
- GLPI is free software; you can redistribute it and/or modify
- it under the terms of the GNU General Public License as published by
- the Free Software Foundation; either version 2 of the License, or
- (at your option) any later version.
-
- GLPI is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with GLPI. If not, see <http://www.gnu.org/licenses/>.
- --------------------------------------------------------------------------
+/**
+ *  -------------------------------------------------------------------------
+ *  LICENSE
+ *
+ *  This file is part of PDF plugin for GLPI.
+ *
+ *  PDF is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Affero General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  PDF is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *  GNU Affero General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Affero General Public License
+ *  along with Reports. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @author    Nelly Mahu-Lasson, Remi Collet, Teclib
+ * @copyright Copyright (c) 2009-2022 PDF plugin team
+ * @license   AGPL License 3.0 or (at your option) any later version
+ * @link      https://github.com/pluginsGLPI/pdf/
+ * @link      http://www.glpi-project.org/
+ * @package   pdf
+ * @since     2009
+ *             http://www.gnu.org/licenses/agpl-3.0-standalone.html
+ *  --------------------------------------------------------------------------
  */
 
 // ----------------------------------------------------------------------
