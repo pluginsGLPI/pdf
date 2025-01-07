@@ -30,100 +30,126 @@
  *  --------------------------------------------------------------------------
  */
 
-class PluginPdfRemote  {
+class PluginPdfRemote
+{
+    public static $rightname = 'plugin_pdf';
 
-   static $rightname = "plugin_pdf";
+    public static function methodGetTabs($params, $protocol)
+    {
+        global $PLUGIN_HOOKS;
 
+        if (isset($params['help'])) {
+            return ['help' => 'bool,optional',
+                'type'     => 'string'];
+        }
 
-   static function methodGetTabs($params, $protocol) {
-      global $PLUGIN_HOOKS;
+        if (!Session::getLoginUserID()) {
+            return PluginWebservicesMethodCommon::Error($protocol, WEBSERVICES_ERROR_NOTAUTHENTICATED);
+        }
 
-      if (isset ($params['help'])) {
-         return ['help'   => 'bool,optional',
-                 'type'   => 'string'];
-      }
+        if (!isset($params['type'])) {
+            return PluginWebservicesMethodCommon::Error(
+                $protocol,
+                WEBSERVICES_ERROR_MISSINGPARAMETER,
+                '',
+                'type',
+            );
+        }
+        $type = $params['type'];
 
-      if (!Session::getLoginUserID()) {
-         return PluginWebservicesMethodCommon::Error($protocol, WEBSERVICES_ERROR_NOTAUTHENTICATED);
-      }
+        if (isset($PLUGIN_HOOKS['plugin_pdf'][$type])
+            && class_exists($PLUGIN_HOOKS['plugin_pdf'][$type])) {
+            $itempdf = new $PLUGIN_HOOKS['plugin_pdf'][$type]($item);
 
-      if (!isset($params['type'])) {
-         return PluginWebservicesMethodCommon::Error($protocol, WEBSERVICES_ERROR_MISSINGPARAMETER,
-                                                     '', 'type');
-      }
-      $type = $params['type'];
+            return $itempdf->defineAllTabs();
+        }
 
-      if (isset($PLUGIN_HOOKS['plugin_pdf'][$type])
-          && class_exists($PLUGIN_HOOKS['plugin_pdf'][$type])) {
+        return PluginWebservicesMethodCommon::Error($protocol, WEBSERVICES_ERROR_FAILED);
+    }
 
-         $itempdf = new $PLUGIN_HOOKS['plugin_pdf'][$type]($item);
-         return $itempdf->defineAllTabs();
-      }
+    public static function methodGetPdf($params, $protocol)
+    {
+        global $PLUGIN_HOOKS;
 
-      return PluginWebservicesMethodCommon::Error($protocol, WEBSERVICES_ERROR_FAILED);
-   }
+        if (isset($params['help'])) {
+            return ['help'  => 'bool,optional',
+                'type'      => 'string',
+                'id'        => 'integer',
+                'landscape' => 'bool,optional',
+                'tabs'      => 'string,optional',
+                'alltabs'   => 'bool,optional'];
+        }
 
+        if (!Session::getLoginUserID()) {
+            return PluginWebservicesMethodCommon::Error($protocol, WEBSERVICES_ERROR_NOTAUTHENTICATED);
+        }
+        if (!isset($params['type'])) {
+            return PluginWebservicesMethodCommon::Error(
+                $protocol,
+                WEBSERVICES_ERROR_MISSINGPARAMETER,
+                '',
+                'type',
+            );
+        }
+        $dbu  = new DbUtils();
+        $type = $params['type'];
+        if (!$item = $dbu->getItemForItemtype($type)) {
+            return PluginWebservicesMethodCommon::Error(
+                $protocol,
+                WEBSERVICES_ERROR_BADPARAMETER,
+                '',
+                'type',
+            );
+        }
+        if (!isset($params['id'])) {
+            return PluginWebservicesMethodCommon::Error(
+                $protocol,
+                WEBSERVICES_ERROR_MISSINGPARAMETER,
+                '',
+                'id',
+            );
+        }
+        if (!is_numeric($params['id'])) {
+            return PluginWebservicesMethodCommon::Error(
+                $protocol,
+                WEBSERVICES_ERROR_BADPARAMETER,
+                '',
+                'id',
+            );
+        }
+        $id = intval($params['id']);
 
-   static function methodGetPdf($params, $protocol) {
-      global $PLUGIN_HOOKS;
+        $landscape = (isset($params['landscape']) ? intval($params['landscape']) : false);
 
-      if (isset ($params['help'])) {
-            return ['help'      => 'bool,optional',
-                    'type'      => 'string',
-                    'id'        => 'integer',
-                    'landscape' => 'bool,optional',
-                    'tabs'      => 'string,optional',
-                    'alltabs'   => 'bool,optional'];
-      }
+        if (!$item->can($id, READ)) {
+            return PluginWebservicesMethodCommon::Error($protocol, WEBSERVICES_ERROR_NOTFOUND);
+        }
 
-      if (!Session::getLoginUserID()) {
-         return PluginWebservicesMethodCommon::Error($protocol, WEBSERVICES_ERROR_NOTAUTHENTICATED);
-      }
-      if (!isset($params['type'])) {
-         return PluginWebservicesMethodCommon::Error($protocol, WEBSERVICES_ERROR_MISSINGPARAMETER,
-                                                     '', 'type');
-      }
-      $dbu = new DbUtils();
-      $type = $params['type'];
-      if (!$item = $dbu->getItemForItemtype($type)) {
-         return PluginWebservicesMethodCommon::Error($protocol, WEBSERVICES_ERROR_BADPARAMETER, '',
-                                                     'type');
-      }
-      if (!isset($params['id'])) {
-         return PluginWebservicesMethodCommon::Error($protocol, WEBSERVICES_ERROR_MISSINGPARAMETER,
-                                                     '', 'id');
-      }
-      if (!is_numeric($params['id'])) {
-         return PluginWebservicesMethodCommon::Error($protocol, WEBSERVICES_ERROR_BADPARAMETER, '',
-                                                     'id');
-      }
-      $id = intval($params['id']);
+        if (isset($params['tabs'])) {
+            if (isset($params['alltabs'])) {
+                return PluginWebservicesMethodCommon::Error(
+                    $protocol,
+                    WEBSERVICES_ERROR_BADPARAMETER,
+                    '',
+                    'tabs+alltabs',
+                );
+            }
+            $tabs = explode(',', $params['tabs']);
+        } else {
+            $tabs = [$type . '$main'];
+        }
+        if (isset($PLUGIN_HOOKS['plugin_pdf'][$type]) && class_exists($PLUGIN_HOOKS['plugin_pdf'][$type])) {
+            $itempdf = new $PLUGIN_HOOKS['plugin_pdf'][$type]($item);
+            if (isset($params['alltabs'])) {
+                $tabs = $itempdf->defineAllTabs();
+                $tabs = array_keys($tabs);
+            }
+            $out = $itempdf->generatePDF([$id], $tabs, $landscape, false);
 
-      $landscape = (isset($params['landscape']) ? intval($params['landscape']) : false);
+            return ['name' => "$type-$id.pdf",
+                'base64'   => base64_encode($out)];
+        }
 
-      if (!$item->can($id, READ)) {
-         return PluginWebservicesMethodCommon::Error($protocol, WEBSERVICES_ERROR_NOTFOUND);
-      }
-
-      if (isset($params['tabs'])) {
-         if (isset($params['alltabs'])) {
-            return PluginWebservicesMethodCommon::Error($protocol, WEBSERVICES_ERROR_BADPARAMETER,
-                                                        '', 'tabs+alltabs');
-         }
-         $tabs = explode(',', $params['tabs']);
-      } else {
-         $tabs = [$type.'$main'];
-      }
-      if (isset($PLUGIN_HOOKS['plugin_pdf'][$type])  && class_exists($PLUGIN_HOOKS['plugin_pdf'][$type])) {
-         $itempdf = new $PLUGIN_HOOKS['plugin_pdf'][$type]($item);
-         if (isset($params['alltabs'])) {
-            $tabs = $itempdf->defineAllTabs();
-            $tabs = array_keys($tabs);
-         }
-         $out = $itempdf->generatePDF([$id], $tabs, $landscape, false);
-         return ['name'   => "$type-$id.pdf",
-                 'base64' => base64_encode($out)];
-      }
-      return PluginWebservicesMethodCommon::Error($protocol, WEBSERVICES_ERROR_FAILED);
-   }
+        return PluginWebservicesMethodCommon::Error($protocol, WEBSERVICES_ERROR_FAILED);
+    }
 }

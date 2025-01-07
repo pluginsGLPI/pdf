@@ -30,78 +30,102 @@
  *  --------------------------------------------------------------------------
  */
 
-class PluginPdfChangeTask extends PluginPdfCommon {
+class PluginPdfChangeTask extends PluginPdfCommon
+{
+    public static $rightname = 'plugin_pdf';
 
+    public function __construct(CommonGLPI $obj = null)
+    {
+        $this->obj = ($obj ? $obj : new ChangeTask());
+    }
 
-   static $rightname = "plugin_pdf";
+    public static function pdfForChange(PluginPdfSimplePDF $pdf, Change $job)
+    {
+        global $DB;
 
+        $dbu = new DbUtils();
 
-   function __construct(CommonGLPI $obj=NULL) {
-      $this->obj = ($obj ? $obj : new ChangeTask());
-   }
+        $ID = $job->getField('id');
 
+        $result = $DB->request(
+            'glpi_changetasks',
+            ['WHERE'    => ['changes_id' => $ID],
+                'ORDER' => 'date DESC'],
+        );
 
-   static function pdfForChange(PluginPdfSimplePDF $pdf, Change $job) {
-      global $DB;
+        $number = count($result);
 
-      $dbu = new DbUtils();
+        $pdf->setColumnsSize(100);
+        $title = '<b>' . ChangeTask::getTypeName(2) . '</b>';
+        if (!$number) {
+            $pdf->displayTitle(sprintf(__('%1$s: %2$s'), $title, __('No item to display')));
+        } else {
+            $title = sprintf(__('%1$s: %2$s'), $title, $number);
+            $pdf->displayTitle($title);
 
-      $ID = $job->getField('id');
+            foreach ($result as $data) {
+                $pdf->setColumnsSize(20, 20, 20, 20, 20);
+                $pdf->displayTitle(
+                    '<i>' . __('Type'),
+                    __('Date'),
+                    __('Duration'),
+                    __('Writer'),
+                    __('Planning') . '</i>',
+                );
 
-      $result = $DB->request('glpi_changetasks',
-                             ['WHERE'  => ['changes_id' => $ID],
-                              'ORDER'  => 'date DESC']);
+                $actiontime    = Html::timestampToString($data['actiontime'], false);
+                $planification = '';
+                if (empty($data['begin'])) {
+                    if (isset($data['state'])) {
+                        $planification = Planning::getState($data['state']) . '<br>';
+                    }
+                } else {
+                    if (isset($data['state']) && $data['state']) {
+                        $planification = sprintf(
+                            __('%1$s: %2$s'),
+                            _x('item', 'State'),
+                            Planning::getState($data['state']),
+                        );
+                    }
+                    $planification .= '<br>' . sprintf(
+                        __('%1$s: %2$s'),
+                        __('Begin'),
+                        Html::convDateTime($data['begin']),
+                    );
+                    $planification .= '<br>' . sprintf(
+                        __('%1$s: %2$s'),
+                        __('End'),
+                        Html::convDateTime($data['end']),
+                    );
+                    $planification .= '<br>' . sprintf(
+                        __('%1$s: %2$s'),
+                        __('By'),
+                        $dbu->getUserName($data['users_id_tech']),
+                    );
+                }
 
-      $number = count($result);
+                if ($data['taskcategories_id']) {
+                    $lib = Dropdown::getDropdownName('glpi_taskcategories', $data['taskcategories_id']);
+                } else {
+                    $lib = '';
+                }
 
-      $pdf->setColumnsSize(100);
-      $title = "<b>".ChangeTask::getTypeName(2)."</b>";
-      if (!$number) {
-         $pdf->displayTitle(sprintf(__('%1$s: %2$s'), $title, __('No item to display')));
-      } else {
-         $title = sprintf(__('%1$s: %2$s'), $title, $number);
-         $pdf->displayTitle($title);
-
-         foreach ($result as $data) {
-            $pdf->setColumnsSize(20,20,20,20,20);
-            $pdf->displayTitle("<i>".__('Type'), __('Date'), __('Duration'), __('Writer'),
-                                     __('Planning')."</i>");
-
-            $actiontime = Html::timestampToString($data['actiontime'], false);
-            $planification = '';
-            if (empty($data['begin'])) {
-               if (isset($data["state"])) {
-                  $planification = Planning::getState($data["state"])."<br>";
-               }
-            } else {
-               if (isset($data["state"]) && $data["state"]) {
-                  $planification = sprintf(__('%1$s: %2$s'), _x('item', 'State'),
-                                           Planning::getState($data["state"]));
-               }
-               $planification .= "<br>".sprintf(__('%1$s: %2$s'), __('Begin'),
-                                                Html::convDateTime($data["begin"]));
-               $planification .= "<br>".sprintf(__('%1$s: %2$s'), __('End'),
-                                                Html::convDateTime($data["end"]));
-               $planification .= "<br>".sprintf(__('%1$s: %2$s'), __('By'),
-                                                $dbu->getUserName($data["users_id_tech"]));
-                           }
-
-            if ($data['taskcategories_id']) {
-               $lib = Dropdown::getDropdownName('glpi_taskcategories', $data['taskcategories_id']);
-            } else {
-               $lib = '';
+                $pdf->displayLine(
+                    '</b>' . Toolbox::stripTags($lib),
+                    Html::convDateTime($data['date']),
+                    Html::timestampToString($data['actiontime'], 0),
+                    Toolbox::stripTags($dbu->getUserName($data['users_id'])),
+                    Toolbox::stripTags($planification),
+                    1,
+                );
+                $pdf->displayText(
+                    '<b><i>' . sprintf(__('%1$s: %2$s') . '</i></b>', __('Description'), ''),
+                    $data['content'],
+                    1,
+                );
             }
+        }
 
-            $pdf->displayLine("</b>".Toolbox::stripTags($lib),
-                              Html::convDateTime($data["date"]),
-                              Html::timestampToString($data["actiontime"], 0),
-                              Toolbox::stripTags($dbu->getUserName($data["users_id"])),
-                              Toolbox::stripTags($planification),1);
-            $pdf->displayText("<b><i>".sprintf(__('%1$s: %2$s')."</i></b>", __('Description'), ''),
-                                               $data["content"], 1);
-         }
-      }
-
-      $pdf->displaySpace();
-   }
+        $pdf->displaySpace();
+    }
 }

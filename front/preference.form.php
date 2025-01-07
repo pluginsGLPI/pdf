@@ -30,32 +30,31 @@
  *  --------------------------------------------------------------------------
  */
 
-include_once ("../../../inc/includes.php");
+include_once('../../../inc/includes.php');
 
 //Save user preferences
 if (isset($_POST['plugin_pdf_user_preferences_save'])
-    && isset($_POST["plugin_pdf_inventory_type"])) {
-
-   $DB->query("DELETE
+    && isset($_POST['plugin_pdf_inventory_type'])) {
+    $DB->query("DELETE
                FROM `glpi_plugin_pdf_preferences`
-               WHERE `users_id` ='" . $_SESSION["glpiID"] . "'
-                     AND `itemtype`='" . $_POST["plugin_pdf_inventory_type"]."'");
+               WHERE `users_id` ='" . $_SESSION['glpiID'] . "'
+                     AND `itemtype`='" . $_POST['plugin_pdf_inventory_type'] . "'");
 
-   if (isset($_POST['item'])) {
-      foreach ($_POST['item'] as $key => $val) {
-         $DB->query("INSERT INTO `glpi_plugin_pdf_preferences`
+    if (isset($_POST['item'])) {
+        foreach ($_POST['item'] as $key => $val) {
+            $DB->query("INSERT INTO `glpi_plugin_pdf_preferences`
                             (`id` ,`users_id` ,`itemtype` ,`tabref`)
-                     VALUES (NULL , '".$_SESSION["glpiID"]."',
-                             '".$_POST["plugin_pdf_inventory_type"]."', '$key')");
-      }
-   }
-   if (isset($_POST["page"]) && $_POST["page"]) {
-      $DB->query("INSERT INTO `glpi_plugin_pdf_preferences`
+                     VALUES (NULL , '" . $_SESSION['glpiID'] . "',
+                             '" . $_POST['plugin_pdf_inventory_type'] . "', '$key')");
+        }
+    }
+    if (isset($_POST['page']) && $_POST['page']) {
+        $DB->query("INSERT INTO `glpi_plugin_pdf_preferences`
                          (`id` ,`users_id` ,`itemtype` ,`tabref`)
-                  VALUES (NULL , '".$_SESSION["glpiID"]."',
-                          '".$_POST["plugin_pdf_inventory_type"]."', 'landscape')");
-   }
-   Html::back();
+                  VALUES (NULL , '" . $_SESSION['glpiID'] . "',
+                          '" . $_POST['plugin_pdf_inventory_type'] . "', 'landscape')");
+    }
+    Html::back();
 } else {
-   Html::redirect("../../../front/preference.php");
+    Html::redirect('../../../front/preference.php');
 }

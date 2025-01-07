@@ -30,94 +30,121 @@
  *  --------------------------------------------------------------------------
  */
 
-class PluginPdfCommonItilCost extends PluginPdfCommon {
+class PluginPdfCommonItilCost extends PluginPdfCommon
+{
+    public static $rightname = 'plugin_pdf';
 
+    public function __construct(CommonGLPI $obj = null)
+    {
+        $this->obj = ($obj ? $obj : new TicketCost());
+    }
 
-   static $rightname = "plugin_pdf";
+    public static function pdfForItem(PluginPdfSimplePDF $pdf, CommonDBTM $job)
+    {
+        global $DB;
 
+        $ID        = $job->getField('id');
+        $type      = $job->gettype();
+        $table     = 'glpi_' . (strtolower($type)) . 'costs';
+        $classname = $type . 'Cost';
 
-   function __construct(CommonGLPI $obj=NULL) {
+        $result = $DB->request($table, ['WHERE' => [$job->getForeignKeyField() => $ID],
+            'ORDER'                             => 'begin_date']);
 
-      $this->obj = ($obj ? $obj : new TicketCost());
-   }
+        $number = count($result);
 
+        if (!$number) {
+            $pdf->setColumnsSize(100);
+            $pdf->displayTitle(sprintf(
+                __('%1$s: %2$s'),
+                '<b>' . $classname::getTypeName(2) . '</b>',
+                __('No item to display'),
+            ));
+        } else {
+            $pdf->setColumnsSize(60, 20, 20);
+            $title = $classname::getTypeName($number);
+            if (!empty(PluginPdfConfig::currencyName())) {
+                $title = sprintf(
+                    __('%1$s (%2$s)'),
+                    $classname::getTypeName($number),
+                    PluginPdfConfig::currencyName(),
+                );
+            }
+            $pdf->displayTitle(
+                '<b>' . $title . '</b>',
+                '<b>' . __('Duration') . '</b>',
+                '<b>' . CommonITILObject::getActionTime($job->fields['actiontime']) . '</b>',
+            );
 
-   static function pdfForItem(PluginPdfSimplePDF $pdf, CommonDBTM $job) {
-      global $DB;
+            $pdf->setColumnsSize(20, 10, 10, 10, 9, 10, 10, 10, 10);
+            $pdf->setColumnsAlign(
+                'center',
+                'center',
+                'center',
+                'left',
+                'right',
+                'right',
+                'right',
+                'right',
+                'right',
+            );
+            $pdf->displayTitle(
+                '<b><i>' . __('Name') . '</i></b>',
+                '<b><i>' . __('Begin date') . '</i></b>',
+                '<b><i>' . __('End date') . '</i></b>',
+                '<b><i>' . __('Budget') . '</i></b>',
+                '<b><i>' . __('Duration') . '</i></b>',
+                '<b><i>' . __('Time cost') . '</i></b>',
+                '<b><i>' . __('Fixed cost') . '</i></b>',
+                '<b><i>' . __('Material cost') . '</i></b>',
+                '<b><i>' . __('Total cost') . '</i></b>',
+            );
 
-      $ID        = $job->getField('id');
-      $type      = $job->gettype();
-      $table     = 'glpi_'.(strtolower($type)).'costs';
-      $classname = $type.'Cost';
+            $total          = 0;
+            $total_time     = 0;
+            $total_costtime = 0;
+            $total_fixed    = 0;
+            $total_material = 0;
 
-      $result = $DB->request($table, ['WHERE'  => [$job->getForeignKeyField() => $ID],
-                                      'ORDER'  => 'begin_date']);
+            foreach ($result as $data) {
+                $cost = $classname::computeTotalCost(
+                    $data['actiontime'],
+                    $data['cost_time'],
+                    $data['cost_fixed'],
+                    $data['cost_material'],
+                );
+                $pdf->displayLine(
+                    $data['name'],
+                    Html::convDate($data['begin_date']),
+                    Html::convDate($data['end_date']),
+                    Toolbox::stripTags(Dropdown::getDropdownName(
+                        'glpi_budgets',
+                        $data['budgets_id'],
+                    )),
+                    CommonITILObject::getActionTime($data['actiontime']),
+                    PluginPdfConfig::formatNumber($data['cost_time']),
+                    PluginPdfConfig::formatNumber($data['cost_fixed']),
+                    PluginPdfConfig::formatNumber($data['cost_material']),
+                    PluginPdfConfig::formatNumber($cost),
+                );
 
-      $number = count($result);
-
-      if (!$number) {
-         $pdf->setColumnsSize(100);
-         $pdf->displayTitle(sprintf(__('%1$s: %2$s'), '<b>'.$classname::getTypeName(2).'</b>',
-                            __('No item to display')));
-      } else {
-         $pdf->setColumnsSize(60,20,20);
-         $title = $classname::getTypeName($number);
-         if (!empty(PluginPdfConfig::currencyName())) {
-            $title = sprintf(__('%1$s (%2$s)'),
-                             $classname::getTypeName($number), PluginPdfConfig::currencyName());
-         }
-         $pdf->displayTitle("<b>".$title."</b>",
-                            "<b>".__('Duration')."</b>",
-                            "<b>".CommonITILObject::getActionTime($job->fields['actiontime'])."</b>");
-
-         $pdf->setColumnsSize(20,10,10,10,9,10,10,10,10);
-         $pdf->setColumnsAlign('center','center','center','left', 'right','right','right',
-                               'right','right');
-         $pdf->displayTitle("<b><i>".__('Name')."</i></b>",
-               "<b><i>".__('Begin date')."</i></b>",
-               "<b><i>".__('End date')."</i></b>",
-               "<b><i>".__('Budget')."</i></b>",
-               "<b><i>".__('Duration')."</i></b>",
-               "<b><i>".__('Time cost')."</i></b>",
-               "<b><i>".__('Fixed cost')."</i></b>",
-               "<b><i>".__('Material cost')."</i></b>",
-               "<b><i>".__('Total cost')."</i></b>");
-
-         $total          = 0;
-         $total_time     = 0;
-         $total_costtime = 0;
-         $total_fixed    = 0;
-         $total_material = 0;
-
-         foreach ($result as $data) {
-            $cost = $classname::computeTotalCost($data['actiontime'], $data['cost_time'],
-                                           $data['cost_fixed'], $data['cost_material']);
-            $pdf->displayLine($data['name'],
-                              Html::convDate($data['begin_date']),
-                              Html::convDate($data['end_date']),
-                              Toolbox::stripTags(Dropdown::getDropdownName('glpi_budgets',
-                                                                           $data['budgets_id'])),
-                              CommonITILObject::getActionTime($data['actiontime']),
-                              PluginPdfConfig::formatNumber($data['cost_time']),
-                              PluginPdfConfig::formatNumber($data['cost_fixed']),
-                              PluginPdfConfig::formatNumber($data['cost_material']),
-                              PluginPdfConfig::formatNumber($cost));
-
-            $total_time     += $data['actiontime'];
-            $total_costtime += ($data['actiontime']*$data['cost_time']/HOUR_TIMESTAMP);
-            $total_fixed    += $data['cost_fixed'];
-            $total_material += $data['cost_material'];
-            $total          += $cost;
-         }
-         $pdf->setColumnsSize(52,8,10,10,10,10);
-         $pdf->setColumnsAlign('right','right','right','right','right','right');
-         $pdf->displayLine('<b>'.__('Total').'</b>',
-                           '<b>'.CommonITILObject::getActionTime($total_time).'</b>',
-                           '<b>'.PluginPdfConfig::formatNumber($total_costtime).'</b>',
-                           '<b>'.PluginPdfConfig::formatNumber($total_fixed).'</b>',
-                           '<b>'.PluginPdfConfig::formatNumber($total_material).'</b>',
-                           '<b>'.PluginPdfConfig::formatNumber($total).'</b>');
-      }
-      $pdf->displaySpace();
-   }
+                $total_time     += $data['actiontime'];
+                $total_costtime += ($data['actiontime'] * $data['cost_time'] / HOUR_TIMESTAMP);
+                $total_fixed    += $data['cost_fixed'];
+                $total_material += $data['cost_material'];
+                $total          += $cost;
+            }
+            $pdf->setColumnsSize(52, 8, 10, 10, 10, 10);
+            $pdf->setColumnsAlign('right', 'right', 'right', 'right', 'right', 'right');
+            $pdf->displayLine(
+                '<b>' . __('Total') . '</b>',
+                '<b>' . CommonITILObject::getActionTime($total_time) . '</b>',
+                '<b>' . PluginPdfConfig::formatNumber($total_costtime) . '</b>',
+                '<b>' . PluginPdfConfig::formatNumber($total_fixed) . '</b>',
+                '<b>' . PluginPdfConfig::formatNumber($total_material) . '</b>',
+                '<b>' . PluginPdfConfig::formatNumber($total) . '</b>',
+            );
+        }
+        $pdf->displaySpace();
+    }
 }

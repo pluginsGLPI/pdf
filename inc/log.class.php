@@ -30,49 +30,57 @@
  *  --------------------------------------------------------------------------
  */
 
-class PluginPdfLog extends PluginPdfCommon {
+class PluginPdfLog extends PluginPdfCommon
+{
+    public static $rightname = 'plugin_pdf';
 
+    public function __construct(CommonGLPI $obj = null)
+    {
+        $this->obj = ($obj ? $obj : new Log());
+    }
 
-   static $rightname = "plugin_pdf";
+    public static function pdfForItem(PluginPdfSimplePDF $pdf, CommonDBTM $item)
+    {
+        // Get the Full history for the item (really a good idea ?, should we limit this)
+        $changes = Log::getHistoryData($item);
+        $number  = count($changes);
 
+        $pdf->setColumnsSize(100);
+        $title = '<b>' . __('Historical') . '</b>';
 
-   function __construct(CommonGLPI $obj=NULL) {
-      $this->obj = ($obj ? $obj : new Log());
-   }
-
-
-   static function pdfForItem(PluginPdfSimplePDF $pdf, CommonDBTM $item) {
-
-      // Get the Full history for the item (really a good idea ?, should we limit this)
-      $changes = Log::getHistoryData($item);
-      $number  = count($changes);
-
-      $pdf->setColumnsSize(100);
-      $title = "<b>".__('Historical')."</b>";
-
-      if (!$number) {
-         $pdf->displayTitle(sprintf(__('%1$s: %2$s'), $title, __('No item to display')));
-      } else {
-         if ($number > $_SESSION['glpilist_limit']) {
-            $title = sprintf(__('%1$s: %2$s'), $title, $_SESSION['glpilist_limit'].' / '.$number);
-         } else {
-            $title = sprintf(__('%1$s: %2$s'), $title, $number);
-         }
-         $pdf->displayTitle($title);
-
-         $pdf->setColumnsSize(10,15,24,11,40);
-         $pdf->displayTitle('<b><i>'.__('ID'), __('Date'), __('User'), __('Field'),
-                            _x('name', 'Update').'</i></b>');
-
-         $tot = 0;
-         foreach ($changes as $data) {
-            if ($data['display_history'] && ($tot < $_SESSION['glpilist_limit'])) {
-               $pdf->displayLine($data['id'], $data['date_mod'], $data['user_name'], $data['field'],
-                                 Toolbox::stripTags($data['change']));
-               $tot++;
+        if (!$number) {
+            $pdf->displayTitle(sprintf(__('%1$s: %2$s'), $title, __('No item to display')));
+        } else {
+            if ($number > $_SESSION['glpilist_limit']) {
+                $title = sprintf(__('%1$s: %2$s'), $title, $_SESSION['glpilist_limit'] . ' / ' . $number);
+            } else {
+                $title = sprintf(__('%1$s: %2$s'), $title, $number);
             }
-         } // Each log
-      }
-      $pdf->displaySpace();
-   }
+            $pdf->displayTitle($title);
+
+            $pdf->setColumnsSize(10, 15, 24, 11, 40);
+            $pdf->displayTitle(
+                '<b><i>' . __('ID'),
+                __('Date'),
+                __('User'),
+                __('Field'),
+                _x('name', 'Update') . '</i></b>',
+            );
+
+            $tot = 0;
+            foreach ($changes as $data) {
+                if ($data['display_history'] && ($tot < $_SESSION['glpilist_limit'])) {
+                    $pdf->displayLine(
+                        $data['id'],
+                        $data['date_mod'],
+                        $data['user_name'],
+                        $data['field'],
+                        Toolbox::stripTags($data['change']),
+                    );
+                    $tot++;
+                }
+            } // Each log
+        }
+        $pdf->displaySpace();
+    }
 }

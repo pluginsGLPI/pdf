@@ -30,55 +30,64 @@
  *  --------------------------------------------------------------------------
  */
 
-class PluginPdfComputerAntivirus extends PluginPdfCommon {
+class PluginPdfComputerAntivirus extends PluginPdfCommon
+{
+    public static $rightname = 'plugin_pdf';
 
-   static $rightname = "plugin_pdf";
+    public function __construct(CommonGLPI $obj = null)
+    {
+        $this->obj = ($obj ? $obj : new ComputerAntivirus());
+    }
 
+    public static function pdfForComputer(PluginPdfSimplePDF $pdf, Computer $item)
+    {
+        global $DB;
 
-   function __construct(CommonGLPI $obj=NULL) {
-      $this->obj = ($obj ? $obj : new ComputerAntivirus());
-   }
+        $ID = $item->getField('id');
 
+        $result = $DB->request('glpi_computerantiviruses', ['computers_id' => $ID,
+            'is_deleted'                                                   => 0]);
+        $number = count($result);
 
-   static function pdfForComputer(PluginPdfSimplePDF $pdf, Computer $item) {
-      global $DB;
+        $pdf->setColumnsSize(100);
+        $title = '<b>' . __('Antivirus') . '</b>';
 
-      $ID = $item->getField('id');
+        if (!$number) {
+            $pdf->displayTitle(sprintf(__('%1$s: %2$s'), $title, __('No item to display')));
+        } else {
+            if ($number > $_SESSION['glpilist_limit']) {
+                $title = sprintf(__('%1$s: %2$s'), $title, $_SESSION['glpilist_limit'] . ' / ' . $number);
+            } else {
+                $title = sprintf(__('%1$s: %2$s'), $title, $number);
+            }
+            $pdf->displayTitle($title);
 
-      $result = $DB->request('glpi_computerantiviruses', ['computers_id' => $ID,
-                                                          'is_deleted'   => 0]);
-      $number = count($result);
+            $pdf->setColumnsSize(25, 20, 15, 15, 5, 5, 15);
+            $pdf->displayTitle(
+                __('Name'),
+                __('Manufacturer'),
+                __('Antivirus version'),
+                __('Signature database version'),
+                __('Active'),
+                __('Up to date'),
+                __('Expiration date'),
+            );
 
-      $pdf->setColumnsSize(100);
-      $title = "<b>".__('Antivirus')."</b>";
-
-      if (!$number) {
-         $pdf->displayTitle(sprintf(__('%1$s: %2$s'), $title, __('No item to display')));
-      } else {
-         if ($number > $_SESSION['glpilist_limit']) {
-            $title = sprintf(__('%1$s: %2$s'), $title, $_SESSION['glpilist_limit'].' / '.$number);
-         } else {
-                  $title = sprintf(__('%1$s: %2$s'), $title, $number);
-         }
-         $pdf->displayTitle($title);
-
-         $pdf->setColumnsSize(25,20,15,15,5,5,15);
-         $pdf->displayTitle(__('Name'), __('Manufacturer'), __('Antivirus version'),
-                            __('Signature database version'), __('Active'),__('Up to date'),
-                            __('Expiration date'));
-
-         $antivirus = new ComputerAntivirus();
-         foreach($result as $data) {
-            $pdf->displayLine($data['name'],
-                              Toolbox::stripTags(Dropdown::getDropdownName('glpi_manufacturers',
-                                                                           $data['manufacturers_id'])),
-                              $data['antivirus_version'],
-                              $data['signature_version'],
-                              Dropdown::getYesNo($data['is_active']),
-                              Dropdown::getYesNo($data['is_uptodate']),
-                              Html::convDate($data['date_expiration']));
-         }
-      }
-
-   }
+            $antivirus = new ComputerAntivirus();
+            foreach ($result as $data) {
+                $pdf->displayLine(
+                    $data['name'],
+                    Toolbox::stripTags(Dropdown::getDropdownName(
+                        'glpi_manufacturers',
+                        $data['manufacturers_id'],
+                    )),
+                    $data['antivirus_version'],
+                    $data['signature_version'],
+                    Dropdown::getYesNo($data['is_active']),
+                    Dropdown::getYesNo($data['is_uptodate']),
+                    Html::convDate($data['date_expiration']),
+                );
+            }
+        }
+    }
 }

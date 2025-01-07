@@ -30,66 +30,78 @@
  *  --------------------------------------------------------------------------
  */
 
-class PluginPdfITILSolution extends PluginPdfCommon {
+class PluginPdfITILSolution extends PluginPdfCommon
+{
+    public static $rightname = 'plugin_pdf';
 
+    public function __construct(CommonGLPI $obj = null)
+    {
+        $this->obj = ($obj ? $obj : new ITILSolution());
+    }
 
-   static $rightname = "plugin_pdf";
+    public static function pdfForItem(PluginPdfSimplePDF $pdf, CommonDBTM $item)
+    {
+        global $DB;
 
+        $dbu = new DbUtils();
 
-   function __construct(CommonGLPI $obj=NULL) {
-      $this->obj = ($obj ? $obj : new ITILSolution());
-   }
+        $pdf->setColumnsSize(100);
 
+        $soluce = $DB->request(
+            'glpi_itilsolutions',
+            ['itemtype'    => $item->getType(),
+                'items_id' => $item->fields['id']],
+        );
 
-   static function pdfForItem(PluginPdfSimplePDF $pdf, CommonDBTM $item){
-      global $DB;
+        $number = count($soluce);
 
-      $dbu = new DbUtils();
+        $title = '<b>' . __('Solution') . '</b>';
+        if (!$number) {
+            $pdf->displayTitle(sprintf(__('%1$s: %2$s'), $title, __('No item to display')));
+        } else {
+            $title = sprintf(__('%1$s: %2$s'), $title, $number);
+            $pdf->displayTitle($title);
+            foreach ($soluce as $row) {
+                if ($row['solutiontypes_id']) {
+                    $title = Toolbox::stripTags(Dropdown::getDropdownName(
+                        'glpi_solutiontypes',
+                        $row['solutiontypes_id'],
+                    ));
+                } else {
+                    $title = __('Solution');
+                }
+                $sol = Toolbox::stripTags(Glpi\Toolbox\Sanitizer::unsanitize(html_entity_decode(
+                    $row['content'],
+                    ENT_QUOTES,
+                    'UTF-8',
+                )));
 
-      $pdf->setColumnsSize(100);
-
-      $soluce = $DB->request('glpi_itilsolutions',
-                             ['itemtype'   => $item->getType(),
-                              'items_id'   => $item->fields['id']]);
-
-      $number = count($soluce);
-
-      $title = '<b>'.__('Solution').'</b>';
-      if (!$number) {
-         $pdf->displayTitle(sprintf(__('%1$s: %2$s'), $title, __('No item to display')));
-      } else {
-         $title = sprintf(__('%1$s: %2$s'), $title, $number);
-         $pdf->displayTitle($title);
-         foreach ($soluce as $row) {
-            if ($row['solutiontypes_id']) {
-               $title = Toolbox::stripTags(Dropdown::getDropdownName('glpi_solutiontypes',
-                                                                     $row['solutiontypes_id']));
-            } else {
-               $title = __('Solution');
+                if ($row['status'] == 3) {
+                    $text = __('Soluce approved on ', 'pdf');
+                } elseif ($row['status'] == 4) {
+                    $text = __('Soluce refused on ', 'pdf');
+                } else {
+                    $text = $textapprove = '';
+                }
+                if (isset($row['date_approval']) || isset($row['users_id_approval'])) {
+                    $textapprove = '<br /><br /><br /><i>' .
+                                    sprintf(
+                                        __('%1$s %2$s'),
+                                        $text,
+                                        Html::convDateTime($row['date_approval']),
+                                    ) . '&nbsp;' .
+                                    sprintf(
+                                        __('%1$s %2$s'),
+                                        __('By'),
+                                        Toolbox::stripTags($dbu->getUserName($row['users_id_approval'])),
+                                    )
+                                    . '</i>';
+                    $pdf->displayText('<b><i>' . sprintf(__('%1$s: %2$s'), $title . '</i></b>', ''), $sol .
+                                      $textapprove);
+                }
             }
-            $sol = Toolbox::stripTags(Glpi\Toolbox\Sanitizer::unsanitize(html_entity_decode($row['content'],
-                                                                         ENT_QUOTES, "UTF-8")));
+        }
 
-            if ($row['status'] == 3) {
-               $text = __('Soluce approved on ', 'pdf');
-            } else if ($row['status'] == 4) {
-               $text = __('Soluce refused on ', 'pdf');
-            } else {
-               $text = $textapprove = '';
-            }
-            if (isset($row['date_approval']) || isset($row["users_id_approval"])) {
-               $textapprove = "<br /><br /><br /><i>".
-                               sprintf(__('%1$s %2$s'), $text,
-                                       Html::convDateTime($row['date_approval']))."&nbsp;".
-                               sprintf(__('%1$s %2$s'), __('By'),
-                                       Toolbox::stripTags($dbu->getUserName($row["users_id_approval"])))
-                               ."</i>";
-               $pdf->displayText("<b><i>".sprintf(__('%1$s: %2$s'), $title."</i></b>", ''), $sol.
-                                 $textapprove);
-            }
-         }
-      }
-
-      $pdf->displaySpace();
-   }
+        $pdf->displaySpace();
+    }
 }

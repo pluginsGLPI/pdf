@@ -30,115 +30,148 @@
  *  --------------------------------------------------------------------------
  */
 
-class PluginPdfCartridgeItem extends PluginPdfCommon {
+class PluginPdfCartridgeItem extends PluginPdfCommon
+{
+    public static $rightname = 'plugin_pdf';
+
+    public function __construct(CommonGLPI $obj = null)
+    {
+        $this->obj = ($obj ? $obj : new CartridgeItem());
+    }
+
+    public function defineAllTabsPDF($options = [])
+    {
+        $onglets = parent::defineAllTabsPDF($options);
+
+        return $onglets;
+    }
+
+    public static function pdfMain(PluginPdfSimplePDF $pdf, CartridgeItem $cartitem)
+    {
+        $dbu = new DbUtils();
+
+        PluginPdfCommon::mainTitle($pdf, $cartitem);
+
+        $pdf->displayLine(
+            '<b><i>' . sprintf(__('%1$s: %2$s'), __('Name') . '</i></b>', $cartitem->fields['name']),
+            '<b><i>' . sprintf(
+                __('%1$s: %2$s'),
+                __('Location') . '</i></b>',
+                Toolbox::stripTags(Dropdown::getDropdownName(
+                    'glpi_locations',
+                    $cartitem->fields['locations_id'],
+                )),
+            ),
+        );
+        $pdf->displayLine(
+            '<b><i>' . sprintf(
+                __('%1$s: %2$s'),
+                __('Type') . '</i></b>',
+                Toolbox::stripTags(Dropdown::getDropdownName(
+                    'glpi_cartridgeitemtypes',
+                    $cartitem->fields['cartridgeitemtypes_id'],
+                )),
+            ),
+            '<b><i>' . sprintf(__('%1$s: %2$s'), __('Reference') . '</i></b>', $cartitem->fields['ref']),
+        );
 
 
-   static $rightname = "plugin_pdf";
+        $pdf->displayLine(
+            '<b><i>' . sprintf(
+                __('%1$s: %2$s'),
+                __('Technician in charge of the hardware') . '</i></b>',
+                $dbu->getUserName($cartitem->fields['users_id_tech']),
+            ),
+            '<b><i>' . sprintf(
+                __('%1$s: %2$s'),
+                __('Manufacturer') . '</i></b>',
+                Toolbox::stripTags(Dropdown::getDropdownName(
+                    'glpi_manufacturers',
+                    $cartitem->fields['manufacturers_id'],
+                )),
+            ),
+        );
+        $pdf->displayLine(
+            '<b><i>' . sprintf(
+                __('%1$s: %2$s'),
+                __('Group in charge of the hardware') . '</i></b>',
+                Dropdown::getDropdownName(
+                    'glpi_groups',
+                    $cartitem->fields['groups_id_tech'],
+                ),
+            ),
+        );
 
+        $pdf->displayLine(
+            '<b><i>' . sprintf(
+                __('%1$s: %2$s'),
+                __('Stock location') . '</i></b>',
+                Dropdown::getDropdownName(
+                    'glpi_locations',
+                    $cartitem->fields['locations_id'],
+                ),
+            ),
+            '<b><i>' . sprintf(
+                __('%1$s: %2$s'),
+                __('Alert threshold') . '</i></b>',
+                $cartitem->getField('alarm_threshold'),
+            ),
+        );
 
-   function __construct(CommonGLPI $obj=NULL) {
-      $this->obj = ($obj ? $obj : new CartridgeItem());
-   }
+        PluginPdfCommon::mainLine($pdf, $cartitem, 'comment');
 
+        $pdf->displaySpace();
+    }
 
-   function defineAllTabsPDF($options=[]) {
+    public static function displayTabContentForPDF(PluginPdfSimplePDF $pdf, CommonGLPI $item, $tab)
+    {
+        switch ($tab) {
+            case 'Cartridge$1':
+                PluginPdfCartridge::pdfForCartridgeItem($pdf, $item, 'new');
+                PluginPdfCartridge::pdfForCartridgeItem($pdf, $item, 'used');
+                PluginPdfCartridge::pdfForCartridgeItem($pdf, $item, 'old');
+                break;
 
-      $onglets = parent::defineAllTabsPDF($options);
-      return $onglets;
-   }
+            case 'CartridgeItem_PrinterModel$1':
+                self::pdfForPrinterModel($pdf, $item);
+                break;
 
+            default:
+                return false;
+        }
 
-   static function pdfMain(PluginPdfSimplePDF $pdf, CartridgeItem $cartitem){
+        return true;
+    }
 
-      $dbu = new DbUtils();
-
-      PluginPdfCommon::mainTitle($pdf, $cartitem);
-
-      $pdf->displayLine(
-            '<b><i>'.sprintf(__('%1$s: %2$s'), __('Name').'</i></b>', $cartitem->fields['name']),
-            '<b><i>'.sprintf(__('%1$s: %2$s'), __('Location').'</i></b>',
-                             Toolbox::stripTags(Dropdown::getDropdownName('glpi_locations',
-                                                              $cartitem->fields['locations_id']))));
-      $pdf->displayLine(
-            '<b><i>'.sprintf(__('%1$s: %2$s'), __('Type').'</i></b>',
-                             Toolbox::stripTags(Dropdown::getDropdownName('glpi_cartridgeitemtypes',
-                                                      $cartitem->fields['cartridgeitemtypes_id']))),
-            '<b><i>'.sprintf(__('%1$s: %2$s'), __('Reference').'</i></b>', $cartitem->fields['ref']));
-
-
-      $pdf->displayLine(
-            '<b><i>'.sprintf(__('%1$s: %2$s'), __('Technician in charge of the hardware').'</i></b>',
-                                              $dbu->getUserName($cartitem->fields['users_id_tech'])),
-            '<b><i>'.sprintf(__('%1$s: %2$s'), __('Manufacturer').'</i></b>',
-                             Toolbox::stripTags(Dropdown::getDropdownName('glpi_manufacturers',
-                                                           $cartitem->fields['manufacturers_id']))));
-      $pdf->displayLine(
-            '<b><i>'.sprintf(__('%1$s: %2$s'),  __('Group in charge of the hardware').'</i></b>',
-                             Dropdown::getDropdownName('glpi_groups',
-                                                       $cartitem->fields['groups_id_tech'])));
-
-      $pdf->displayLine(
-            '<b><i>'.sprintf(__('%1$s: %2$s'), __('Stock location').'</i></b>',
-                             Dropdown::getDropdownName('glpi_locations',
-                                                       $cartitem->fields['locations_id'])),
-            '<b><i>'.sprintf(__('%1$s: %2$s'),  __('Alert threshold').'</i></b>',
-                             $cartitem->getField('alarm_threshold')));
-
-      PluginPdfCommon::mainLine($pdf, $cartitem, 'comment');
-
-      $pdf->displaySpace();
-   }
-
-
-   static function displayTabContentForPDF(PluginPdfSimplePDF $pdf, CommonGLPI $item, $tab) {
-
-      switch ($tab) {
-         case 'Cartridge$1' :
-            PluginPdfCartridge::pdfForCartridgeItem($pdf, $item, 'new');
-            PluginPdfCartridge::pdfForCartridgeItem($pdf, $item, 'used');
-            PluginPdfCartridge::pdfForCartridgeItem($pdf, $item, 'old');
-            break;
-
-         case 'CartridgeItem_PrinterModel$1' :
-            self::pdfForPrinterModel($pdf, $item);
-            break;
-
-         default :
+    public static function pdfForPrinterModel(PluginPdfSimplePDF $pdf, CartridgeItem $item)
+    {
+        $instID = $item->getField('id');
+        if (!$item->can($instID, READ)) {
             return false;
-      }
-      return true;
-   }
+        }
 
+        $iterator = CartridgeItem_PrinterModel::getListForItem($item);
+        $number   = count($iterator);
 
-   static function pdfForPrinterModel(PluginPdfSimplePDF $pdf, CartridgeItem $item) {
+        foreach ($iterator as $data) {
+            $datas[$data['linkid']] = $data;
+        }
 
-      $instID = $item->getField('id');
-      if (!$item->can($instID, READ)) {
-         return false;
-      }
+        $pdf->setColumnsSize(100);
+        $title = '<b>' . _n('Printer model', 'Printer models', $number) . '</b>';
+        if (!$number) {
+            $pdf->displayTitle(_('No printel model associated', 'pdf'));
+        } else {
+            if ($number > $_SESSION['glpilist_limit']) {
+                $title = sprintf(__('%1$s: %2$s'), $title, $_SESSION['glpilist_limit'] . ' / ' . $number);
+            } else {
+                $title = sprintf(__('%1$s: %2$s'), $title, $number);
+            }
+            $pdf->displayTitle($title);
 
-      $iterator = CartridgeItem_PrinterModel::getListForItem($item);
-      $number = count($iterator);
-
-      foreach ($iterator as $data) {
-         $datas[$data["linkid"]]  = $data;
-      }
-
-      $pdf->setColumnsSize(100);
-      $title = '<b>'._n('Printer model', 'Printer models', $number).'</b>';
-      if (!$number) {
-         $pdf->displayTitle(_('No printel model associated', 'pdf'));
-      } else {
-         if ($number > $_SESSION['glpilist_limit']) {
-            $title = sprintf(__('%1$s: %2$s'), $title, $_SESSION['glpilist_limit'].' / '.$number);
-         } else {
-            $title = sprintf(__('%1$s: %2$s'), $title, $number);
-         }
-         $pdf->displayTitle($title);
-
-         foreach ($datas as $data) {
-            $pdf->displayLine($data['name']);
-         }
-      }
-   }
+            foreach ($datas as $data) {
+                $pdf->displayLine($data['name']);
+            }
+        }
+    }
 }

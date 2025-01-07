@@ -30,65 +30,83 @@
  *  --------------------------------------------------------------------------
  */
 
-class PluginPdfDocument extends PluginPdfCommon {
+class PluginPdfDocument extends PluginPdfCommon
+{
+    public static $rightname = 'plugin_pdf';
 
-   static $rightname = "plugin_pdf";
+    public function __construct(CommonGLPI $obj = null)
+    {
+        $this->obj = ($obj ? $obj : new Document());
+    }
 
+    public static function pdfForItem(PluginPdfSimplePDF $pdf, CommonDBTM $item)
+    {
+        global $DB;
 
-   function __construct(CommonGLPI $obj=NULL) {
-      $this->obj = ($obj ? $obj : new Document());
-   }
+        $ID   = $item->getField('id');
+        $type = get_class($item);
 
+        $result = $DB->request(
+            'glpi_documents_items',
+            ['SELECT' => ['glpi_documents_items.id',
+                'glpi_documents_items.date_mod',
+                'glpi_documents.*', 'glpi_entities.id',
+                'completename'],
+                'LEFT JOIN' => ['glpi_documents'
+                                  => ['FKEY' => ['glpi_documents_items' => 'documents_id',
+                                      'glpi_documents'                  => 'id']],
+                    'glpi_entities'
+                      => ['FKEY' => ['glpi_documents' => 'entities_id',
+                          'glpi_entities'             => 'id']]],
+                'WHERE' => ['items_id' => $ID,
+                    'itemtype'         => $type]],
+            true,
+        );
 
-   static function pdfForItem(PluginPdfSimplePDF $pdf, CommonDBTM $item){
-      global $DB;
+        $number = count($result);
 
-      $ID   = $item->getField('id');
-      $type = get_class($item);
+        $pdf->setColumnsSize(100);
+        $title = '<b>' . _n('Document', 'Documents', $number) . '</b>';
+        if (!$number) {
+            $pdf->displayTitle(sprintf(__('%1$s: %2$s'), $title, __('No item to display')));
+        } else {
+            if ($number > $_SESSION['glpilist_limit']) {
+                $title = sprintf(__('%1$s: %2$s'), $title, $_SESSION['glpilist_limit'] . ' / ' . $number);
+            } else {
+                $title = sprintf(__('%1$s: %2$s'), $title, $number);
+            }
+            $pdf->displayTitle($title);
 
-      $result = $DB->request('glpi_documents_items',
-                             ['SELECT'    => ['glpi_documents_items.id',
-                                              'glpi_documents_items.date_mod',
-                                              'glpi_documents.*', 'glpi_entities.id',
-                                              'completename'],
-                              'LEFT JOIN' => ['glpi_documents'
-                                                => ['FKEY' => ['glpi_documents_items' => 'documents_id',
-                                                               'glpi_documents'       => 'id']],
-                                              'glpi_entities'
-                                                => ['FKEY' => ['glpi_documents' => 'entities_id',
-                                                               'glpi_entities'  => 'id']]],
-                              'WHERE'     => ['items_id' => $ID,
-                                              'itemtype' => $type]], true);
-
-       $number = count($result);
-
-      $pdf->setColumnsSize(100);
-      $title = '<b>'._n('Document', 'Documents', $number).'</b>';
-      if (!$number) {
-         $pdf->displayTitle(sprintf(__('%1$s: %2$s'), $title, __('No item to display')));
-      } else {
-         if ($number > $_SESSION['glpilist_limit']) {
-            $title = sprintf(__('%1$s: %2$s'), $title, $_SESSION['glpilist_limit'].' / '.$number);
-         } else {
-            $title = sprintf(__('%1$s: %2$s'), $title, $number);
-         }
-         $pdf->displayTitle($title);
-
-         $pdf->setColumnsSize(20,15,10,10,10,8,20,7);
-         $pdf->displayTitle(__('Name'), __('Entity'), __('File'), __('Web link'), __('Heading'),
-                            __('MIME type'), __('Tag'), __('Date'));
-         foreach ($result as $data) {
-            if (empty($data["link"])) {
-                $data["link"] = '';   
-            }            
-            $pdf->displayLine($data["name"], $data['completename'], basename($data["filename"]),
-                              $data["link"], Dropdown::getDropdownName("glpi_documentcategories",
-                                                                       $data["documentcategories_id"]),
-                              $data["mime"],
-                              !empty($data["tag"]) ? Document::getImageTag($data["tag"]) : '',
-                              Html::convDateTime($data["date_mod"]));
-         }
-      }
-      $pdf->displaySpace();
-   }
+            $pdf->setColumnsSize(20, 15, 10, 10, 10, 8, 20, 7);
+            $pdf->displayTitle(
+                __('Name'),
+                __('Entity'),
+                __('File'),
+                __('Web link'),
+                __('Heading'),
+                __('MIME type'),
+                __('Tag'),
+                __('Date'),
+            );
+            foreach ($result as $data) {
+                if (empty($data['link'])) {
+                    $data['link'] = '';
+                }
+                $pdf->displayLine(
+                    $data['name'],
+                    $data['completename'],
+                    basename($data['filename']),
+                    $data['link'],
+                    Dropdown::getDropdownName(
+                        'glpi_documentcategories',
+                        $data['documentcategories_id'],
+                    ),
+                    $data['mime'],
+                    !empty($data['tag']) ? Document::getImageTag($data['tag']) : '',
+                    Html::convDateTime($data['date_mod']),
+                );
+            }
+        }
+        $pdf->displaySpace();
+    }
 }

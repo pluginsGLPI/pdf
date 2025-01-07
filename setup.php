@@ -39,17 +39,17 @@ function plugin_init_pdf()
 
     $PLUGIN_HOOKS['csrf_compliant']['pdf'] = true;
 
-   // manage autoload of tcppdf (glpi core now use mdpdf)
-    include_once(Plugin::getPhpDir('pdf') . "/vendor/autoload.php");
+    // manage autoload of tcppdf (glpi core now use mdpdf)
+    include_once(Plugin::getPhpDir('pdf') . '/vendor/autoload.php');
 
     Plugin::registerClass('PluginPdfConfig', ['addtabon' => 'Config']);
     $PLUGIN_HOOKS['config_page']['pdf'] = 'front/config.form.php';
 
-    include_once(Plugin::getPhpDir('pdf') . "/inc/config.class.php");
+    include_once(Plugin::getPhpDir('pdf') . '/inc/config.class.php');
     $PDF_DEVICES = PluginPdfConfig::currency();
 
     Plugin::registerClass('PluginPdfProfile', ['addtabon' => 'Profile']);
-    $PLUGIN_HOOKS['change_profile']['pdf'] = ['PluginPdfProfile','initProfile'];
+    $PLUGIN_HOOKS['change_profile']['pdf'] = ['PluginPdfProfile', 'initProfile'];
 
     if (Session::haveRight('plugin_pdf', READ)) {
         Plugin::registerClass('PluginPdfPreference', ['addtabon' => 'Preference']);
@@ -63,56 +63,55 @@ function plugin_init_pdf()
     }
 
     $plugin = new Plugin();
-    if ($plugin->isActivated("datainjection")) {
+    if ($plugin->isActivated('datainjection')) {
         $PLUGIN_HOOKS['menu_entry']['pdf'] = 'front/preference.form.php';
-    } elseif ($plugin->isActivated("geststock")) {
+    } elseif ($plugin->isActivated('geststock')) {
         $PLUGIN_HOOKS['menu_entry']['pdf'] = 'front/preference.form.php';
     }
 
 
-      // Define the type for which we know how to generate PDF :
-      $PLUGIN_HOOKS['plugin_pdf']['Appliance']        = 'PluginPdfAppliance';
-      $PLUGIN_HOOKS['plugin_pdf']['CartridgeItem']    = 'PluginPdfCartridgeItem';
-      $PLUGIN_HOOKS['plugin_pdf']['ConsumableItem']   = 'PluginPdfConsumableItem';
-      $PLUGIN_HOOKS['plugin_pdf']['Change']           = 'PluginPdfChange';
-      $PLUGIN_HOOKS['plugin_pdf']['Computer']         = 'PluginPdfComputer';
-      $PLUGIN_HOOKS['plugin_pdf']['Contract']         = 'PluginPdfContract';
-      $PLUGIN_HOOKS['plugin_pdf']['Group']            = 'PluginPdfGroup';
-      $PLUGIN_HOOKS['plugin_pdf']['KnowbaseItem']     = 'PluginPdfKnowbaseItem';
-      $PLUGIN_HOOKS['plugin_pdf']['Monitor']          = 'PluginPdfMonitor';
-      $PLUGIN_HOOKS['plugin_pdf']['NetworkEquipment'] = 'PluginPdfNetworkEquipment';
-      $PLUGIN_HOOKS['plugin_pdf']['Peripheral']       = 'PluginPdfPeripheral';
-      $PLUGIN_HOOKS['plugin_pdf']['Phone']            = 'PluginPdfPhone';
-      $PLUGIN_HOOKS['plugin_pdf']['Printer']          = 'PluginPdfPrinter';
-      $PLUGIN_HOOKS['plugin_pdf']['Problem']          = 'PluginPdfProblem';
-      $PLUGIN_HOOKS['plugin_pdf']['Software']         = 'PluginPdfSoftware';
-      $PLUGIN_HOOKS['plugin_pdf']['SoftwareLicense']  = 'PluginPdfSoftwareLicense';
-      $PLUGIN_HOOKS['plugin_pdf']['SoftwareVersion']  = 'PluginPdfSoftwareVersion';
-      $PLUGIN_HOOKS['plugin_pdf']['Ticket']           = 'PluginPdfTicket';
-      $PLUGIN_HOOKS['plugin_pdf']['User']             = 'PluginPdfUser';
+    // Define the type for which we know how to generate PDF :
+    $PLUGIN_HOOKS['plugin_pdf']['Appliance']        = 'PluginPdfAppliance';
+    $PLUGIN_HOOKS['plugin_pdf']['CartridgeItem']    = 'PluginPdfCartridgeItem';
+    $PLUGIN_HOOKS['plugin_pdf']['ConsumableItem']   = 'PluginPdfConsumableItem';
+    $PLUGIN_HOOKS['plugin_pdf']['Change']           = 'PluginPdfChange';
+    $PLUGIN_HOOKS['plugin_pdf']['Computer']         = 'PluginPdfComputer';
+    $PLUGIN_HOOKS['plugin_pdf']['Contract']         = 'PluginPdfContract';
+    $PLUGIN_HOOKS['plugin_pdf']['Group']            = 'PluginPdfGroup';
+    $PLUGIN_HOOKS['plugin_pdf']['KnowbaseItem']     = 'PluginPdfKnowbaseItem';
+    $PLUGIN_HOOKS['plugin_pdf']['Monitor']          = 'PluginPdfMonitor';
+    $PLUGIN_HOOKS['plugin_pdf']['NetworkEquipment'] = 'PluginPdfNetworkEquipment';
+    $PLUGIN_HOOKS['plugin_pdf']['Peripheral']       = 'PluginPdfPeripheral';
+    $PLUGIN_HOOKS['plugin_pdf']['Phone']            = 'PluginPdfPhone';
+    $PLUGIN_HOOKS['plugin_pdf']['Printer']          = 'PluginPdfPrinter';
+    $PLUGIN_HOOKS['plugin_pdf']['Problem']          = 'PluginPdfProblem';
+    $PLUGIN_HOOKS['plugin_pdf']['Software']         = 'PluginPdfSoftware';
+    $PLUGIN_HOOKS['plugin_pdf']['SoftwareLicense']  = 'PluginPdfSoftwareLicense';
+    $PLUGIN_HOOKS['plugin_pdf']['SoftwareVersion']  = 'PluginPdfSoftwareVersion';
+    $PLUGIN_HOOKS['plugin_pdf']['Ticket']           = 'PluginPdfTicket';
+    $PLUGIN_HOOKS['plugin_pdf']['User']             = 'PluginPdfUser';
 
 
 
-      // End init, when all types are registered by all plugins
-      $PLUGIN_HOOKS['post_init']['pdf'] = 'plugin_pdf_postinit';
+    // End init, when all types are registered by all plugins
+    $PLUGIN_HOOKS['post_init']['pdf'] = 'plugin_pdf_postinit';
 
-      // Integration with WebService plugin
-      $PLUGIN_HOOKS['webservices']['pdf'] = 'plugin_pdf_registerMethods';
+    // Integration with WebService plugin
+    $PLUGIN_HOOKS['webservices']['pdf'] = 'plugin_pdf_registerMethods';
 }
 
 
 function plugin_version_pdf()
 {
-
-    return ['name'           => __('Print to pdf', 'pdf'),
+    return ['name'       => __('Print to pdf', 'pdf'),
         'version'        => '3.0.0',
         'author'         => 'Remi Collet, Nelly Mahu-Lasson, Teclib',
         'license'        => 'GPLv3+',
         'homepage'       => 'https://github.com/yllen/pdf',
         'minGlpiVersion' => '10.0.0',
         'requirements'   => ['glpi' => ['min' => '10.0.0',
-            'max' => '10.1.0'
-        ]
-        ]
+            'max'                             => '10.1.0',
+        ],
+        ],
     ];
 }

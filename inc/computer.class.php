@@ -30,131 +30,183 @@
  *  --------------------------------------------------------------------------
  */
 
-class PluginPdfComputer extends PluginPdfCommon {
+class PluginPdfComputer extends PluginPdfCommon
+{
+    public static $rightname = 'plugin_pdf';
 
-   static $rightname = "plugin_pdf";
+    public function __construct(CommonGLPI $obj = null)
+    {
+        $this->obj = ($obj ? $obj : new Computer());
+    }
 
+    public function defineAllTabsPDF($options = [])
+    {
+        $onglets = parent::defineAllTabsPDF($options);
+        unset($onglets['Lock$1']);
+        unset($onglets['Appliance_Item$1']);
+        unset($onglets['Certificate_Item$1']);
+        unset($onglets['Impact$1']);
+        unset($onglets['GLPI\Socket$1']);
+        unset($onglets['Item_RemoteManagement$1']);
+        unset($onglets['DatabaseInstance$1']);
+        unset($onglets['RuleMatchedLog$1']);
+        unset($onglets['Glpi\Socket$1']);
 
-   function __construct(CommonGLPI $obj=NULL) {
-      $this->obj = ($obj ? $obj : new Computer());
-   }
+        return $onglets;
+    }
 
+    public static function pdfMain(PluginPdfSimplePDF $pdf, Computer $computer)
+    {
+        $dbu = new DbUtils();
 
-   function defineAllTabsPDF($options=[]) {
+        PluginPdfCommon::mainTitle($pdf, $computer);
 
-      $onglets = parent::defineAllTabsPDF($options);
-      unset($onglets['Lock$1']);
-      unset($onglets['Appliance_Item$1']);
-      unset($onglets['Certificate_Item$1']);
-      unset($onglets['Impact$1']);
-      unset($onglets['GLPI\Socket$1']);
-      unset($onglets['Item_RemoteManagement$1']);
-      unset($onglets['DatabaseInstance$1']);
-      unset($onglets['RuleMatchedLog$1']);
-      unset($onglets['Glpi\Socket$1']);
-      return $onglets;
-   }
-
-
-   static function pdfMain(PluginPdfSimplePDF $pdf, Computer $computer){
-
-      $dbu = new DbUtils();
-
-      PluginPdfCommon::mainTitle($pdf, $computer);
-
-      PluginPdfCommon::mainLine($pdf, $computer, 'name-status');
-      PluginPdfCommon::mainLine($pdf, $computer, 'location-type');
-      PluginPdfCommon::mainLine($pdf, $computer, 'tech-manufacturer');
-      PluginPdfCommon::mainLine($pdf, $computer, 'group-model');
-      PluginPdfCommon::mainLine($pdf, $computer, 'contactnum-serial');
-      PluginPdfCommon::mainLine($pdf, $computer, 'contact-otherserial');
-
-
-      $pdf->displayLine(
-         '<b><i>'.sprintf(__('%1$s: %2$s'), __('User').'</i></b>',
-                          $dbu->getUserName($computer->fields['users_id'])),
-         '<b><i>'.sprintf(__('%1$s: %2$s'), __('Network').'</i></b>',
-                          Toolbox::stripTags(Dropdown::getDropdownName('glpi_networks',
-                                                                       $computer->fields['networks_id']))));
-
-      $pdf->displayLine(
-         '<b><i>'.sprintf(__('%1$s: %2$s'), __('Group').'</i></b>',
-                          Dropdown::getDropdownName('glpi_groups',
-                                                    $computer->fields['groups_id'])),
-         '<b><i>'.sprintf(__('%1$s: %2$s'), __('UUID').'</i></b>', $computer->fields['uuid']));
-
-      $pdf->displayLine(
-         '<b><i>'.sprintf(__('%1$s: %2$s'), __('Update Source').'</i></b>',
-                          Dropdown::getDropdownName('glpi_autoupdatesystems',
-                                                     $computer->fields['autoupdatesystems_id'])));
-
-      PluginPdfCommon::mainLine($pdf, $computer, 'comment');
-
-      $pdf->displaySpace();
-   }
+        PluginPdfCommon::mainLine($pdf, $computer, 'name-status');
+        PluginPdfCommon::mainLine($pdf, $computer, 'location-type');
+        PluginPdfCommon::mainLine($pdf, $computer, 'tech-manufacturer');
+        PluginPdfCommon::mainLine($pdf, $computer, 'group-model');
+        PluginPdfCommon::mainLine($pdf, $computer, 'contactnum-serial');
+        PluginPdfCommon::mainLine($pdf, $computer, 'contact-otherserial');
 
 
-   static function pdfOperatingSystem(PluginPdfSimplePDF $pdf, Computer $computer) {
+        $pdf->displayLine(
+            '<b><i>' . sprintf(
+                __('%1$s: %2$s'),
+                __('User') . '</i></b>',
+                $dbu->getUserName($computer->fields['users_id']),
+            ),
+            '<b><i>' . sprintf(
+                __('%1$s: %2$s'),
+                __('Network') . '</i></b>',
+                Toolbox::stripTags(Dropdown::getDropdownName(
+                    'glpi_networks',
+                    $computer->fields['networks_id'],
+                )),
+            ),
+        );
 
-      $ID = $computer->getField('id');
-      if (!$computer->can($ID, READ)) {
-         return false;
-      }
+        $pdf->displayLine(
+            '<b><i>' . sprintf(
+                __('%1$s: %2$s'),
+                __('Group') . '</i></b>',
+                Dropdown::getDropdownName(
+                    'glpi_groups',
+                    $computer->fields['groups_id'],
+                ),
+            ),
+            '<b><i>' . sprintf(__('%1$s: %2$s'), __('UUID') . '</i></b>', $computer->fields['uuid']),
+        );
 
-      $pdf->setColumnsSize(100);
-      $pdf->displayTitle('<b>'.Toolbox::ucfirst(OperatingSystem::getTypeName(2)).'</b>');
+        $pdf->displayLine(
+            '<b><i>' . sprintf(
+                __('%1$s: %2$s'),
+                __('Update Source') . '</i></b>',
+                Dropdown::getDropdownName(
+                    'glpi_autoupdatesystems',
+                    $computer->fields['autoupdatesystems_id'],
+                ),
+            ),
+        );
 
-      $pdf->setColumnsSize(50,50);
+        PluginPdfCommon::mainLine($pdf, $computer, 'comment');
 
-      $pdf->displayLine(
-         '<b><i>'.sprintf(__('%1$s: %2$s'), __('Name').'</i></b>',
-                          Toolbox::stripTags(Dropdown::getDropdownName('glpi_operatingsystems',
-                                                                       $computer->fields['operatingsystems_id']))),
-         '<b><i>'.sprintf(__('%1$s: %2$s'), __('Version').'</i></b>',
-                          Toolbox::stripTags(Dropdown::getDropdownName('glpi_operatingsystemversions',
-                                                                       $computer->fields['operatingsystemversions_id']))));
-      $pdf->displayLine(
-         '<b><i>'.sprintf(__('%1$s: %2$s'), __('Architecture').'</i></b>',
-                          Toolbox::stripTags(Dropdown::getDropdownName('glpi_operatingsystemarchitectures',
-                                                                       $computer->fields['operatingsystemarchitectures_id']))),
-         '<b><i>'.sprintf(__('%1$s: %2$s'), __('Service pack').'</i></b>',
-                          Toolbox::stripTags(Dropdown::getDropdownName('glpi_operatingsystemservicepacks',
-                                                                       $computer->fields['operatingsystemservicepacks_id']))));
+        $pdf->displaySpace();
+    }
 
-      $pdf->displayLine(
-         '<b><i>'.sprintf(__('%1$s: %2$s'), __('Kernel version').'</i></b>',
-                          $computer->fields['os_kernel_version']),
-         '<b><i>'.sprintf(__('%1$s: %2$s'), __('Product ID').'</i></b>',
-                          $computer->fields['os_licenseid']));
-
-      $pdf->displayLine(
-         '<b><i>'.sprintf(__('%1$s: %2$s'), __('Serial number').'</i></b>',
-                          $computer->fields['os_license_number']));
-   }
-
-
-   static function displayTabContentForPDF(PluginPdfSimplePDF $pdf, CommonGLPI $item, $tab) {
-
-      switch ($tab) {
-         case 'ComputerVirtualMachine$1' :
-            PluginPdfComputerVirtualMachine::pdfForComputer($pdf, $item);
-            break;
-
-         case 'ComputerAntivirus$1' :
-            PluginPdfComputerAntivirus::pdfForComputer($pdf, $item);
-            break;
-
-         case 'RegistryKey$1' :
-            PluginPdfRegistryKey::pdfForComputer($pdf, $item);
-            break;
-
-         case 'Computer_Item$1' :
-            PluginPdfComputer_Item::pdfForComputer($pdf, $item);
-            break;
-
-         default :
+    public static function pdfOperatingSystem(PluginPdfSimplePDF $pdf, Computer $computer)
+    {
+        $ID = $computer->getField('id');
+        if (!$computer->can($ID, READ)) {
             return false;
-      }
-      return true;
-   }
+        }
+
+        $pdf->setColumnsSize(100);
+        $pdf->displayTitle('<b>' . Toolbox::ucfirst(OperatingSystem::getTypeName(2)) . '</b>');
+
+        $pdf->setColumnsSize(50, 50);
+
+        $pdf->displayLine(
+            '<b><i>' . sprintf(
+                __('%1$s: %2$s'),
+                __('Name') . '</i></b>',
+                Toolbox::stripTags(Dropdown::getDropdownName(
+                    'glpi_operatingsystems',
+                    $computer->fields['operatingsystems_id'],
+                )),
+            ),
+            '<b><i>' . sprintf(
+                __('%1$s: %2$s'),
+                __('Version') . '</i></b>',
+                Toolbox::stripTags(Dropdown::getDropdownName(
+                    'glpi_operatingsystemversions',
+                    $computer->fields['operatingsystemversions_id'],
+                )),
+            ),
+        );
+        $pdf->displayLine(
+            '<b><i>' . sprintf(
+                __('%1$s: %2$s'),
+                __('Architecture') . '</i></b>',
+                Toolbox::stripTags(Dropdown::getDropdownName(
+                    'glpi_operatingsystemarchitectures',
+                    $computer->fields['operatingsystemarchitectures_id'],
+                )),
+            ),
+            '<b><i>' . sprintf(
+                __('%1$s: %2$s'),
+                __('Service pack') . '</i></b>',
+                Toolbox::stripTags(Dropdown::getDropdownName(
+                    'glpi_operatingsystemservicepacks',
+                    $computer->fields['operatingsystemservicepacks_id'],
+                )),
+            ),
+        );
+
+        $pdf->displayLine(
+            '<b><i>' . sprintf(
+                __('%1$s: %2$s'),
+                __('Kernel version') . '</i></b>',
+                $computer->fields['os_kernel_version'],
+            ),
+            '<b><i>' . sprintf(
+                __('%1$s: %2$s'),
+                __('Product ID') . '</i></b>',
+                $computer->fields['os_licenseid'],
+            ),
+        );
+
+        $pdf->displayLine(
+            '<b><i>' . sprintf(
+                __('%1$s: %2$s'),
+                __('Serial number') . '</i></b>',
+                $computer->fields['os_license_number'],
+            ),
+        );
+    }
+
+    public static function displayTabContentForPDF(PluginPdfSimplePDF $pdf, CommonGLPI $item, $tab)
+    {
+        switch ($tab) {
+            case 'ComputerVirtualMachine$1':
+                PluginPdfComputerVirtualMachine::pdfForComputer($pdf, $item);
+                break;
+
+            case 'ComputerAntivirus$1':
+                PluginPdfComputerAntivirus::pdfForComputer($pdf, $item);
+                break;
+
+            case 'RegistryKey$1':
+                PluginPdfRegistryKey::pdfForComputer($pdf, $item);
+                break;
+
+            case 'Computer_Item$1':
+                PluginPdfComputer_Item::pdfForComputer($pdf, $item);
+                break;
+
+            default:
+                return false;
+        }
+
+        return true;
+    }
 }
