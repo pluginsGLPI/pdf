@@ -30,58 +30,60 @@
  *  --------------------------------------------------------------------------
  */
 
-class PluginPdfPeripheral extends PluginPdfCommon {
+class PluginPdfPeripheral extends PluginPdfCommon
+{
+    public static $rightname = 'plugin_pdf';
 
+    public function __construct(CommonGLPI $obj = null)
+    {
+        $this->obj = ($obj ? $obj : new Peripheral());
+    }
 
-   static $rightname = "plugin_pdf";
+    public function defineAllTabsPDF($options = [])
+    {
+        $onglets = parent::defineAllTabsPDF($options);
+        unset($onglets['Certificate_Item$1']);
+        unset($onglets['Impact$1']);
+        unset($onglets['Appliance_Item$1']);
+        unset($onglets['Glpi\Socket$1']);
 
+        return $onglets;
+    }
 
-   function __construct(CommonGLPI $obj=NULL) {
-      $this->obj = ($obj ? $obj : new Peripheral());
-   }
+    public static function pdfMain(PluginPdfSimplePDF $pdf, Peripheral $item)
+    {
+        PluginPdfCommon::mainTitle($pdf, $item);
 
+        PluginPdfCommon::mainLine($pdf, $item, 'name-status');
+        PluginPdfCommon::mainLine($pdf, $item, 'location-type');
+        PluginPdfCommon::mainLine($pdf, $item, 'tech-manufacturer');
+        PluginPdfCommon::mainLine($pdf, $item, 'group-model');
+        PluginPdfCommon::mainLine($pdf, $item, 'contactnum-serial');
+        PluginPdfCommon::mainLine($pdf, $item, 'contact-otherserial');
+        PluginPdfCommon::mainLine($pdf, $item, 'user-management');
 
-   function defineAllTabsPDF($options=[]) {
+        $pdf->displayLine(
+            '<b><i>' . sprintf(
+                __('%1$s: %2$s'),
+                __('Group') . '</i></b>',
+                Dropdown::getDropdownName('glpi_groups', $item->fields['groups_id']),
+            ),
+            '<b><i>' . sprintf(__('%1$s: %2$s'), __('Brand') . '</i></b>', $item->fields['brand']),
+        );
 
-      $onglets = parent::defineAllTabsPDF($options);
-      unset($onglets['Certificate_Item$1']);
-      unset($onglets['Impact$1']);
-      unset($onglets['Appliance_Item$1']);
-      unset($onglets['Glpi\Socket$1']);
-      return $onglets;
-   }
+        $pdf->setColumnsSize(100);
+        PluginPdfCommon::mainLine($pdf, $item, 'comment');
 
+        $pdf->displaySpace();
+    }
 
-   static function pdfMain(PluginPdfSimplePDF $pdf, Peripheral $item) {
+    public static function displayTabContentForPDF(PluginPdfSimplePDF $pdf, CommonGLPI $item, $tab)
+    {
+        switch ($tab) {
+            default:
+                return false;
+        }
 
-      PluginPdfCommon::mainTitle($pdf, $item);
-
-      PluginPdfCommon::mainLine($pdf, $item, 'name-status');
-      PluginPdfCommon::mainLine($pdf, $item, 'location-type');
-      PluginPdfCommon::mainLine($pdf, $item, 'tech-manufacturer');
-      PluginPdfCommon::mainLine($pdf, $item, 'group-model');
-      PluginPdfCommon::mainLine($pdf, $item, 'contactnum-serial');
-      PluginPdfCommon::mainLine($pdf, $item, 'contact-otherserial');
-      PluginPdfCommon::mainLine($pdf, $item, 'user-management');
-
-      $pdf->displayLine(
-         '<b><i>'.sprintf(__('%1$s: %2$s'), __('Group').'</i></b>',
-                          Dropdown::getDropdownName('glpi_groups', $item->fields['groups_id'])),
-         '<b><i>'.sprintf(__('%1$s: %2$s'), __('Brand').'</i></b>',  $item->fields['brand']));
-
-      $pdf->setColumnsSize(100);
-      PluginPdfCommon::mainLine($pdf, $item, 'comment');
-
-      $pdf->displaySpace();
-   }
-
-
-   static function displayTabContentForPDF(PluginPdfSimplePDF $pdf, CommonGLPI $item, $tab) {
-
-      switch ($tab) {
-         default :
-            return false;
-      }
-      return true;
-   }
+        return true;
+    }
 }

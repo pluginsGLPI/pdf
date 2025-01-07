@@ -30,64 +30,72 @@
  *  --------------------------------------------------------------------------
  */
 
-class PluginPdfDomain_Item extends PluginPdfCommon {
+class PluginPdfDomain_Item extends PluginPdfCommon
+{
+    public static $rightname = 'plugin_pdf';
 
-   static $rightname = "plugin_pdf";
+    public function __construct(CommonGLPI $obj = null)
+    {
+        $this->obj = ($obj ? $obj : new Domain_Item());
+    }
 
+    public static function pdfForItem(PluginPdfSimplePDF $pdf, CommonDBTM $item)
+    {
+        global $DB;
 
-   function __construct(CommonGLPI $obj=NULL) {
-      $this->obj = ($obj ? $obj : new Domain_Item());
-   }
+        $ID = $item->getField('id');
 
+        $query = ['SELECT' => ['glpi_domains.*',
+            'glpi_domains_items.domainrelations_id'],
+            'FROM'       => 'glpi_domains',
+            'INNER JOIN' => ['glpi_domains_items'
+                             => ['FKEY' => ['glpi_domains' => 'id',
+                                 'glpi_domains_items'      => 'domains_id']]],
+            'WHERE' => ['glpi_domains_items.itemtype' => $item->getType(),
+                'glpi_domains_items.items_id'         => $ID],
+            'ORDER' => 'glpi_domains.name'];
 
-   static function pdfForItem(PluginPdfSimplePDF $pdf, CommonDBTM $item){
-      global $DB;
+        $result = $DB->request($query);
+        $number = count($result);
 
-      $ID   = $item->getField('id');
+        $pdf->setColumnsSize(100);
+        $title = '<b>' . Domain::getTypeName($number) . '</b>';
 
-      $query = ['SELECT'     => ['glpi_domains.*',
-                                 'glpi_domains_items.domainrelations_id'],
-                'FROM'       => 'glpi_domains',
-                'INNER JOIN' => ['glpi_domains_items'
-                                 => ['FKEY' => ['glpi_domains'       => 'id',
-                                                'glpi_domains_items' => 'domains_id']]],
-                'WHERE'      => ['glpi_domains_items.itemtype' => $item->getType(),
-                                 'glpi_domains_items.items_id' => $ID],
-                'ORDER'      => 'glpi_domains.name'];
+        if (!$number) {
+            $pdf->displayTitle(sprintf(__('%1$s: %2$s'), $title, __('No item to display')));
+        } else {
+            if ($number > $_SESSION['glpilist_limit']) {
+                $title = sprintf(__('%1$s: %2$s'), $title, $_SESSION['glpilist_limit'] . ' / ' . $number);
+            } else {
+                $title = sprintf(__('%1$s: %2$s'), $title, $number);
+            }
+            $pdf->displayTitle($title);
 
-      $result = $DB->request($query);
-      $number = count($result);
+            $pdf->setColumnsSize(17, 15, 10, 10, 8, 8, 16, 16);
+            $pdf->displayTitle(
+                __('Name'),
+                __('Entity'),
+                __('Group in charge'),
+                __('Technician in charge'),
+                __('Type'),
+                __('Domain relation'),
+                __('Creation date'),
+                __('Expiration date'),
+            );
 
-      $pdf->setColumnsSize(100);
-      $title = '<b>'.Domain::getTypeName($number).'</b>';
-
-      if (!$number) {
-         $pdf->displayTitle(sprintf(__('%1$s: %2$s'), $title, __('No item to display')));
-      } else {
-         if ($number > $_SESSION['glpilist_limit']) {
-            $title = sprintf(__('%1$s: %2$s'), $title, $_SESSION['glpilist_limit'].' / '.$number);
-         } else {
-            $title = sprintf(__('%1$s: %2$s'), $title, $number);
-         }
-         $pdf->displayTitle($title);
-
-         $pdf->setColumnsSize(17,15,10,10,8,8,16,16);
-         $pdf->displayTitle(__('Name'), __('Entity'), __('Group in charge'), __('Technician in charge'),
-                            __('Type'), __('Domain relation'), __('Creation date'),
-                            __('Expiration date'));
-
-         foreach ($result as $data) {
-            $pdf->displayLine($data["name"],
-                              Dropdown::getDropdownName("glpi_entities", $data["entities_id"]),
-                              Dropdown::getDropdownName("glpi_groups", $data["groups_id_tech"]),
-                              getUserName($data["users_id_tech"]),
-                              Dropdown::getDropdownName("glpi_domaintypes", $data["domaintypes_id"]),
-                              Dropdown::getDropdownName("glpi_domainrelations", $data["domainrelations_id"]),
-                              Html::convDate($data["date_creation"]),
-                              Html::convDate($data["date_expiration"]));
-         }
-      }
-      $pdf->displaySpace();
-   }
-
+            foreach ($result as $data) {
+                $pdf->displayLine(
+                    $data['name'],
+                    Dropdown::getDropdownName('glpi_entities', $data['entities_id']),
+                    Dropdown::getDropdownName('glpi_groups', $data['groups_id_tech']),
+                    getUserName($data['users_id_tech']),
+                    Dropdown::getDropdownName('glpi_domaintypes', $data['domaintypes_id']),
+                    Dropdown::getDropdownName('glpi_domainrelations', $data['domainrelations_id']),
+                    Html::convDate($data['date_creation']),
+                    Html::convDate($data['date_expiration']),
+                );
+            }
+        }
+        $pdf->displaySpace();
+    }
 }

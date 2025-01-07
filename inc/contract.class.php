@@ -30,156 +30,231 @@
  *  --------------------------------------------------------------------------
  */
 
-class PluginPdfContract extends PluginPdfCommon {
+class PluginPdfContract extends PluginPdfCommon
+{
+    public static $rightname = 'plugin_pdf';
 
-   static $rightname = "plugin_pdf";
+    public function __construct(CommonGLPI $obj = null)
+    {
+        $this->obj = ($obj ? $obj : new Contract());
+    }
 
+    public function defineAllTabsPDF($options = [])
+    {
+        $onglets = parent::defineAllTabsPDF($options);
+        unset($onglets['Contract_Supplier$1']);
 
-   function __construct(CommonGLPI $obj=NULL) {
-      $this->obj = ($obj ? $obj : new Contract());
-   }
+        return $onglets;
+    }
 
+    public static function pdfMain(PluginPdfSimplePDF $pdf, Contract $contract)
+    {
+        $dbu = new DbUtils();
 
-   function defineAllTabsPDF($options=[]) {
+        PluginPdfCommon::mainTitle($pdf, $contract);
 
-      $onglets = parent::defineAllTabsPDF($options);
-      unset($onglets['Contract_Supplier$1']);
-      return $onglets;
-   }
+        $pdf->displayLine(
+            '<b><i>' . sprintf(__('%1$s: %2$s'), __('Name') . '</i></b>', $contract->fields['name']),
+            '<b><i>' . sprintf(
+                __('%1$s: %2$s'),
+                __('Status') . '</i></b>',
+                Toolbox::stripTags(Dropdown::getDropdownName(
+                    'glpi_states',
+                    $contract->fields['states_id'],
+                )),
+            ),
+        );
 
+        $pdf->displayLine(
+            '<b><i>' . sprintf(
+                __('%1$s: %2$s'),
+                __('Contract type') . '</i></b>',
+                Toolbox::stripTags(Dropdown::getDropdownName(
+                    'glpi_contracttypes',
+                    $contract->fields['contracttypes_id'],
+                )),
+            ),
+            '<b><i>' . sprintf(
+                __('%1$s: %2$s'),
+                _x('phone', 'Number') . '</i></b>',
+                $contract->fields['num'],
+            ),
+        );
 
-   static function pdfMain(PluginPdfSimplePDF $pdf, Contract $contract){
+        $textduration = '';
+        if (!empty($contract->fields['begin_date'])) {
+            $textduration = sprintf(
+                __('%1$s %2$s'),
+                '   -> ',
+                Infocom::getWarrantyExpir(
+                    $contract->fields['begin_date'],
+                    $contract->fields['duration'],
+                ),
+            );
+        }
+        $pdf->displayLine(
+            '<b><i>' . sprintf(
+                __('%1$s: %2$s'),
+                __('Start date') . '</i></b>',
+                Html::convDate($contract->fields['begin_date']),
+            ),
+            '<b><i>' . sprintf(
+                __('%1$s: %2$s'),
+                __('Initial contract period') . '</i></b>',
+                sprintf(
+                    _n('%d month', '%d months', $contract->fields['duration']),
+                    $contract->fields['duration'],
+                ) . $textduration,
+            ),
+        );
 
-      $dbu = new DbUtils();
+        if (!empty($contract->fields['begin_date']) && ($contract->fields['notice'] > 0)) {
+            $textduration = sprintf(
+                __('%1$s %2$s'),
+                '   -> ',
+                Infocom::getWarrantyExpir(
+                    $contract->fields['begin_date'],
+                    $contract->fields['duration'],
+                    $contract->fields['notice'],
+                ),
+            );
+        }
+        $pdf->displayLine(
+            '<b><i>' . sprintf(
+                __('%1$s: %2$s'),
+                __('Notice') . '</i></b>',
+                sprintf(
+                    _n('%d month', '%d months', $contract->fields['notice']),
+                    $contract->fields['notice'],
+                ) . $textduration,
+            ),
+            '<b><i>' . sprintf(
+                __('%1$s: %2$s'),
+                __('Account number') . '</i></b>',
+                $contract->fields['accounting_number'],
+            ),
+        );
 
-      PluginPdfCommon::mainTitle($pdf, $contract);
+        $pdf->displayLine(
+            '<b><i>' . sprintf(
+                __('%1$s: %2$s'),
+                __('Contract renewal period') . '</i></b>',
+                sprintf(
+                    _n('%d month', '%d months', $contract->fields['periodicity']),
+                    $contract->fields['periodicity'],
+                ),
+            ),
+            '<b><i>' . sprintf(
+                __('%1$s: %2$s'),
+                __('Invoice period') . '</i></b>',
+                sprintf(
+                    _n('%d month', '%d months', $contract->fields['billing']),
+                    $contract->fields['billing'],
+                ),
+            ),
+        );
 
-      $pdf->displayLine(
-         '<b><i>'.sprintf(__('%1$s: %2$s'), __('Name').'</i></b>', $contract->fields['name']),
-         '<b><i>'.sprintf(__('%1$s: %2$s'), __('Status').'</i></b>',
-                          Toolbox::stripTags(Dropdown::getDropdownName('glpi_states',
-                                                                       $contract->fields['states_id']))));
+        $pdf->displayLine(
+            '<b><i>' . sprintf(
+                __('%1$s: %2$s'),
+                __('Renewal') . '</i></b>',
+                Contract::getContractRenewalName($contract->fields['renewal']),
+            ),
+            '<b><i>' . sprintf(
+                __('%1$s: %2$s'),
+                __('Max number of items') . '</i></b>',
+                $contract->fields['max_links_allowed'],
+            ),
+        );
 
-      $pdf->displayLine(
-         '<b><i>'.sprintf(__('%1$s: %2$s'), __('Contract type').'</i></b>',
-                          Toolbox::stripTags(Dropdown::getDropdownName('glpi_contracttypes',
-                                                                       $contract->fields['contracttypes_id']))),
-         '<b><i>'.sprintf(__('%1$s: %2$s'), _x('phone', 'Number').'</i></b>',
-                          $contract->fields['num']));
+        if (Entity::getUsedConfig('use_contracts_alert', $contract->fields['entities_id'])) {
+            $pdf->displayLine(
+                '<b><i>' . sprintf(
+                    __('%1$s: %2$s'),
+                    __('Email alarms') . '</i></b>',
+                    ($contract->fields['alert'] > 0) ? $contract->fields['alert'] : '',
+                ),
+            );
+        }
 
-      $textduration = "";
-      if (!empty($contract->fields["begin_date"])) {
-         $textduration = sprintf(__('%1$s %2$s'), '   -> ',
-                                 Infocom::getWarrantyExpir($contract->fields['begin_date'],
-                                                           $contract->fields['duration']));
-      }
-      $pdf->displayLine(
-         '<b><i>'.sprintf(__('%1$s: %2$s'), __('Start date').'</i></b>',
-                          Html::convDate($contract->fields['begin_date'])),
-         '<b><i>'.sprintf(__('%1$s: %2$s'), __('Initial contract period').'</i></b>',
-                          sprintf(_n('%d month', '%d months', $contract->fields['duration']),
-                                  $contract->fields['duration']) .$textduration));
+        PluginPdfCommon::mainLine($pdf, $contract, 'comment');
 
-      if (!empty($contract->fields["begin_date"]) && ($contract->fields["notice"] > 0)) {
-         $textduration = sprintf(__('%1$s %2$s'), '   -> ',
-                                 Infocom::getWarrantyExpir($contract->fields["begin_date"],
-                                                           $contract->fields["duration"],
-                                                           $contract->fields["notice"]));
-      }
-      $pdf->displayLine(
-         '<b><i>'.sprintf(__('%1$s: %2$s'), __('Notice').'</i></b>',
-                          sprintf(_n('%d month', '%d months', $contract->fields["notice"]),
-                                  $contract->fields["notice"]).$textduration),
-         '<b><i>'.sprintf(__('%1$s: %2$s'), __('Account number').'</i></b>',
-                           $contract->fields["accounting_number"]));
+        $pdf->displaySpace();
+    }
 
-      $pdf->displayLine(
-            '<b><i>'.sprintf(__('%1$s: %2$s'), __('Contract renewal period').'</i></b>',
-                             sprintf(_n('%d month', '%d months', $contract->fields["periodicity"]),
-                                   $contract->fields["periodicity"])),
-            '<b><i>'.sprintf(__('%1$s: %2$s'), __('Invoice period').'</i></b>',
-                             sprintf(_n('%d month', '%d months', $contract->fields["billing"]),
-                                     $contract->fields["billing"])));
+    public static function displayTabContentForPDF(PluginPdfSimplePDF $pdf, CommonGLPI $item, $tab)
+    {
+        switch ($tab) {
+            case 'ContractCost$1':
+                PluginPdfContract::pdfCost($pdf, $item);
+                break;
 
-      $pdf->displayLine(
-            '<b><i>'.sprintf(__('%1$s: %2$s'), __('Renewal').'</i></b>',
-                             Contract::getContractRenewalName($contract->fields["renewal"])),
-            '<b><i>'.sprintf(__('%1$s: %2$s'), __('Max number of items').'</i></b>',
-                             $contract->fields["max_links_allowed"]));
+            case 'Contract_Item$1':
+                PluginPdfContract_Item::pdfForContract($pdf, $item);
+                break;
 
-      if (Entity::getUsedConfig("use_contracts_alert", $contract->fields["entities_id"])) {
-         $pdf->displayLine(
-               '<b><i>'.sprintf(__('%1$s: %2$s'), __('Email alarms').'</i></b>',
-                                ($contract->fields['alert'] > 0) ? $contract->fields['alert'] : ''));
-      }
+            default:
+                return false;
+        }
 
-      PluginPdfCommon::mainLine($pdf, $contract, 'comment');
+        return true;
+    }
 
-      $pdf->displaySpace();
-   }
+    public static function pdfCost(PluginPdfSimplePDF $pdf, Contract $contract)
+    {
+        global $DB;
 
+        $ID = $contract->getField('id');
 
-   static function displayTabContentForPDF(PluginPdfSimplePDF $pdf, CommonGLPI $item, $tab) {
+        $result = $DB->request(['FROM' => 'glpi_contractcosts',
+            'WHERE'                    => ['contracts_id' => $ID],
+            'ORDER'                    => 'begin_date']);
 
-      switch ($tab) {
-         case 'ContractCost$1' :
-            PluginPdfContract::pdfCost($pdf, $item);
-            break;
+        $number = count($result);
 
-         case 'Contract_Item$1' :
-            PluginPdfContract_Item::pdfForContract($pdf, $item);
-            break;
+        if (!$number) {
+            $pdf->setColumnsSize(100);
+            $pdf->displayTitle(sprintf(
+                __('%1$s: %2$s'),
+                '<b>' . ContractCost::getTypeName(2) . '</b>',
+                __('No item to display'),
+            ));
+        } else {
+            $pdf->setColumnsSize(100);
+            $pdf->displayTitle('<b>' . ContractCost::getTypeName($number) . '</b>');
 
-         default :
-            return false;
-      }
-      return true;
-   }
+            $pdf->setColumnsSize(20, 20, 20, 20, 20);
+            $pdf->setColumnsAlign('left', 'center', 'center', 'left', 'right');
 
+            $pdf->displayTitle(
+                '<b><i>' . __('Name') . '</i></b>',
+                '<b><i>' . __('Begin date') . '</i></b>',
+                '<b><i>' . __('End date') . '</i></b>',
+                '<b><i>' . Budget::getTypeName(1) . '</i></b>',
+                '<b><i>' . _n('Cost', 'Costs', 1) . '</i></b>',
+            );
 
-   static function pdfCost(PluginPdfSimplePDF $pdf, Contract $contract) {
-      global $DB;
+            $total = 0;
+            foreach ($result as $data) {
+                $pdf->displayLine(
+                    $data['name'],
+                    Html::convDate($data['begin_date']),
+                    Html::convDate($data['end_date']),
+                    Toolbox::stripTags(Dropdown::getDropdownName(
+                        'glpi_budgets',
+                        $data['budgets_id'],
+                    )),
+                    PluginPdfConfig::formatNumber($data['cost']),
+                );
+                $total += $data['cost'];
+            }
 
-      $ID = $contract->getField('id');
-
-      $result = $DB->request(['FROM'   => 'glpi_contractcosts',
-                              'WHERE'  => ['contracts_id' => $ID],
-                              'ORDER'  => 'begin_date']);
-
-      $number = count($result);
-
-      if (!$number) {
-         $pdf->setColumnsSize(100);
-         $pdf->displayTitle(sprintf(__('%1$s: %2$s'), '<b>'.ContractCost::getTypeName(2).'</b>',
-                                    __('No item to display')));
-      } else {
-         $pdf->setColumnsSize(100);
-         $pdf->displayTitle('<b>'.ContractCost::getTypeName($number).'</b>');
-
-         $pdf->setColumnsSize(20,20,20,20,20);
-         $pdf->setColumnsAlign('left','center','center','left', 'right');
-
-         $pdf->displayTitle("<b><i>".__('Name')."</i></b>",
-                            "<b><i>".__('Begin date')."</i></b>",
-                            "<b><i>".__('End date')."</i></b>",
-                            "<b><i>".Budget::getTypeName(1)."</i></b>",
-                            "<b><i>"._n('Cost', 'Costs', 1)."</i></b>");
-
-         $total = 0;
-         foreach ($result as $data) {
-            $pdf->displayLine($data['name'],
-                              Html::convDate($data['begin_date']),
-                              Html::convDate($data['end_date']),
-                              Toolbox::stripTags(Dropdown::getDropdownName('glpi_budgets',
-                                                                           $data['budgets_id'])),
-                              PluginPdfConfig::formatNumber($data['cost']));
-            $total += $data['cost'];
-         }
-
-         $pdf->setColumnsSize(81,19);
-         $pdf->setColumnsAlign('right','right');
-         $pdf->displayLine('<b>'.__('Total cost').'</b>',
-                           '<b>'.PluginPdfConfig::formatNumber($total).'</b>');
-      }
-   }
+            $pdf->setColumnsSize(81, 19);
+            $pdf->setColumnsAlign('right', 'right');
+            $pdf->displayLine(
+                '<b>' . __('Total cost') . '</b>',
+                '<b>' . PluginPdfConfig::formatNumber($total) . '</b>',
+            );
+        }
+    }
 }

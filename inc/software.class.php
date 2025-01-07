@@ -30,111 +30,156 @@
  *  --------------------------------------------------------------------------
  */
 
-class PluginPdfSoftware extends PluginPdfCommon {
+class PluginPdfSoftware extends PluginPdfCommon
+{
+    public static $rightname = 'plugin_pdf';
+
+    public function __construct(CommonGLPI $obj = null)
+    {
+        $this->obj = ($obj ? $obj : new Software());
+    }
+
+    public static function pdfMain(PluginPdfSimplePDF $pdf, Software $software)
+    {
+        $dbu = new DbUtils();
+
+        PluginPdfCommon::mainTitle($pdf, $software);
+
+        $pdf->displayLine(
+            '<b><i>' . sprintf(__('%1$s: %2$s'), __('Name') . '</i></b>', $software->fields['name']),
+            '<b><i>' . sprintf(
+                __('%1$s: %2$s'),
+                __('Publisher') . '</i></b>',
+                Toolbox::stripTags(Dropdown::getDropdownName(
+                    'glpi_manufacturers',
+                    $software->fields['manufacturers_id'],
+                )),
+            ),
+        );
+
+        $pdf->displayLine(
+            '<b><i>' . sprintf(
+                __('%1$s: %2$s'),
+                __('Location') . '</i></b>',
+                Dropdown::getDropdownName(
+                    'glpi_locations',
+                    $software->fields['locations_id'],
+                ),
+            ),
+            '<b><i>' . sprintf(
+                __('%1$s: %2$s'),
+                __('Category') . '</i></b>',
+                Dropdown::getDropdownName(
+                    'glpi_softwarecategories',
+                    $software->fields['softwarecategories_id'],
+                ),
+            ),
+        );
+
+        $pdf->displayLine(
+            '<b><i>' . sprintf(
+                __('%1$s: %2$s'),
+                __('Technician in charge of the hardware') . '</i></b>',
+                $dbu->getUserName($software->fields['users_id_tech']),
+            ),
+            '<b><i>' . sprintf(
+                __('%1$s: %2$s'),
+                __('Associable to a ticket') . '</i></b>',
+                ($software->fields['is_helpdesk_visible'] ? __('Yes') : __('No')),
+            ),
+        );
+
+        $pdf->displayLine(
+            '<b><i>' . sprintf(
+                __('%1$s: %2$s'),
+                __('Group in charge of the hardware') . '</i></b>',
+                Dropdown::getDropdownName(
+                    'glpi_groups',
+                    $software->fields['groups_id_tech'],
+                ),
+            ),
+            '<b><i>' . sprintf(
+                __('%1$s: %2$s'),
+                __('User') . '</i></b>',
+                $dbu->getUserName($software->fields['users_id']),
+            ),
+        );
+
+        $pdf->displayLine(
+            '<b><i>' . sprintf(
+                __('%1$s: %2$s'),
+                __('Group') . '</i></b>',
+                Dropdown::getDropdownName('glpi_groups', $software->fields['groups_id']),
+            ),
+        );
+
+        $pdf->displayLine(
+            '<b><i>' . sprintf(
+                __('Last update on %s'),
+                Html::convDateTime($software->fields['date_mod']),
+            ),
+        );
 
 
-   static $rightname = "plugin_pdf";
+        if ($software->fields['softwares_id'] > 0) {
+            $col2 = '<b><i> ' . __('from') . ' </i></b> ' .
+                     Toolbox::stripTags(Dropdown::getDropdownName(
+                         'glpi_softwares',
+                         $software->fields['softwares_id'],
+                     ));
+        } else {
+            $col2 = '';
+        }
+
+        $pdf->displayLine(
+            '<b><i>' . sprintf(
+                __('%1$s: %2$s'),
+                __('Upgrade') . '</i></b>',
+                ($software->fields['is_update'] ? __('Yes') : __('No')),
+                $col2,
+            ),
+        );
 
 
-   function __construct(CommonGLPI $obj=NULL) {
-      $this->obj = ($obj ? $obj : new Software());
-   }
+        $pdf->setColumnsSize(100);
+        PluginPdfCommon::mainLine($pdf, $software, 'comment');
 
+        $pdf->displaySpace();
+    }
 
-   static function pdfMain(PluginPdfSimplePDF $pdf, Software $software) {
+    public function defineAllTabsPDF($options = [])
+    {
+        $onglets = parent::defineAllTabsPDF($options);
+        unset($onglets['Appliance_Item$1']);
+        unset($onglets['Impact$1']);
 
-      $dbu = new DbUtils();
+        return $onglets;
+    }
 
-      PluginPdfCommon::mainTitle($pdf, $software);
+    public static function displayTabContentForPDF(PluginPdfSimplePDF $pdf, CommonGLPI $item, $tab)
+    {
+        switch ($tab) {
+            case 'SoftwareVersion$1':
+                PluginPdfSoftwareVersion::pdfForSoftware($pdf, $item);
+                break;
 
-      $pdf->displayLine(
-         '<b><i>'.sprintf(__('%1$s: %2$s'), __('Name').'</i></b>', $software->fields['name']),
-         '<b><i>'.sprintf(__('%1$s: %2$s'), __('Publisher').'</i></b>',
-                          Toolbox::stripTags(Dropdown::getDropdownName('glpi_manufacturers',
-                                                                       $software->fields['manufacturers_id']))));
+            case 'SoftwareLicense$1':
+                $infocom = isset($_REQUEST['item']['Infocom$1']);
+                PluginPdfSoftwareLicense::pdfForSoftware($pdf, $item, $infocom);
+                break;
 
-      $pdf->displayLine(
-         '<b><i>'.sprintf(__('%1$s: %2$s'), __('Location').'</i></b>',
-                          Dropdown::getDropdownName('glpi_locations',
-                                                    $software->fields['locations_id'])),
-         '<b><i>'.sprintf(__('%1$s: %2$s'), __('Category').'</i></b>',
-                          Dropdown::getDropdownName('glpi_softwarecategories',
-                                                    $software->fields['softwarecategories_id'])));
+            case 'Item_SoftwareVersion$1':
+                PluginPdfItem_SoftwareVersion::pdfForSoftware($pdf, $item);
+                break;
 
-      $pdf->displayLine(
-         '<b><i>'.sprintf(__('%1$s: %2$s'), __('Technician in charge of the hardware').'</i></b>',
-                          $dbu->getUserName($software->fields['users_id_tech'])),
-         '<b><i>'.sprintf(__('%1$s: %2$s'), __('Associable to a ticket').'</i></b>',
-                          ($software->fields['is_helpdesk_visible'] ?__('Yes'):__('No'))));
+            case 'Domain_Item$1':
+                PluginPdfDomain_Item::pdfForItem($pdf, $item);
+                break;
 
-      $pdf->displayLine(
-         '<b><i>'.sprintf(__('%1$s: %2$s'), __('Group in charge of the hardware').'</i></b>',
-                          Dropdown::getDropdownName('glpi_groups',
-                                                    $software->fields['groups_id_tech'])),
-         '<b><i>'.sprintf(__('%1$s: %2$s'), __('User').'</i></b>',
-                          $dbu->getUserName($software->fields['users_id'])));
+            default:
+                return false;
+        }
 
-      $pdf->displayLine(
-         '<b><i>'.sprintf(__('%1$s: %2$s'), __('Group').'</i></b>',
-                          Dropdown::getDropdownName('glpi_groups', $software->fields['groups_id'])));
-
-      $pdf->displayLine(
-         '<b><i>'.sprintf(__('Last update on %s'),
-                          Html::convDateTime($software->fields['date_mod'])));
-
-
-      if ($software->fields['softwares_id'] > 0) {
-         $col2 = '<b><i> '.__('from').' </i></b> '.
-                  Toolbox::stripTags(Dropdown::getDropdownName('glpi_softwares',
-                                                               $software->fields['softwares_id']));
-      } else {
-         $col2 = '';
-      }
-
-      $pdf->displayLine(
-         '<b><i>'.sprintf(__('%1$s: %2$s'), __('Upgrade').'</i></b>',
-                          ($software->fields['is_update']?__('Yes'):__('No')), $col2));
-
-
-      $pdf->setColumnsSize(100);
-      PluginPdfCommon::mainLine($pdf, $software, 'comment');
-
-      $pdf->displaySpace();
-   }
-
-
-   function defineAllTabsPDF($options=[]) {
-
-      $onglets = parent::defineAllTabsPDF($options);
-      unset($onglets['Appliance_Item$1']);
-      unset($onglets['Impact$1']);
-      return $onglets;
-   }
-
-
-   static function displayTabContentForPDF(PluginPdfSimplePDF $pdf, CommonGLPI $item, $tab) {
-
-      switch ($tab) {
-         case 'SoftwareVersion$1' :
-            PluginPdfSoftwareVersion::pdfForSoftware($pdf, $item);
-            break;
-
-         case 'SoftwareLicense$1' :
-            $infocom = isset($_REQUEST['item']['Infocom$1']);
-            PluginPdfSoftwareLicense::pdfForSoftware($pdf, $item, $infocom);
-            break;
-
-         case 'Item_SoftwareVersion$1' :
-            PluginPdfItem_SoftwareVersion::pdfForSoftware($pdf, $item);
-            break;
-
-         Case 'Domain_Item$1' :
-            PluginPdfDomain_Item::pdfForItem($pdf, $item);
-            break;
-
-         default :
-            return false;
-      }
-      return true;
-   }
+        return true;
+    }
 }

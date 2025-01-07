@@ -30,72 +30,85 @@
  *  --------------------------------------------------------------------------
  */
 
-class PluginPdfNetworkEquipment extends PluginPdfCommon {
+class PluginPdfNetworkEquipment extends PluginPdfCommon
+{
+    public static $rightname = 'plugin_pdf';
 
+    public function __construct(CommonGLPI $obj = null)
+    {
+        $this->obj = ($obj ? $obj : new NetworkEquipment());
+    }
 
-   static $rightname = "plugin_pdf";
+    public function defineAllTabsPDF($options = [])
+    {
+        $onglets = parent::defineAllTabsPDF($options);
+        unset($onglets['NetworkName$1']);
+        unset($onglets['Certificate_Item$1']);
+        unset($onglets['Impact$1']);
+        unset($onglets['Appliance_Item$1']);
+        unset($onglets['Glpi\Socket$1']);
 
+        return $onglets;
+    }
 
-   function __construct(CommonGLPI $obj=NULL) {
-      $this->obj = ($obj ? $obj : new NetworkEquipment());
-   }
+    public static function pdfMain(PluginPdfSimplePDF $pdf, NetworkEquipment $item)
+    {
+        $dbu = new DbUtils();
 
+        PluginPdfCommon::mainTitle($pdf, $item);
 
-   function defineAllTabsPDF($options=[]) {
-
-      $onglets = parent::defineAllTabsPDF($options);
-      unset($onglets['NetworkName$1']);
-      unset($onglets['Certificate_Item$1']);
-      unset($onglets['Impact$1']);
-      unset($onglets['Appliance_Item$1']);
-      unset($onglets['Glpi\Socket$1']);
-      return $onglets;
-   }
-
-
-   static function pdfMain(PluginPdfSimplePDF $pdf, NetworkEquipment $item) {
-
-      $dbu = new DbUtils();
-
-      PluginPdfCommon::mainTitle($pdf, $item);
-
-      PluginPdfCommon::mainLine($pdf, $item, 'name-status');
-      PluginPdfCommon::mainLine($pdf, $item, 'location-type');
-      PluginPdfCommon::mainLine($pdf, $item, 'tech-manufacturer');
-      PluginPdfCommon::mainLine($pdf, $item, 'group-model');
-      PluginPdfCommon::mainLine($pdf, $item, 'contactnum-serial');
-      PluginPdfCommon::mainLine($pdf, $item, 'contact-otherserial');
+        PluginPdfCommon::mainLine($pdf, $item, 'name-status');
+        PluginPdfCommon::mainLine($pdf, $item, 'location-type');
+        PluginPdfCommon::mainLine($pdf, $item, 'tech-manufacturer');
+        PluginPdfCommon::mainLine($pdf, $item, 'group-model');
+        PluginPdfCommon::mainLine($pdf, $item, 'contactnum-serial');
+        PluginPdfCommon::mainLine($pdf, $item, 'contact-otherserial');
 
 
 
-      $pdf->displayLine(
-         '<b><i>'.sprintf(__('%1$s: %2$s'), __('User').'</i></b>',
-                          $dbu->getUserName($item->fields['users_id'])),
-         '<b><i>'.sprintf(__('%1$s: %2$s'), __('Network').'</i></b>',
-                          Toolbox::stripTags(Dropdown::getDropdownName('glpi_networks',
-                                                                       $item->fields['networks_id']))));
+        $pdf->displayLine(
+            '<b><i>' . sprintf(
+                __('%1$s: %2$s'),
+                __('User') . '</i></b>',
+                $dbu->getUserName($item->fields['users_id']),
+            ),
+            '<b><i>' . sprintf(
+                __('%1$s: %2$s'),
+                __('Network') . '</i></b>',
+                Toolbox::stripTags(Dropdown::getDropdownName(
+                    'glpi_networks',
+                    $item->fields['networks_id'],
+                )),
+            ),
+        );
 
-      $pdf->displayLine(
-         '<b><i>'.sprintf(__('%1$s: %2$s'), __('Group').'</i></b>',
-                          Dropdown::getDropdownName('glpi_groups', $item->fields['groups_id'])),
-         '<b><i>'.__('The MAC address and the IP of the equipment are included in an aggregated network port'),
-         '<b><i>'.sprintf(__('%1$s: %2$s'),
-                          sprintf(__('%1$s (%2$s)'), __('Memory'),__('Mio')).'</i></b>',
-                                  $item->fields['ram']));
+        $pdf->displayLine(
+            '<b><i>' . sprintf(
+                __('%1$s: %2$s'),
+                __('Group') . '</i></b>',
+                Dropdown::getDropdownName('glpi_groups', $item->fields['groups_id']),
+            ),
+            '<b><i>' . __('The MAC address and the IP of the equipment are included in an aggregated network port'),
+            '<b><i>' . sprintf(
+                __('%1$s: %2$s'),
+                sprintf(__('%1$s (%2$s)'), __('Memory'), __('Mio')) . '</i></b>',
+                $item->fields['ram'],
+            ),
+        );
 
-      $pdf->setColumnsSize(100);
-      PluginPdfCommon::mainLine($pdf, $item, 'comment');
+        $pdf->setColumnsSize(100);
+        PluginPdfCommon::mainLine($pdf, $item, 'comment');
 
-      $pdf->displaySpace();
-   }
+        $pdf->displaySpace();
+    }
 
+    public static function displayTabContentForPDF(PluginPdfSimplePDF $pdf, CommonGLPI $item, $tab)
+    {
+        switch ($tab) {
+            default:
+                return false;
+        }
 
-   static function displayTabContentForPDF(PluginPdfSimplePDF $pdf, CommonGLPI $item, $tab) {
-
-      switch ($tab) {
-         default :
-            return false;
-      }
-      return true;
-   }
+        return true;
+    }
 }

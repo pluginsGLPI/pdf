@@ -30,80 +30,85 @@
  *  --------------------------------------------------------------------------
  */
 
-function plugin_pdf_postinit() {
-   global $CFG_GLPI, $PLUGIN_HOOKS;
+function plugin_pdf_postinit()
+{
+    global $CFG_GLPI, $PLUGIN_HOOKS;
 
-   foreach ($PLUGIN_HOOKS['plugin_pdf'] as $type => $typepdf) {
-      CommonGLPI::registerStandardTab($type, $typepdf);
-   }
+    foreach ($PLUGIN_HOOKS['plugin_pdf'] as $type => $typepdf) {
+        CommonGLPI::registerStandardTab($type, $typepdf);
+    }
 }
 
 
-function plugin_pdf_MassiveActions($type) {
-   global $PLUGIN_HOOKS;
+function plugin_pdf_MassiveActions($type)
+{
+    global $PLUGIN_HOOKS;
 
-   switch ($type) {
-      default :
-         if (isset($PLUGIN_HOOKS['plugin_pdf'][$type])) {
-            return ['PluginPdfCommon'.MassiveAction::CLASS_ACTION_SEPARATOR.'DoIt'
-                     => __('Print to pdf', 'pdf')];
-         }
-   }
-   return [];
+    switch ($type) {
+        default:
+            if (isset($PLUGIN_HOOKS['plugin_pdf'][$type])) {
+                return ['PluginPdfCommon' . MassiveAction::CLASS_ACTION_SEPARATOR . 'DoIt'
+                         => __('Print to pdf', 'pdf')];
+            }
+    }
+
+    return [];
 }
 
 
-function plugin_pdf_install() {
-   global $DB;
+function plugin_pdf_install()
+{
+    global $DB;
 
-   $migration = new Migration('3.0.0');
+    $migration = new Migration('3.0.0');
 
-   include_once(Plugin::getPhpDir('pdf')."/inc/profile.class.php");
-   PluginPdfProfile::install($migration);
+    include_once(Plugin::getPhpDir('pdf') . '/inc/profile.class.php');
+    PluginPdfProfile::install($migration);
 
-   include_once(Plugin::getPhpDir('pdf')."/inc/preference.class.php");
-   PluginPdfPreference::install($migration);
+    include_once(Plugin::getPhpDir('pdf') . '/inc/preference.class.php');
+    PluginPdfPreference::install($migration);
 
-   include_once(Plugin::getPhpDir('pdf')."/inc/config.class.php");
-   PluginPdfConfig::install($migration);
+    include_once(Plugin::getPhpDir('pdf') . '/inc/config.class.php');
+    PluginPdfConfig::install($migration);
 
-   $migration->executeMigration();
+    $migration->executeMigration();
 
-   return true;
+    return true;
 }
 
 
-function plugin_pdf_uninstall() {
-   global $DB;
+function plugin_pdf_uninstall()
+{
+    global $DB;
 
-   $migration = new Migration('3.0.0');
-   
-   $tables = ['glpi_plugin_pdf_configs',
-              'glpi_plugin_pdf_preferences'];
-   
-   foreach($tables as $table) {
-       $migration->dropTable($table);
-   }
+    $migration = new Migration('3.0.0');
 
-   //Delete rights associated with the plugin
-   $query = "DELETE
+    $tables = ['glpi_plugin_pdf_configs',
+        'glpi_plugin_pdf_preferences'];
+
+    foreach ($tables as $table) {
+        $migration->dropTable($table);
+    }
+
+    //Delete rights associated with the plugin
+    $query = "DELETE
              FROM `glpi_profilerights`
              WHERE `name` = 'plugin_pdf'";
-   $DB->queryOrDie($query, $DB->error());
+    $DB->queryOrDie($query, $DB->error());
 
-   $migration->executeMigration();
+    $migration->executeMigration();
 
-   return true;
+    return true;
 }
 
 
 /**
  * @since version 1.0.2
 **/
-function plugin_pdf_registerMethods() {
-   global $WEBSERVICES_METHOD;
+function plugin_pdf_registerMethods()
+{
+    global $WEBSERVICES_METHOD;
 
-   $WEBSERVICES_METHOD['pdf.getTabs']  = ['PluginPdfRemote', 'methodGetTabs'];
-   $WEBSERVICES_METHOD['pdf.getPdf']   = ['PluginPdfRemote', 'methodGetPdf'];
+    $WEBSERVICES_METHOD['pdf.getTabs'] = ['PluginPdfRemote', 'methodGetTabs'];
+    $WEBSERVICES_METHOD['pdf.getPdf']  = ['PluginPdfRemote', 'methodGetPdf'];
 }
-

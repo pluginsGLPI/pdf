@@ -30,61 +30,74 @@
  *  --------------------------------------------------------------------------
  */
 
-class PluginPdfChangeValidation extends PluginPdfCommon {
+class PluginPdfChangeValidation extends PluginPdfCommon
+{
+    public static $rightname = 'plugin_pdf';
 
+    public function __construct(CommonGLPI $obj = null)
+    {
+        $this->obj = ($obj ? $obj : new ChangeValidation());
+    }
 
-   static $rightname = "plugin_pdf";
+    public static function pdfForChange(PluginPdfSimplePDF $pdf, Change $change)
+    {
+        global $DB;
 
+        $dbu = new DbUtils();
 
-   function __construct(CommonGLPI $obj=NULL) {
-      $this->obj = ($obj ? $obj : new ChangeValidation());
-   }
+        $pdf->setColumnsSize(100);
+        $pdf->displayTitle('<b>' . __('Approvals for the change', 'pdf') . '</b>');
 
+        if (!Session::haveRightsOr(
+            'changevalidation',
+            array_merge(
+                CommonITILValidation::getCreateRights(),
+                CommonITILValidation::getValidateRights(),
+                CommonITILValidation::getPurgeRights(),
+            ),
+        )) {
+            return false;
+        }
+        $ID = $change->getField('id');
 
-   static function pdfForChange(PluginPdfSimplePDF $pdf, Change $change) {
-      global $DB;
+        $result = $DB->request(
+            'glpi_changevalidations',
+            ['WHERE'    => ['changes_id' => $change->getField('id')],
+                'ORDER' => 'submission_date DESC'],
+        );
+        $number = count($result);
 
-      $dbu = new DbUtils();
+        $pdf->setColumnsSize(100);
+        $title = '<b>' . ChangeValidation::getTypeName(2) . '</b>';
+        if (!$number) {
+            $pdf->displayTitle(sprintf(__('%1$s: %2$s'), $title, __('No item to display')));
+        } else {
+            $title = sprintf(__('%1$s: %2$s'), $title, $number);
+            $pdf->displayTitle($title);
 
-      $pdf->setColumnsSize(100);
-      $pdf->displayTitle("<b>".__('Approvals for the change', 'pdf')."</b>");
+            $pdf->setColumnsSize(10, 10, 15, 20, 10, 15, 20);
+            $pdf->displayTitle(
+                _x('item', 'State'),
+                __('Request date'),
+                __('Approval requester'),
+                __('Request comments'),
+                __('Approval status'),
+                __('Approver'),
+                __('Approval comments'),
+            );
 
-      if (!Session::haveRightsOr('changevalidation',
-                                 array_merge(CommonITILValidation::getCreateRights(),
-                                             CommonITILValidation::getValidateRights(),
-                                             CommonITILValidation::getPurgeRights()))) {
-         return false;
-      }
-      $ID = $change->getField('id');
-
-      $result = $DB->request('glpi_changevalidations',
-                             ['WHERE'  => ['changes_id' => $change->getField('id')],
-                              'ORDER'  => 'submission_date DESC']);
-      $number = count($result);
-
-      $pdf->setColumnsSize(100);
-      $title = '<b>'.ChangeValidation::getTypeName(2).'</b>';
-      if (!$number) {
-          $pdf->displayTitle(sprintf(__('%1$s: %2$s'), $title, __('No item to display')));
-      } else {
-         $title = sprintf(__('%1$s: %2$s'), $title, $number);
-         $pdf->displayTitle($title);
-
-         $pdf->setColumnsSize(10,10,15,20,10,15,20);
-         $pdf->displayTitle(_x('item', 'State'), __('Request date'), __('Approval requester'),
-                            __('Request comments'), __('Approval status'), __('Approver'),
-                            __('Approval comments'));
-
-         foreach ($result as $row) {
-            $pdf->displayLine(TicketValidation::getStatus($row['status']),
-                              Html::convDateTime($row["submission_date"]),
-                              $dbu->getUserName($row["users_id"]),
-                              trim($row["comment_submission"]),
-                              Html::convDateTime($row["validation_date"]),
-                              $dbu->getUserName($row["users_id_validate"]),
-                              trim($row["comment_validation"]));
-         }
-      }
-      $pdf->displaySpace();
-   }
+            foreach ($result as $row) {
+                $pdf->displayLine(
+                    TicketValidation::getStatus($row['status']),
+                    Html::convDateTime($row['submission_date']),
+                    $dbu->getUserName($row['users_id']),
+                    trim($row['comment_submission']),
+                    Html::convDateTime($row['validation_date']),
+                    $dbu->getUserName($row['users_id_validate']),
+                    trim($row['comment_validation']),
+                );
+            }
+        }
+        $pdf->displaySpace();
+    }
 }

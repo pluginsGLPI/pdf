@@ -30,99 +30,117 @@
  *  --------------------------------------------------------------------------
  */
 
-class PluginPdfComputerVirtualMachine extends PluginPdfCommon {
+class PluginPdfComputerVirtualMachine extends PluginPdfCommon
+{
+    public static $rightname = 'plugin_pdf';
 
-   static $rightname = "plugin_pdf";
+    public function __construct(CommonGLPI $obj = null)
+    {
+        $this->obj = ($obj ? $obj : new ComputerVirtualMachine());
+    }
 
-   function __construct(CommonGLPI $obj=NULL) {
-      $this->obj = ($obj ? $obj : new ComputerVirtualMachine());
-   }
+    public static function pdfForComputer(PluginPdfSimplePDF $pdf, Computer $item)
+    {
+        $dbu = new DbUtils();
 
+        $ID = $item->getField('id');
 
-   static function pdfForComputer(PluginPdfSimplePDF $pdf, Computer $item) {
+        // From ComputerVirtualMachine::showForComputer()
+        $virtualmachines = $dbu->getAllDataFromTable(
+            'glpi_computervirtualmachines',
+            ['computers_id' => $ID],
+        );
+        $pdf->setColumnsSize(100);
+        $title = '<b>' . __('List of virtualized environments') . '</b>';
 
-      $dbu = new DbUtils();
+        $number = count($virtualmachines);
 
-      $ID = $item->getField('id');
-
-      // From ComputerVirtualMachine::showForComputer()
-      $virtualmachines = $dbu->getAllDataFromTable('glpi_computervirtualmachines',
-                                              ['computers_id' => $ID]);
-      $pdf->setColumnsSize(100);
-      $title = "<b>".__('List of virtualized environments')."</b>";
-
-      $number = count($virtualmachines);
-
-      if (!$number) {
-         $pdf->displayTitle("<b>".__('No virtualized environment associated with the computer')."</b>");
-      } else {
-         if ($number > $_SESSION['glpilist_limit']) {
-            $title = sprintf(__('%1$s: %2$s'), $title, $_SESSION['glpilist_limit'].' / '.$number);
-         } else {
-            $title = sprintf(__('%1$s: %2$s'), $title, $number);
-         }
-         $pdf->displayTitle($title);
-
-         $pdf->setColumnsSize(19,11,11,8,20,8,8,15);
-         $pdf->displayTitle(__('Name'), __('Virtualization system'), __('Virtualization model'),
-                            __('State'), __('UUID'), _x('quantity', 'Processors number'),
-                              sprintf(__('%1$s (%2$s)'), __('Memory'), __('Mio')),
-                            __('Machine'));
-         $pdf->setColumnsAlign('left', 'center', 'center', 'center', 'left', 'right', 'right', 'left');
-
-         foreach ($virtualmachines as $virtualmachine) {
-            $name = '';
-            if ($link_computer = ComputerVirtualMachine::findVirtualMachine($virtualmachine)) {
-               $computer = new Computer();
-               if ($computer->getFromDB($link_computer)) {
-                  $name = $computer->getName();
-               }
+        if (!$number) {
+            $pdf->displayTitle('<b>' . __('No virtualized environment associated with the computer') . '</b>');
+        } else {
+            if ($number > $_SESSION['glpilist_limit']) {
+                $title = sprintf(__('%1$s: %2$s'), $title, $_SESSION['glpilist_limit'] . ' / ' . $number);
+            } else {
+                $title = sprintf(__('%1$s: %2$s'), $title, $number);
             }
-            $pdf->displayLine(
-               $virtualmachine['name'],
-               Toolbox::stripTags(Dropdown::getDropdownName('glpi_virtualmachinetypes',
-                                                            $virtualmachine['virtualmachinetypes_id'])),
-               Toolbox::stripTags(Dropdown::getDropdownName('glpi_virtualmachinesystems',
-                                                            $virtualmachine['virtualmachinesystems_id'])),
-               Toolbox::stripTags(Dropdown::getDropdownName('glpi_virtualmachinestates',
-                                                            $virtualmachine['virtualmachinestates_id'])),
-               $virtualmachine['uuid'],
-               $virtualmachine['vcpu'],
+            $pdf->displayTitle($title);
 
-               Toolbox::stripTags(Html::formatNumber($virtualmachine['ram'],false,0)),
-               $name
+            $pdf->setColumnsSize(19, 11, 11, 8, 20, 8, 8, 15);
+            $pdf->displayTitle(
+                __('Name'),
+                __('Virtualization system'),
+                __('Virtualization model'),
+                __('State'),
+                __('UUID'),
+                _x('quantity', 'Processors number'),
+                sprintf(__('%1$s (%2$s)'), __('Memory'), __('Mio')),
+                __('Machine'),
             );
-         }
-      }
+            $pdf->setColumnsAlign('left', 'center', 'center', 'center', 'left', 'right', 'right', 'left');
 
-      // From ComputerVirtualMachine::showForVirtualMachine()
-      if ($item->fields['uuid']) {
-         $hosts = $dbu->getAllDataFromTable($item::getTable(),
-                                            ['RAW'
-                                             => ['LOWER(uuid)'
-                                                 => ComputerVirtualMachine::getUUIDRestrictCriteria($item->fields['uuid'])
-                                                ]
-                                            ]);
-
-         if (count($hosts)) {
-            $pdf->setColumnsSize(100);
-            $pdf->displayTitle("<b>".__('List of virtualized environments')."</b>");
-
-            $pdf->setColumnsSize(26,37,37);
-            $pdf->displayTitle(__('Name'), __('Operating system'), __('Entity'));
-
-            $computer = new Computer();
-            foreach ($hosts as $host) {
-               if ($computer->getFromDB($host['id'])) {
-                  $pdf->displayLine(
-                     $computer->getName(),
-                     Toolbox::stripTags(Dropdown::getDropdownName('glpi_operatingsystems',
-                                                                  $computer->getField('operatingsystems_id'))),
-                     Dropdown::getDropdownName('glpi_entities', $computer->getEntityID()));
-               }
+            foreach ($virtualmachines as $virtualmachine) {
+                $name = '';
+                if ($link_computer = ComputerVirtualMachine::findVirtualMachine($virtualmachine)) {
+                    $computer = new Computer();
+                    if ($computer->getFromDB($link_computer)) {
+                        $name = $computer->getName();
+                    }
+                }
+                $pdf->displayLine(
+                    $virtualmachine['name'],
+                    Toolbox::stripTags(Dropdown::getDropdownName(
+                        'glpi_virtualmachinetypes',
+                        $virtualmachine['virtualmachinetypes_id'],
+                    )),
+                    Toolbox::stripTags(Dropdown::getDropdownName(
+                        'glpi_virtualmachinesystems',
+                        $virtualmachine['virtualmachinesystems_id'],
+                    )),
+                    Toolbox::stripTags(Dropdown::getDropdownName(
+                        'glpi_virtualmachinestates',
+                        $virtualmachine['virtualmachinestates_id'],
+                    )),
+                    $virtualmachine['uuid'],
+                    $virtualmachine['vcpu'],
+                    Toolbox::stripTags(Html::formatNumber($virtualmachine['ram'], false, 0)),
+                    $name,
+                );
             }
-         }
-      }
-      $pdf->displaySpace();
-   }
+        }
+
+        // From ComputerVirtualMachine::showForVirtualMachine()
+        if ($item->fields['uuid']) {
+            $hosts = $dbu->getAllDataFromTable(
+                $item::getTable(),
+                ['RAW'
+                 => ['LOWER(uuid)'
+                     => ComputerVirtualMachine::getUUIDRestrictCriteria($item->fields['uuid']),
+                 ],
+                ],
+            );
+
+            if (count($hosts)) {
+                $pdf->setColumnsSize(100);
+                $pdf->displayTitle('<b>' . __('List of virtualized environments') . '</b>');
+
+                $pdf->setColumnsSize(26, 37, 37);
+                $pdf->displayTitle(__('Name'), __('Operating system'), __('Entity'));
+
+                $computer = new Computer();
+                foreach ($hosts as $host) {
+                    if ($computer->getFromDB($host['id'])) {
+                        $pdf->displayLine(
+                            $computer->getName(),
+                            Toolbox::stripTags(Dropdown::getDropdownName(
+                                'glpi_operatingsystems',
+                                $computer->getField('operatingsystems_id'),
+                            )),
+                            Dropdown::getDropdownName('glpi_entities', $computer->getEntityID()),
+                        );
+                    }
+                }
+            }
+        }
+        $pdf->displaySpace();
+    }
 }

@@ -30,96 +30,98 @@
  *  --------------------------------------------------------------------------
  */
 
-class PluginPdfItilFollowup extends PluginPdfCommon {
+class PluginPdfItilFollowup extends PluginPdfCommon
+{
+    public static $rightname = 'plugin_pdf';
 
+    public function __construct(CommonGLPI $obj = null)
+    {
+        $this->obj = ($obj ? $obj : new ITILFollowup());
+    }
 
-   static $rightname = "plugin_pdf";
+    public static function pdfForItem(PluginPdfSimplePDF $pdf, CommonDBTM $item, $private)
+    {
+        global $DB;
 
+        $dbu = new DbUtils();
 
-   function __construct(CommonGLPI $obj=NULL) {
+        $ID   = $item->getField('id');
+        $type = $item->getType();
 
-      $this->obj = ($obj ? $obj : new ITILFollowup());
-   }
+        //////////////followups///////////
 
+        $query = ['FROM' => 'glpi_itilfollowups',
+            'WHERE'      => ['items_id' => $ID,
+                'itemtype'              => $type],
+            'ORDER' => 'date DESC'];
 
-   static function pdfForItem(PluginPdfSimplePDF $pdf, CommonDBTM $item, $private) {
-      global $DB;
+        if (!$private) {
+            // Don't show private'
+            $query['WHERE']['is_private'] = 0;
+        } elseif (!Session::haveRight('followup', ITILFollowup::SEEPRIVATE)) {
+            // No right, only show connected user private one
+            $query['WHERE']['OR'] = ['is_private' => 0,
+                'users_id'                        => Session::getLoginUserID()];
+        }
 
-      $dbu = new DbUtils();
+        $result = $DB->request($query);
 
-      $ID   = $item->getField('id');
-      $type = $item->getType();
+        $number = count($result);
 
-      //////////////followups///////////
+        $pdf->setColumnsSize(100);
+        $title = '<b>' . ITILFollowup::getTypeName(2) . '</b>';
 
-      $query = ['FROM'  => 'glpi_itilfollowups',
-                'WHERE' => ['items_id' => $ID,
-                            'itemtype' => $type],
-                'ORDER' => 'date DESC'];
-
-      if (!$private) {
-         // Don't show private'
-         $query['WHERE']['is_private'] = 0;
-      } else if (!Session::haveRight('followup', ITILFollowup::SEEPRIVATE)) {
-         // No right, only show connected user private one
-         $query['WHERE']['OR'] = ['is_private' => 0,
-                                  'users_id'   => Session::getLoginUserID()];
-      }
-
-      $result = $DB->request($query);
-
-      $number = count($result);
-
-      $pdf->setColumnsSize(100);
-      $title = '<b>'.ITILFollowup::getTypeName(2).'</b>';
-
-      if (!$number) {
-         $pdf->displayTitle(sprintf(__('%1$s: %2$s'), $title, __('No item to display')));
-      } else {
-         if ($number > $_SESSION['glpilist_limit']) {
-            $title = sprintf(__('%1$s (%2$s)'), $title, $_SESSION['glpilist_limit']."/".$number);
-         } else {
-            $title = sprintf(__('%1$s: %2$s'), $title, $number);
-         }
-         $pdf->displayTitle($title);
-
-         $pdf->setColumnsSize(44,14,42);
-         $pdf->displayTitle("<b><i>".__('Source of followup', 'pdf')."</i></b>", // Source
-               "<b><i>".__('Date')."</i></b>", // Date
-               "<b><i>".__('Requester')."</i></b>"); // Author
-
-         foreach ($result as $data) {
-            if ($data['requesttypes_id']) {
-               $lib = Dropdown::getDropdownName('glpi_requesttypes', $data['requesttypes_id']);
+        if (!$number) {
+            $pdf->displayTitle(sprintf(__('%1$s: %2$s'), $title, __('No item to display')));
+        } else {
+            if ($number > $_SESSION['glpilist_limit']) {
+                $title = sprintf(__('%1$s (%2$s)'), $title, $_SESSION['glpilist_limit'] . '/' . $number);
             } else {
-               $lib = '';
+                $title = sprintf(__('%1$s: %2$s'), $title, $number);
             }
-            if ($data['is_private']) {
-               $lib = sprintf(__('%1$s (%2$s)'), $lib, __('Private'));
-            }
-            $pdf->displayLine(Toolbox::stripTags($lib),
-                              Html::convDateTime($data["date"]),
-                              Toolbox::stripTags($dbu->getUserName($data["users_id"])));
+            $pdf->displayTitle($title);
 
-        
-            $content = Glpi\Toolbox\Sanitizer::unsanitize(Html::entity_decode_deep($data['content']));
-            $content = preg_replace('#data:image/[^;]+;base64,#', '@', $content);
-            
-            preg_match_all('/<img [^>]*src=[\'"]([^\'"]*docid=([0-9]*))[^>]*>/', $content, $res, PREG_SET_ORDER);
-            
-            foreach ($res as $img) {
-                $docimg = new Document();
-                $docimg->getFromDB($img[2]);
-                
-                $path = '<img src="file://'.GLPI_DOC_DIR.'/'.$docimg->fields['filepath'].'"/>';
-                $content = str_replace($img[0], $path, $content);
+            $pdf->setColumnsSize(44, 14, 42);
+            $pdf->displayTitle('<b><i>' . __('Source of followup', 'pdf') . '</i></b>', // Source
+                '<b><i>' . __('Date') . '</i></b>', // Date
+                '<b><i>' . __('Requester') . '</i></b>'); // Author
+
+            foreach ($result as $data) {
+                if ($data['requesttypes_id']) {
+                    $lib = Dropdown::getDropdownName('glpi_requesttypes', $data['requesttypes_id']);
+                } else {
+                    $lib = '';
+                }
+                if ($data['is_private']) {
+                    $lib = sprintf(__('%1$s (%2$s)'), $lib, __('Private'));
+                }
+                $pdf->displayLine(
+                    Toolbox::stripTags($lib),
+                    Html::convDateTime($data['date']),
+                    Toolbox::stripTags($dbu->getUserName($data['users_id'])),
+                );
+
+
+                $content = Glpi\Toolbox\Sanitizer::unsanitize(Html::entity_decode_deep($data['content']));
+                $content = preg_replace('#data:image/[^;]+;base64,#', '@', $content);
+
+                preg_match_all('/<img [^>]*src=[\'"]([^\'"]*docid=([0-9]*))[^>]*>/', $content, $res, PREG_SET_ORDER);
+
+                foreach ($res as $img) {
+                    $docimg = new Document();
+                    $docimg->getFromDB($img[2]);
+
+                    $path    = '<img src="file://' . GLPI_DOC_DIR . '/' . $docimg->fields['filepath'] . '"/>';
+                    $content = str_replace($img[0], $path, $content);
+                }
+
+                $pdf->displayText(
+                    '<b><i>' . sprintf(__('%1$s: %2$s') . '</i></b>', __('Description'), ''),
+                    $content,
+                    1,
+                );
             }
-            
-            $pdf->displayText("<b><i>".sprintf(__('%1$s: %2$s')."</i></b>", __('Description'), ''),
-                                               $content, 1);
-            
-         }
-      }
-      $pdf->displaySpace();
-   }
+        }
+        $pdf->displaySpace();
+    }
 }

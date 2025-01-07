@@ -30,74 +30,83 @@
  *  --------------------------------------------------------------------------
  */
 
-class PluginPdfMonitor extends PluginPdfCommon {
+class PluginPdfMonitor extends PluginPdfCommon
+{
+    public static $rightname = 'plugin_pdf';
 
+    public function __construct(CommonGLPI $obj = null)
+    {
+        $this->obj = ($obj ? $obj : new Monitor());
+    }
 
-   static $rightname = "plugin_pdf";
+    public function defineAllTabsPDF($options = [])
+    {
+        $onglets = parent::defineAllTabsPDF($options);
+        unset($onglets['Impact$1']);
+        unset($onglets['Appliance_Item$1']);
 
+        return $onglets;
+    }
 
-   function __construct(CommonGLPI $obj=NULL) {
-      $this->obj = ($obj ? $obj : new Monitor());
-   }
+    public static function pdfMain(PluginPdfSimplePDF $pdf, Monitor $item)
+    {
+        PluginPdfCommon::mainTitle($pdf, $item);
 
+        PluginPdfCommon::mainLine($pdf, $item, 'name-status');
+        PluginPdfCommon::mainLine($pdf, $item, 'location-type');
+        PluginPdfCommon::mainLine($pdf, $item, 'tech-manufacturer');
+        PluginPdfCommon::mainLine($pdf, $item, 'group-model');
+        PluginPdfCommon::mainLine($pdf, $item, 'contactnum-serial');
+        PluginPdfCommon::mainLine($pdf, $item, 'contact-otherserial');
+        PluginPdfCommon::mainLine($pdf, $item, 'user-management');
 
-   function defineAllTabsPDF($options=[]) {
+        $pdf->displayLine(
+            '<b><i>' . sprintf(
+                __('%1$s: %2$s'),
+                __('Group') . '</i></b>',
+                Dropdown::getDropdownName('glpi_groups', $item->fields['groups_id']),
+            ),
+            '<b><i>' . sprintf(
+                __('%1$s: %2$s'),
+                __('Size') . '</i></b>',
+                sprintf(__('%1$s %2$s'), $item->fields['size'], '"'),
+            ),
+        );
 
-      $onglets = parent::defineAllTabsPDF($options);
-      unset($onglets['Impact$1']);
-      unset($onglets['Appliance_Item$1']);
-      return $onglets;
-   }
+        $opts = ['have_micro'  => __('Microphone'),
+            'have_speaker'     => __('Speakers'),
+            'have_subd'        => __('Sub-D'),
+            'have_bnc'         => __('BNC'),
+            'have_dvi'         => __('DVI'),
+            'have_pivot'       => __('Pivot'),
+            'have_hdmi'        => __('HDMI'),
+            'have_displayport' => __('DisplayPort')];
+        foreach ($opts as $key => $val) {
+            if (!$item->fields[$key]) {
+                unset($opts[$key]);
+            }
+        }
+        $pdf->setColumnsSize(100);
+        $pdf->displayLine(
+            '<b><i>' . sprintf(
+                __('%1$s: %2$s'),
+                __('Flags') . '</i></b>',
+                (count($opts) ? implode(', ', $opts) : __('None')),
+            ),
+        );
 
+        PluginPdfCommon::mainLine($pdf, $item, 'comment');
 
-   static function pdfMain(PluginPdfSimplePDF $pdf, Monitor $item) {
+        $pdf->displaySpace();
+    }
 
-      PluginPdfCommon::mainTitle($pdf, $item);
+    public static function displayTabContentForPDF(PluginPdfSimplePDF $pdf, CommonGLPI $item, $tab)
+    {
+        switch ($tab) {
+            default:
+                return false;
+        }
 
-      PluginPdfCommon::mainLine($pdf, $item, 'name-status');
-      PluginPdfCommon::mainLine($pdf, $item, 'location-type');
-      PluginPdfCommon::mainLine($pdf, $item, 'tech-manufacturer');
-      PluginPdfCommon::mainLine($pdf, $item, 'group-model');
-      PluginPdfCommon::mainLine($pdf, $item, 'contactnum-serial');
-      PluginPdfCommon::mainLine($pdf, $item, 'contact-otherserial');
-      PluginPdfCommon::mainLine($pdf, $item, 'user-management');
-
-      $pdf->displayLine(
-         '<b><i>'.sprintf(__('%1$s: %2$s'), __('Group').'</i></b>',
-                          Dropdown::getDropdownName('glpi_groups', $item->fields['groups_id'])),
-         '<b><i>'.sprintf(__('%1$s: %2$s'), __('Size').'</i></b>',
-                          sprintf(__('%1$s %2$s'), $item->fields['size'], '"')));
-
-      $opts = ['have_micro'         => __('Microphone'),
-               'have_speaker'       => __('Speakers'),
-               'have_subd'          => __('Sub-D'),
-               'have_bnc'           => __('BNC'),
-               'have_dvi'           => __('DVI'),
-               'have_pivot'         => __('Pivot'),
-               'have_hdmi'          => __('HDMI'),
-               'have_displayport'   => __('DisplayPort')];
-      foreach ($opts as $key => $val) {
-         if (!$item->fields[$key]) {
-            unset($opts[$key]);
-         }
-      }
-      $pdf->setColumnsSize(100);
-      $pdf->displayLine(
-         '<b><i>'.sprintf(__('%1$s: %2$s'), __('Flags').'</i></b>',
-                          (count($opts) ? implode(', ',$opts) : __('None'))));
-
-      PluginPdfCommon::mainLine($pdf, $item, 'comment');
-
-      $pdf->displaySpace();
-   }
-
-
-   static function displayTabContentForPDF(PluginPdfSimplePDF $pdf, CommonGLPI $item, $tab) {
-
-      switch ($tab) {
-         default :
-            return false;
-      }
-      return true;
-   }
+        return true;
+    }
 }

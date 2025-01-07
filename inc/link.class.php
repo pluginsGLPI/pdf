@@ -30,82 +30,85 @@
  *  --------------------------------------------------------------------------
  */
 
-class PluginPdfLink extends PluginPdfCommon {
+class PluginPdfLink extends PluginPdfCommon
+{
+    public static $rightname = 'plugin_pdf';
 
+    public function __construct(CommonGLPI $obj = null)
+    {
+        $this->obj = ($obj ? $obj : new Link());
+    }
 
-   static $rightname = "plugin_pdf";
+    public static function pdfForItem(PluginPdfSimplePDF $pdf, CommonDBTM $item)
+    {
+        global $DB;
 
+        $ID   = $item->getField('id');
+        $type = get_class($item);
 
-   function __construct(CommonGLPI $obj=NULL) {
-      $this->obj = ($obj ? $obj : new Link());
-   }
+        $query = ['SELECT' => ['glpi_links.id', 'link', 'name', 'data'],
+            'FROM'         => 'glpi_links',
+            'INNER JOIN'   => ['glpi_links_itemtypes'
+                             => ['FKEY' => ['glpi_links' => 'id',
+                                 'glpi_links_itemtypes'  => 'links_id']]],
+            'WHERE' => ['itemtype' => $type],
+            'ORDER' => 'name'];
 
+        $result = $DB->request($query);
+        $number = count($result);
 
-   static function pdfForItem(PluginPdfSimplePDF $pdf, CommonDBTM $item) {
-      global $DB;
-
-      $ID   = $item->getField('id');
-      $type = get_class($item);
-
-      $query = ['SELECT'     => ['glpi_links.id', 'link', 'name', 'data'],
-                'FROM'       => 'glpi_links',
-                'INNER JOIN' => ['glpi_links_itemtypes'
-                                 => ['FKEY' => ['glpi_links'           => 'id',
-                                                'glpi_links_itemtypes' => 'links_id']]],
-                'WHERE'      => ['itemtype' => $type],
-                'ORDER'      => 'name'];
-
-      $result = $DB->request($query);
-      $number = count($result);
-
-      $pdf->setColumnsSize(100);
-      $title = '<b>'._n('External link', 'External links', $number).'</b>';
-      if (!$number) {
-         $pdf->displayTitle(sprintf(__('%1$s: %2$s'), $title, __('No item to display')));
-      } else {
-         if ($number > $_SESSION['glpilist_limit']) {
-            $title = sprintf(__('%1$s: %2$s'), $title, $_SESSION['glpilist_limit'].' / '.$number);
-         } else {
-            $title = sprintf(__('%1$s: %2$s'), $title, $number);
-         }
-         $pdf->displayTitle($title);
-
-         foreach ($result as $data) {
-            $name = $data["name"];
-            if (empty($name)) {
-               $name = $data["link"];
+        $pdf->setColumnsSize(100);
+        $title = '<b>' . _n('External link', 'External links', $number) . '</b>';
+        if (!$number) {
+            $pdf->displayTitle(sprintf(__('%1$s: %2$s'), $title, __('No item to display')));
+        } else {
+            if ($number > $_SESSION['glpilist_limit']) {
+                $title = sprintf(__('%1$s: %2$s'), $title, $_SESSION['glpilist_limit'] . ' / ' . $number);
+            } else {
+                $title = sprintf(__('%1$s: %2$s'), $title, $number);
             }
-            $link = $data["link"];
-            $file = trim($data["data"]);
+            $pdf->displayTitle($title);
 
-            if (empty($file)) {
-               $links = Link::generateLinkContents($data['link'], $item, $name);
-               $i     = 1;
-               foreach ($links as $key => $link) {
-                  $url = $link;
-                  $pdf->displayLine(sprintf(__('%1$s: %2$s'), "<b>$name #$i</b>", $link));
-                  $i++;
-                  $i++;
-               }
-            } else { // Generated File
-                  $files = Link::generateLinkContents($data['link'], $item);
-                  $links = Link::generateLinkContents($data['data'], $item);
-                  $i=1;
-                  foreach ($links as $key => $data) {
-                     if (isset($files[$key])) {
-                        // a different name for each file, ex name = foo-[IP].txt
-                        $file = $files[$key];
-                     } else {
-                        // same name for all files, ex name = foo.txt
-                        $file = reset($files);
-                     }
-                     $pdf->displayText(sprintf(__('%1$s: %2$s'), "<b>$name #$i - $file</b>", ''),
-                                               trim($data), 1, 10);
-                     $i++;
-                  }
-            }
-         } // Each link
-      }
-      $pdf->displaySpace();
-   }
+            foreach ($result as $data) {
+                $name = $data['name'];
+                if (empty($name)) {
+                    $name = $data['link'];
+                }
+                $link = $data['link'];
+                $file = trim($data['data']);
+
+                if (empty($file)) {
+                    $links = Link::generateLinkContents($data['link'], $item, $name);
+                    $i     = 1;
+                    foreach ($links as $key => $link) {
+                        $url = $link;
+                        $pdf->displayLine(sprintf(__('%1$s: %2$s'), "<b>$name #$i</b>", $link));
+                        $i++;
+                        $i++;
+                    }
+                } else { // Generated File
+                    $files = Link::generateLinkContents($data['link'], $item);
+                    $links = Link::generateLinkContents($data['data'], $item);
+                    $i     = 1;
+                    foreach ($links as $key => $data) {
+                        if (isset($files[$key])) {
+                            // a different name for each file, ex name = foo-[IP].txt
+                            $file = $files[$key];
+                        } else {
+                            // same name for all files, ex name = foo.txt
+                            $file = reset($files);
+                        }
+                        $pdf->displayText(
+                            sprintf(__('%1$s: %2$s'), "<b>$name #$i - $file</b>", ''),
+                            trim($data),
+                            1,
+                            10,
+                        );
+                        $i++;
+                    }
+                }
+            } // Each link
+        }
+        $pdf->displaySpace();
+    }
 }

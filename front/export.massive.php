@@ -30,38 +30,39 @@
  *  --------------------------------------------------------------------------
  */
 
-include ("../../../inc/includes.php");
+include('../../../inc/includes.php');
 
 Plugin::load('pdf', true);
 
-$type = $_SESSION["plugin_pdf"]["type"];
+$type = $_SESSION['plugin_pdf']['type'];
 $item = new $type();
 
-$tab_id = unserialize($_SESSION["plugin_pdf"]["tab_id"]);
-unset($_SESSION["plugin_pdf"]["tab_id"]);
+$tab_id = unserialize($_SESSION['plugin_pdf']['tab_id']);
+unset($_SESSION['plugin_pdf']['tab_id']);
 
-$result = $DB->request('glpi_plugin_pdf_preferences',
-                       ['SELECT' => 'tabref',
-                        'WHERE'  => ['users_ID' => $_SESSION['glpiID'],
-                                     'itemtype' => $type]]);
+$result = $DB->request(
+    'glpi_plugin_pdf_preferences',
+    ['SELECT'   => 'tabref',
+        'WHERE' => ['users_ID' => $_SESSION['glpiID'],
+            'itemtype'         => $type]],
+);
 
 $tab = [];
 
 foreach ($result as $data) {
-   if ($data["tabref"] == 'landscape') {
-      $pag = 1;
-   } else {
-      $tab[]= $data["tabref"];
-   }
+    if ($data['tabref'] == 'landscape') {
+        $pag = 1;
+    } else {
+        $tab[] = $data['tabref'];
+    }
 }
-   if (empty($tab)) {
-      $tab[] = $type.'$main';
-   }
+if (empty($tab)) {
+    $tab[] = $type . '$main';
+}
 
 if (isset($PLUGIN_HOOKS['plugin_pdf'][$type])) {
-
-   $itempdf = new $PLUGIN_HOOKS['plugin_pdf'][$type]($item);
-   $itempdf->generatePDF($tab_id, $tab, (isset($pag) ? $pag : 0));
+    $itempdf = new $PLUGIN_HOOKS['plugin_pdf'][$type]($item);
+    $itempdf->generatePDF($tab_id, $tab, (isset($pag) ? $pag : 0));
 } else {
-   die("Missing hook");
+    die('Missing hook');
 }

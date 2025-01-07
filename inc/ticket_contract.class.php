@@ -30,75 +30,92 @@
  *  --------------------------------------------------------------------------
  */
 
-class PluginPdfTicket_Contract extends PluginPdfCommon {
+class PluginPdfTicket_Contract extends PluginPdfCommon
+{
+    public static $rightname = 'plugin_pdf';
 
-   static $rightname = "plugin_pdf";
+    public function __construct(CommonGLPI $obj = null)
+    {
+        $this->obj = ($obj ? $obj : new Ticket_Contract());
+    }
 
+    public static function pdfForTicket(PluginPdfSimplePDF $pdf, CommonDBTM $item)
+    {
+        global $DB;
 
-   function __construct(CommonGLPI $obj=NULL) {
-      $this->obj = ($obj ? $obj : new Ticket_Contract());
-   }
+        $type      = $item->getType();
+        $ID        = $item->getField('id');
+        $itemtable = getTableForItemType($type);
+        $con       = new Contract();
+        $dbu       = new DbUtils();
 
+        $query = ['SELECT' => ['glpi_tickets_contracts.*', 'glpi_contracts.*'],
+            'FROM'         => 'glpi_tickets_contracts',
+            'LEFT JOIN'    => ['glpi_contracts'
+                            => ['FKEY' => ['glpi_contracts' => 'id',
+                                'glpi_tickets_contracts'    => 'contracts_id']]],
+            'WHERE' => ['glpi_tickets_contracts.tickets_id' => $ID]
+                           + $dbu->getEntitiesRestrictCriteria('glpi_contracts', '', '', true),
+            'ORDER' => 'glpi_contracts.name'];
 
-   static function pdfForTicket(PluginPdfSimplePDF $pdf, CommonDBTM $item){
-      global $DB;
+        $result = $DB->request($query);
+        $number = count($result);
 
-      $type       = $item->getType();
-      $ID         = $item->getField('id');
-      $itemtable  = getTableForItemType($type);
-      $con        = new Contract();
-      $dbu        = new DbUtils();
+        $pdf->setColumnsSize(100);
+        $title = '<b>' . _n('Associated contract', 'Associated contracts', $number) . '</b>';
+        if (!$number) {
+            $pdf->displayTitle(sprintf(__('%1$s: %2$s'), $title, __('No item to display')));
+        } else {
+            $pdf->displayTitle(sprintf(__('%1$s: %2$s'), $title, $number));
 
-     $query = ['SELECT'    => ['glpi_tickets_contracts.*', 'glpi_contracts.*'],
-               'FROM'      => 'glpi_tickets_contracts',
-               'LEFT JOIN' => ['glpi_contracts'
-                               => ['FKEY' => ['glpi_contracts' => 'id',
-                                             'glpi_tickets_contracts' => 'contracts_id']]],
-               'WHERE'    => ['glpi_tickets_contracts.tickets_id' => $ID ]
-                              + $dbu->getEntitiesRestrictCriteria('glpi_contracts','','',true),
-               'ORDER'    => 'glpi_contracts.name'];
+            $pdf->setColumnsSize(19, 19, 15, 10, 16, 11, 10);
+            $pdf->displayTitle(
+                __('Name'),
+                __('Entity'),
+                _x('phone', 'Number'),
+                __('Contract type'),
+                __('Supplier'),
+                __('Start date'),
+                __('Initial contract period'),
+            );
 
-      $result = $DB->request($query);
-      $number = count($result);
+            foreach ($result as $row) {
+                $cID     = $row['contracts_id'];
+                $assocID = $row['id'];
 
-      $pdf->setColumnsSize(100);
-      $title = '<b>'._n('Associated contract', 'Associated contracts', $number).'</b>';
-      if (!$number) {
-         $pdf->displayTitle(sprintf(__('%1$s: %2$s'), $title, __('No item to display')));
-      } else {
-         $pdf->displayTitle(sprintf(__('%1$s: %2$s'), $title, $number));
-
-         $pdf->setColumnsSize(19,19,15,10,16,11,10);
-         $pdf->displayTitle(__('Name'), __('Entity'), _x('phone', 'Number'), __('Contract type'),
-                            __('Supplier'), __('Start date'), __('Initial contract period'));
-
-         foreach ($result as $row) {
-            $cID     = $row['contracts_id'];
-            $assocID = $row['id'];
-
-            if ($con->getFromDB($cID)) {
-               $textduration = '';
-               if ($con->fields['duration'] > 0) {
-                  $textduration = sprintf(__('Valid to %s'),
-                                          Infocom::getWarrantyExpir($con->fields["begin_date"],
-                                                                    $con->fields["duration"]));
-               }
-               $pdf->displayLine(
-                  (empty($con->fields["name"]) ? "(".$con->fields["id"].")" : $con->fields["name"]),
-                  Dropdown::getDropdownName("glpi_entities", $con->fields["entities_id"]),
-                  $con->fields["num"],
-                  Toolbox::stripTags(Dropdown::getDropdownName("glpi_contracttypes",
-                                                               $con->fields["contracttypes_id"])),
-                  str_replace("<br>", " ", $con->getSuppliersNames()),
-                  Html::convDate($con->fields["begin_date"]),
-                  sprintf(__('%1$s - %2$s'),
-                          sprintf(_n('%d month', '%d months', $con->fields["duration"]),
-                                  $con->fields["duration"]),
-                          $textduration));
+                if ($con->getFromDB($cID)) {
+                    $textduration = '';
+                    if ($con->fields['duration'] > 0) {
+                        $textduration = sprintf(
+                            __('Valid to %s'),
+                            Infocom::getWarrantyExpir(
+                                $con->fields['begin_date'],
+                                $con->fields['duration'],
+                            ),
+                        );
+                    }
+                    $pdf->displayLine(
+                        (empty($con->fields['name']) ? '(' . $con->fields['id'] . ')' : $con->fields['name']),
+                        Dropdown::getDropdownName('glpi_entities', $con->fields['entities_id']),
+                        $con->fields['num'],
+                        Toolbox::stripTags(Dropdown::getDropdownName(
+                            'glpi_contracttypes',
+                            $con->fields['contracttypes_id'],
+                        )),
+                        str_replace('<br>', ' ', $con->getSuppliersNames()),
+                        Html::convDate($con->fields['begin_date']),
+                        sprintf(
+                            __('%1$s - %2$s'),
+                            sprintf(
+                                _n('%d month', '%d months', $con->fields['duration']),
+                                $con->fields['duration'],
+                            ),
+                            $textduration,
+                        ),
+                    );
+                }
             }
-         }
-      }
-      $pdf->displaySpace();
-   }
-
+        }
+        $pdf->displaySpace();
+    }
 }

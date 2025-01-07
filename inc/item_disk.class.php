@@ -30,70 +30,94 @@
  *  --------------------------------------------------------------------------
  */
 
-class PluginPdfItem_Disk extends PluginPdfCommon {
+class PluginPdfItem_Disk extends PluginPdfCommon
+{
+    public static $rightname = 'plugin_pdf';
 
-   static $rightname = "plugin_pdf";
+    public function __construct(CommonGLPI $obj = null)
+    {
+        $this->obj = ($obj ? $obj : new Item_Disk());
+    }
 
+    public static function pdfForItem(PluginPdfSimplePDF $pdf, CommonDBTM $item)
+    {
+        global $DB;
 
-   function __construct(CommonGLPI $obj=NULL) {
-      $this->obj = ($obj ? $obj : new Item_Disk());
-   }
+        $ID = $item->getField('id');
 
+        $result = $DB->request(
+            'glpi_items_disks',
+            ['SELECT'       => ['glpi_filesystems.name', 'glpi_items_disks.*'],
+                'LEFT JOIN' => ['glpi_filesystems'
+                                => ['FKEY' => ['glpi_items_disks' => 'filesystems_id',
+                                    'glpi_filesystems'            => 'id']]],
+                'WHERE' => ['items_id' => $ID,
+                    'itemtype'         => $item->getType(),
+                    'is_deleted'       => 0]],
+        );
 
-   static function pdfForItem(PluginPdfSimplePDF $pdf, CommonDBTM $item) {
-      global $DB;
+        $number = count($result);
 
-      $ID = $item->getField('id');
+        $pdf->setColumnsSize(100);
+        $title = '<b>' . _n('Volume', 'Volumes', $number) . '</b>';
 
-      $result = $DB->request('glpi_items_disks',
-                             ['SELECT'    => ['glpi_filesystems.name', 'glpi_items_disks.*'],
-                              'LEFT JOIN' => ['glpi_filesystems'
-                                              => ['FKEY' => ['glpi_items_disks' => 'filesystems_id',
-                                                             'glpi_filesystems'   => 'id']]],
-                              'WHERE'     => ['items_id'   => $ID,
-                                              'itemtype'   => $item->getType(),
-                                              'is_deleted' => 0]]);
-
-      $number = count($result);
-
-      $pdf->setColumnsSize(100);
-      $title = "<b>"._n('Volume', 'Volumes', $number)."</b>";
-
-      if (!$number) {
-         $pdf->displayTitle(sprintf(__('%1$s: %2$s'), $title, __('No item to display')));
-      } else {
-         if ($number > $_SESSION['glpilist_limit']) {
-            $title = sprintf(__('%1$s: %2$s'), $title, $_SESSION['glpilist_limit'].' / '.$number);
-         } else {
-            $title = sprintf(__('%1$s: %2$s'), $title, $number);
-         }
-         $pdf->displayTitle($title);
-
-         $pdf->setColumnsSize(21,21,20,9,9,9,11);
-         $pdf->displayTitle('<b>'.__('Name'), __('Partition'), __('Mount point'), __('File system'),
-                                   __('Global size'), __('Free size'), __('Free percentage').'</b>');
-
-         $pdf->setColumnsAlign('left','left','left','left','center','right','right');
-
-         foreach ($result as $data) {
-            $percent = 0;
-            if ($data['totalsize'] > 0) {
-               $percent = round(100*$data['freesize']/$data['totalsize']);
+        if (!$number) {
+            $pdf->displayTitle(sprintf(__('%1$s: %2$s'), $title, __('No item to display')));
+        } else {
+            if ($number > $_SESSION['glpilist_limit']) {
+                $title = sprintf(__('%1$s: %2$s'), $title, $_SESSION['glpilist_limit'] . ' / ' . $number);
+            } else {
+                $title = sprintf(__('%1$s: %2$s'), $title, $number);
             }
-            $pdf->displayLine('<b>'.$data['name'].'</b>',
-                              $data['device'],
-                              $data['mountpoint'],
-                              $data['name'],
-                              sprintf(__('%s Mio'),
-                                      Toolbox::stripTags(Html::formatNumber($data['totalsize'],
-                                                         false, 0))),
-                              sprintf(__('%s Mio'),
-                                      Toolbox::stripTags(Html::formatNumber($data['freesize'],
-                                                         false, 0))),
-                              sprintf(__('%s %s'),
-                                      Toolbox::stripTags(Html::formatNumber($percent, false, 0)), '%'));
-         }
-      }
-      $pdf->displaySpace();
-   }
+            $pdf->displayTitle($title);
+
+            $pdf->setColumnsSize(21, 21, 20, 9, 9, 9, 11);
+            $pdf->displayTitle(
+                '<b>' . __('Name'),
+                __('Partition'),
+                __('Mount point'),
+                __('File system'),
+                __('Global size'),
+                __('Free size'),
+                __('Free percentage') . '</b>',
+            );
+
+            $pdf->setColumnsAlign('left', 'left', 'left', 'left', 'center', 'right', 'right');
+
+            foreach ($result as $data) {
+                $percent = 0;
+                if ($data['totalsize'] > 0) {
+                    $percent = round(100 * $data['freesize'] / $data['totalsize']);
+                }
+                $pdf->displayLine(
+                    '<b>' . $data['name'] . '</b>',
+                    $data['device'],
+                    $data['mountpoint'],
+                    $data['name'],
+                    sprintf(
+                        __('%s Mio'),
+                        Toolbox::stripTags(Html::formatNumber(
+                            $data['totalsize'],
+                            false,
+                            0,
+                        )),
+                    ),
+                    sprintf(
+                        __('%s Mio'),
+                        Toolbox::stripTags(Html::formatNumber(
+                            $data['freesize'],
+                            false,
+                            0,
+                        )),
+                    ),
+                    sprintf(
+                        __('%s %s'),
+                        Toolbox::stripTags(Html::formatNumber($percent, false, 0)),
+                        '%',
+                    ),
+                );
+            }
+        }
+        $pdf->displaySpace();
+    }
 }

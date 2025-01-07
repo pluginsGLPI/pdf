@@ -30,78 +30,94 @@
  *  --------------------------------------------------------------------------
  */
 
-class PluginPdfPhone extends PluginPdfCommon {
+class PluginPdfPhone extends PluginPdfCommon
+{
+    public static $rightname = 'plugin_pdf';
+
+    public function __construct(CommonGLPI $obj = null)
+    {
+        $this->obj = ($obj ? $obj : new Phone());
+    }
+
+    public function defineAllTabsPDF($options = [])
+    {
+        $onglets = parent::defineAllTabsPDF($options);
+        unset($onglets['Appliance_Item$1']);
+        unset($onglets['Impact$1']);
+        unset($onglets['Glpi\Socket$1']);
+        unset($onglets['Item_RemoteManagement$1']);
+
+        return $onglets;
+    }
+
+    public static function pdfMain(PluginPdfSimplePDF $pdf, Phone $item)
+    {
+        PluginPdfCommon::mainTitle($pdf, $item);
+
+        PluginPdfCommon::mainLine($pdf, $item, 'name-status');
+        PluginPdfCommon::mainLine($pdf, $item, 'location-type');
+        PluginPdfCommon::mainLine($pdf, $item, 'tech-manufacturer');
+        PluginPdfCommon::mainLine($pdf, $item, 'group-model');
+        PluginPdfCommon::mainLine($pdf, $item, 'contactnum-serial');
+        PluginPdfCommon::mainLine($pdf, $item, 'contact-otherserial');
+        PluginPdfCommon::mainLine($pdf, $item, 'user-management');
 
 
-   static $rightname = "plugin_pdf";
+        $pdf->displayLine(
+            '<b><i>' . sprintf(
+                __('%1$s: %2$s'),
+                __('Group') . '</i></b>',
+                Dropdown::getDropdownName('glpi_groups', $item->fields['groups_id']),
+            ),
+            '<b><i>' . sprintf(
+                __('%1$s: %2$s'),
+                __('UUID') . '</i></b>',
+                $item->fields['uuid'],
+            ),
+        );
 
+        $pdf->displayLine(
+            '<b><i>' . sprintf(__('%1$s: %2$s'), __('Brand') . '</i></b>', $item->fields['brand']),
+            '<b><i>' . sprintf(
+                __('%1$s: %2$s'),
+                _x('quantity', 'Number of lines') . '</i></b>',
+                $item->fields['number_line'],
+            ),
+        );
 
-   function __construct(CommonGLPI $obj=NULL) {
-      $this->obj = ($obj ? $obj : new Phone());
-   }
+        $opts = ['have_headset' => __('Headset'),
+            'have_hp'           => __('Speaker')];
+        foreach ($opts as $key => $val) {
+            if (!$item->fields[$key]) {
+                unset($opts[$key]);
+            }
+        }
 
+        $pdf->displayLine(
+            '<b><i>' . sprintf(
+                __('%1$s: %2$s'),
+                __('Power supply') . '</i></b>',
+                Dropdown::getYesNo($item->fields['phonepowersupplies_id']),
+            ),
+            '<b><i>' . sprintf(
+                __('%1$s: %2$s'),
+                __('Flags') . '</i></b>',
+                (count($opts) ? implode(', ', $opts) : __('None')),
+            ),
+        );
 
-   function defineAllTabsPDF($options=[]) {
+        PluginPdfCommon::mainLine($pdf, $item, 'comment');
 
-      $onglets = parent::defineAllTabsPDF($options);
-      unset($onglets['Appliance_Item$1']);
-      unset($onglets['Impact$1']);
-      unset($onglets['Glpi\Socket$1']);
-      unset($onglets['Item_RemoteManagement$1']);
-      return $onglets;
-   }
+        $pdf->displaySpace();
+    }
 
+    public static function displayTabContentForPDF(PluginPdfSimplePDF $pdf, CommonGLPI $item, $tab)
+    {
+        switch ($tab) {
+            default:
+                return false;
+        }
 
-   static function pdfMain(PluginPdfSimplePDF $pdf, Phone $item) {
-
-      PluginPdfCommon::mainTitle($pdf, $item);
-
-      PluginPdfCommon::mainLine($pdf, $item, 'name-status');
-      PluginPdfCommon::mainLine($pdf, $item, 'location-type');
-      PluginPdfCommon::mainLine($pdf, $item, 'tech-manufacturer');
-      PluginPdfCommon::mainLine($pdf, $item, 'group-model');
-      PluginPdfCommon::mainLine($pdf, $item, 'contactnum-serial');
-      PluginPdfCommon::mainLine($pdf, $item, 'contact-otherserial');
-      PluginPdfCommon::mainLine($pdf, $item, 'user-management');
-
-
-      $pdf->displayLine(
-         '<b><i>'.sprintf(__('%1$s: %2$s'), __('Group').'</i></b>',
-                          Dropdown::getDropdownName('glpi_groups', $item->fields['groups_id'])),
-         '<b><i>'.sprintf(__('%1$s: %2$s'), __('UUID').'</i></b>',
-                          $item->fields['uuid']));
-
-      $pdf->displayLine(
-         '<b><i>'.sprintf(__('%1$s: %2$s'), __('Brand').'</i></b>', $item->fields['brand']),
-         '<b><i>'.sprintf(__('%1$s: %2$s'), _x('quantity', 'Number of lines').'</i></b>',
-                          $item->fields['number_line']));
-
-      $opts = ['have_headset' => __('Headset'),
-               'have_hp'      => __('Speaker')];
-      foreach ($opts as $key => $val) {
-         if (!$item->fields[$key]) {
-            unset($opts[$key]);
-         }
-      }
-
-      $pdf->displayLine(
-            '<b><i>'.sprintf(__('%1$s: %2$s'), __('Power supply').'</i></b>',
-                  Dropdown::getYesNo($item->fields['phonepowersupplies_id'])),
-            '<b><i>'.sprintf(__('%1$s: %2$s'), __('Flags').'</i></b>',
-                             (count($opts) ? implode(', ',$opts) : __('None'))));
-
-      PluginPdfCommon::mainLine($pdf, $item, 'comment');
-
-      $pdf->displaySpace();
-   }
-
-
-   static function displayTabContentForPDF(PluginPdfSimplePDF $pdf, CommonGLPI $item, $tab) {
-
-      switch ($tab) {
-         default :
-            return false;
-      }
-      return true;
-   }
+        return true;
+    }
 }
