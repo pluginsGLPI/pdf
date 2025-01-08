@@ -112,8 +112,8 @@ function plugin_version_pdf()
         'requirements'   => [
             'glpi' => [
                 'min' => '10.0.0',
-                'max' => '10.0.99'
-            ]
-        ]
+                'max' => '10.0.99',
+            ],
+        ],
     ];
 }
