@@ -109,20 +109,11 @@ function plugin_version_pdf()
         'license'        => 'GPLv3+',
         'homepage'       => 'https://github.com/yllen/pdf',
         'minGlpiVersion' => '10.0.0',
-        'requirements'   => ['glpi' => ['min' => '10.0.0',
-            'max' => '10.1.0'
+        'requirements'   => [
+            'glpi' => [
+                'min' => '10.0.0',
+                'max' => '10.0.99'
+            ]
         ]
-        ]
-    ];
-    return ['name'           => __('Print to pdf', 'pdf'),
-        'version'        => '3.0.0',
-        'author'         => 'Remi Collet, Nelly Mahu-Lasson, Teclib',
-        'license'        => 'GPLv3+',
-        'homepage'       => 'https://github.com/yllen/pdf',
-        'minGlpiVersion' => '10.0.0',
-        'requirements'   => ['glpi' => ['min' => '10.0.0',
-            'max'                             => '10.1.0',
-        ],
-        ],
     ];
 }
