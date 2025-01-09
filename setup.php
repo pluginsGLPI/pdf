@@ -109,9 +109,11 @@ function plugin_version_pdf()
         'license'        => 'GPLv3+',
         'homepage'       => 'https://github.com/yllen/pdf',
         'minGlpiVersion' => '10.0.0',
-        'requirements'   => ['glpi' => ['min' => '10.0.0',
-            'max'                             => '10.1.0',
-        ],
+        'requirements'   => [
+            'glpi' => [
+                'min' => '10.0.0',
+                'max' => '10.0.99',
+            ],
         ],
     ];
 }
