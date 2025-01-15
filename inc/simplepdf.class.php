@@ -118,7 +118,11 @@ class PluginPdfSimplePDF
         $this->header = $msg;
         $this->pdf->resetHeaderTemplate();
         $this->pdf->SetTitle($msg);
-        if (Plugin::isPluginActive('branding')) {
+        $config = PluginPdfConfig::getInstance();
+        if (
+            Plugin::isPluginActive('branding')
+            && $config->getField('use_branding_logo')
+        ) {
             $brandingUtils = new \PluginBrandingUtils();
             $logo = $brandingUtils->getFilePath(Session::getActiveEntity(), 'main_logo');
             $this->pdf->SetHeaderData($logo, 15, $msg, '');

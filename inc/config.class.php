@@ -83,6 +83,7 @@ class PluginPdfConfig extends CommonDBTM
                      `id` int $default_key_sign NOT NULL,
                      `currency`  VARCHAR(15) NULL,
                      `add_text`  VARCHAR(255) NULL,
+                     `use_branding_logo` BOOLEAN DEFAULT 0,
                      `date_mod` timestamp NULL DEFAULT NULL,
                      PRIMARY KEY  (`id`)
                    ) ENGINE=InnoDB  DEFAULT CHARSET= {$default_charset}
@@ -104,6 +105,10 @@ class PluginPdfConfig extends CommonDBTM
             if (!$DB->fieldExists($table, 'add_text')) {
                 $mig->addField($table, 'add_text', 'char(255) DEFAULT NULL', ['after' => 'currency']);
             }
+            //4.0.0
+            if (!$DB->fieldExists($table, 'use_branding_logo')) {
+                $mig->addField($table, 'use_branding_logo', 'boolean DEFAULT 0', ['after' => 'add_text']);
+            }
         }
     }
 
@@ -115,6 +120,7 @@ class PluginPdfConfig extends CommonDBTM
 
         $config->showFormHeader();
 
+        $is_branding_active = Plugin::isPluginActive('branding');
 
         echo "<tr class='tab_bg_1'>";
         echo '<td>' . __('Choose your international currency', 'pdf') . '</td><td>';
@@ -127,6 +133,37 @@ class PluginPdfConfig extends CommonDBTM
             ['value' => $config->fields['currency']],
         );
         echo "</td></tr>\n";
+
+        echo "<tr class='tab_bg_1'>";
+        echo '<td>' . __('Use logo from Branding plugin', 'pdf') . '</td><td>';
+
+        echo '<input type="hidden" id="use_branding_logo_hidden" name="use_branding_logo" value="'
+            . (!empty($config->fields['use_branding_logo']) && $is_branding_active ? 1 : 0) . '" />';
+
+        if ($is_branding_active) {
+            echo '<label class="form-switch mt-1" style="padding-left: 1rem;"
+        data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-trigger="hover"
+        title="' . __('The logo will be used in the header of generated PDFs.', 'pdf') . '">';
+            echo '<input type="checkbox" class="form-check-input ms-0 me-1 mt-0"
+        id="use_branding_logo_checkbox" '
+                . (!empty($config->fields['use_branding_logo']) ? 'checked' : '') . ' />';
+            echo '</label>';
+
+            // Script pour synchroniser la valeur du champ caché avec la case à cocher
+            echo '<script>
+        document.getElementById("use_branding_logo_checkbox").addEventListener("change", function () {
+            document.getElementById("use_branding_logo_hidden").value = this.checked ? 1 : 0;
+        });
+    </script>';
+        } else {
+            echo '<label class="form-switch mt-1" style="padding-left: 1rem;"
+        data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-trigger="hover"
+        title="' . __('The Branding plugin is disabled or non-existent', 'pdf') . '">';
+            echo '<input type="checkbox" class="form-check-input ms-0 me-1 mt-0" disabled />';
+            echo '</label>';
+        }
+        echo '</td></tr>';
+
 
         echo "<tr class='tab_bg_1'>";
         echo '<td>' . __('Text to add at the end of the PDF generation', 'pdf') . '</td>';
