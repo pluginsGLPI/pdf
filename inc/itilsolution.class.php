@@ -70,7 +70,18 @@ class PluginPdfITILSolution extends PluginPdfCommon
                 } else {
                     $title = __('Solution');
                 }
-                $sol = Glpi\Toolbox\Sanitizer::unsanitize(html_entity_decode($row['content'], ENT_QUOTES, "UTF-8"));
+                $sol = Glpi\Toolbox\Sanitizer::unsanitize(Html::entity_decode_deep($row['content']));
+                $sol = preg_replace('#data:image/[^;]+;base64,#', '@', $sol);
+
+                preg_match_all('/<img [^>]*src=[\'"]([^\'"]*docid=([0-9]*))[^>]*>/', $sol, $res, PREG_SET_ORDER);
+
+                foreach ($res as $img) {
+                    $docimg = new Document();
+                    $docimg->getFromDB($img[2]);
+
+                    $path = '<img src="file://' . GLPI_DOC_DIR . '/' . $docimg->fields['filepath'] . '"/>';
+                    $sol = str_replace($img[0], $path, $sol);
+                }
 
                 if ($row['status'] == 3) {
                     $text = __('Soluce approved on ', 'pdf');
@@ -79,7 +90,7 @@ class PluginPdfITILSolution extends PluginPdfCommon
                 } else {
                     $text = $textapprove = '';
                 }
-                if (isset($row['date_approval']) || isset($row['users_id_approval'])) {
+                if (isset($row['date_approval']) || !empty($row['users_id_approval'])) {
                     $textapprove = '<br /><br /><br /><i>' .
                                     sprintf(
                                         __('%1$s %2$s'),
@@ -92,9 +103,8 @@ class PluginPdfITILSolution extends PluginPdfCommon
                                         Toolbox::stripTags($dbu->getUserName($row['users_id_approval'])),
                                     )
                                     . '</i>';
-                    $pdf->displayText('<b><i>' . sprintf(__('%1$s: %2$s'), $title . '</i></b>', ''), $sol .
-                                      $textapprove);
                 }
+                $pdf->displayText('<b><i>' . sprintf(__('%1$s: %2$s'), $title . '</i></b>', ''), $sol . $textapprove);
             }
         }
 
