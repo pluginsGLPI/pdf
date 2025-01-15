@@ -119,14 +119,9 @@ class PluginPdfSimplePDF
         $this->pdf->resetHeaderTemplate();
         $this->pdf->SetTitle($msg);
         if (Plugin::isPluginActive('branding')) {
-            try {
-                $reflectionClass = new ReflectionClass('PluginBrandingUtils');
-                $brandingUtils = $reflectionClass->newInstance();
-                $logo = $brandingUtils->getFilePath(Session::getActiveEntity(), 'main_logo');
-                $this->pdf->SetHeaderData($logo, 15, $msg, '');
-            } catch (ReflectionException $e) {
-                return;
-            }
+            $brandingUtils = new \PluginBrandingUtils();
+            $logo = $brandingUtils->getFilePath(Session::getActiveEntity(), 'main_logo');
+            $this->pdf->SetHeaderData($logo, 15, $msg, '');
         } else {
             $configurationValues = Config::getConfigurationValues('core', ['version']);
             $current_version     = $configurationValues['version'];
