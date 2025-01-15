@@ -33,6 +33,10 @@
  *  --------------------------------------------------------------------------
  */
 
+define('PLUGIN_PDF_VERSION', '3.0.0');
+define('PLUGIN_PDF_MIN_GLPI', '10.0.0');
+define('PLUGIN_PDF_MAX_GLPI', '10.0.99');
+
 function plugin_init_pdf()
 {
     global $PLUGIN_HOOKS, $PDF_DEVICES;
@@ -104,15 +108,15 @@ function plugin_init_pdf()
 function plugin_version_pdf()
 {
     return ['name'       => __('Print to pdf', 'pdf'),
-        'version'        => '3.0.0',
+        'version'        => PLUGIN_PDF_VERSION,
         'author'         => 'Remi Collet, Nelly Mahu-Lasson, Teclib',
         'license'        => 'GPLv3+',
         'homepage'       => 'https://github.com/yllen/pdf',
-        'minGlpiVersion' => '10.0.0',
+        'minGlpiVersion' => PLUGIN_PDF_MIN_GLPI,
         'requirements'   => [
             'glpi' => [
-                'min' => '10.0.0',
-                'max' => '10.0.99',
+                'min' => PLUGIN_PDF_MIN_GLPI,
+                'max' => PLUGIN_PDF_MAX_GLPI,
             ],
         ],
     ];
