@@ -395,12 +395,12 @@ class PluginPdfAppliance extends PluginPdfCommon
 
         $opts = [];
         for ($i = 1 ; $i <= $number_champs ; $i++) {
-            if ($data_opt = $result_app_opt->next()) {
+            if ($data_opt = $result_app_opt->current()) {
                 $query_val = $DB->request(['SELECT' => 'vvalue',
                     'FROM'                          => 'glpi_plugin_appliances_optvalues_items',
                     'WHERE'                         => ['plugin_appliances_optvalues_id' => $data_opt['id'],
                         'items_id'                                                       => $ID]]);
-                $data_val = $query_val->next();
+                $data_val = $query_val->current();
                 $vvalue   = ($data_val ? $data_val['vvalue'] : '');
                 if (empty($vvalue) && !empty($data_opt['ddefault'])) {
                     $vvalue = $data_opt['ddefault'];
@@ -463,7 +463,7 @@ class PluginPdfAppliance extends PluginPdfCommon
                 $pdf->displayTitle('<b><i>' . __('Name'), __('Group'), __('Type') . '</i></b>');
             }
 
-            while ($data = $result->next()) {
+            while ($data = $result->current()) {
                 $appliancesID = $data['id'];
                 if (Session::isMultiEntitiesMode()) {
                     $pdf->setColumnsSize(30, 30, 20, 20);
@@ -498,6 +498,7 @@ class PluginPdfAppliance extends PluginPdfCommon
                 }
                 PluginAppliancesRelation::showList_PDF($pdf, $data['relationtype'], $data['entID']);
                 PluginAppliancesOptvalue_Item::showList_PDF($pdf, $ID, $appliancesID);
+                $result->next();
             }
         }
         $pdf->displaySpace();
