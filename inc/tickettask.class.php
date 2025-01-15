@@ -154,14 +154,14 @@ class PluginPdfTicketTask extends PluginPdfCommon
                     $docimg = new Document();
                     $docimg->getFromDB($img[2]);
 
-                    $path = '<img src="file://'.GLPI_DOC_DIR.'/'.$docimg->fields['filepath'].'"/>';
+                    $path = '<img src="file://' . GLPI_DOC_DIR . '/' . $docimg->fields['filepath'] . '"/>';
                     $content = str_replace($img[0], $path, $content);
                 }
 
                 $pdf->displayText(
                     "<b><i>" . sprintf(__('%1$s: %2$s') . "</i></b>", __('Description'), ''),
                     $content,
-                    1
+                    1,
                 );
             }
         }
