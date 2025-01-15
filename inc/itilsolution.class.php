@@ -79,7 +79,7 @@ class PluginPdfITILSolution extends PluginPdfCommon
                     $docimg = new Document();
                     $docimg->getFromDB($img[2]);
 
-                    $path = '<img src="file://'.GLPI_DOC_DIR.'/'.$docimg->fields['filepath'].'"/>';
+                    $path = '<img src="file://' . GLPI_DOC_DIR . '/' . $docimg->fields['filepath'] . '"/>';
                     $sol = str_replace($img[0], $path, $sol);
                 }
 
