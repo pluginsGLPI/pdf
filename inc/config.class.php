@@ -149,7 +149,6 @@ class PluginPdfConfig extends CommonDBTM
                 . (!empty($config->fields['use_branding_logo']) ? 'checked' : '') . ' />';
             echo '</label>';
 
-            // Script pour synchroniser la valeur du champ caché avec la case à cocher
             echo '<script>
         document.getElementById("use_branding_logo_checkbox").addEventListener("change", function () {
             document.getElementById("use_branding_logo_hidden").value = this.checked ? 1 : 0;
