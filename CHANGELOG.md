@@ -9,4 +9,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
-- Use the Branding plugin logo in PDF headers (configurable)
+- New option to use the Branding plugin logo in PDF headers
