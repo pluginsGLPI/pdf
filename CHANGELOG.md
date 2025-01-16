@@ -6,3 +6,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [UNRELEASE]
+
+### Added
+
+- New option to use the Branding plugin logo in PDF headers
