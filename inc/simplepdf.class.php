@@ -127,19 +127,8 @@ class PluginPdfSimplePDF
             $logo = $brandingUtils->getFilePath(Session::getActiveEntity(), 'main_logo');
             $this->pdf->SetHeaderData($logo, 15, $msg, '');
         } else {
-            $configurationValues = Config::getConfigurationValues('core', ['version']);
-            $current_version     = $configurationValues['version'];
             $path = Plugin::getPhpDir('pdf') . '/pics/';
-            switch ($current_version) {
-                case '0.85.3':
-                case '0.85.4':
-                case '0.85.5':
-                    $this->pdf->SetHeaderData($path . 'fd_logo.jpg', 15, $msg, '');
-                    break;
-
-                default:
-                    $this->pdf->SetHeaderData($path . 'fd_logo.png', 15, $msg, '');
-            }
+            $this->pdf->SetHeaderData($path . 'fd_logo.png', 15, $msg, '');
         }
     }
 
