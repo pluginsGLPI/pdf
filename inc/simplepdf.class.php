@@ -119,13 +119,17 @@ class PluginPdfSimplePDF
         $this->pdf->resetHeaderTemplate();
         $this->pdf->SetTitle($msg);
         $config = PluginPdfConfig::getInstance();
+
+        $params = [
+            'entities_id' => Session::getActiveEntity(),
+            'logo'        => '',
+        ];
+        $hook = Plugin::doHookFunction('import_logo', $params);
         if (
-            Plugin::isPluginActive('branding')
+            !empty($hook['logo'])
             && $config->getField('use_branding_logo')
         ) {
-            $brandingUtils = new \PluginBrandingUtils();
-            $logo = $brandingUtils->getFilePath(Session::getActiveEntity(), 'main_logo');
-            $this->pdf->SetHeaderData($logo, 15, $msg, '');
+            $this->pdf->SetHeaderData($hook['logo'], 15, $msg, '');
         } else {
             $path = Plugin::getPhpDir('pdf') . '/pics/';
             $this->pdf->SetHeaderData($path . 'fd_logo.png', 15, $msg, '');
