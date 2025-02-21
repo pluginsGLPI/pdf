@@ -165,8 +165,8 @@ class PluginPdfConfig extends CommonDBTM
                 'selected_currency'  => $config->fields['currency'],
                 'is_branding_active' => $is_branding_active,
                 'use_branding_logo'  => (!empty($config->fields['use_branding_logo']) && $is_branding_active),
-                'add_text'           => $config->fields['add_text']
-            ]
+                'add_text'           => $config->fields['add_text'],
+            ],
         );
 
         $config->showFormButtons(['candel' => false]);
