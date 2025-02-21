@@ -30,6 +30,38 @@
  *  --------------------------------------------------------------------------
  */
 
+use Glpi\Application\View\TemplateRenderer;
+
+/**
+ *  -------------------------------------------------------------------------
+ *  LICENSE
+ *
+ *  This file is part of PDF plugin for GLPI.
+ *
+ *  PDF is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Affero General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  PDF is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *  GNU Affero General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Affero General Public License
+ *  along with Reports. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @author    Nelly Mahu-Lasson, Remi Collet, Teclib
+ * @copyright Copyright (c) 2009-2022 PDF plugin team
+ * @license   AGPL License 3.0 or (at your option) any later version
+ * @link      https://github.com/pluginsGLPI/pdf/
+ * @link      http://www.glpi-project.org/
+ * @package   pdf
+ * @since     2009
+ *             http://www.gnu.org/licenses/agpl-3.0-standalone.html
+ *  --------------------------------------------------------------------------
+ */
+
 class PluginPdfConfig extends CommonDBTM
 {
     private static $_instance = null;
@@ -115,63 +147,27 @@ class PluginPdfConfig extends CommonDBTM
     public static function showConfigForm($item)
     {
         global $PDF_DEVICES;
-
         $config = self::getInstance();
 
         $config->showFormHeader();
 
         $is_branding_active = Plugin::isPluginActive('branding');
 
-        echo "<tr class='tab_bg_1'>";
-        echo '<td>' . __('Choose your international currency', 'pdf') . '</td><td>';
+        $options = [];
         foreach ($PDF_DEVICES as $option => $value) {
             $options[$option] = $option . ' - ' . $value[0] . ' (' . $value[1] . ')';
         }
-        Dropdown::showFromArray(
-            'currency',
-            $options,
-            ['value' => $config->fields['currency']],
+
+        TemplateRenderer::getInstance()->display(
+            '@pdf/config.html.twig',
+            [
+                'currency_options'   => $options,
+                'selected_currency'  => $config->fields['currency'],
+                'is_branding_active' => $is_branding_active,
+                'use_branding_logo'  => (!empty($config->fields['use_branding_logo']) && $is_branding_active),
+                'add_text'           => $config->fields['add_text']
+            ]
         );
-        echo "</td></tr>\n";
-
-        echo "<tr class='tab_bg_1'>";
-        echo '<td>' . __('Use logo from Branding plugin', 'pdf') . '</td><td>';
-
-        echo '<input type="hidden" id="use_branding_logo_hidden" name="use_branding_logo" value="'
-            . (!empty($config->fields['use_branding_logo']) && $is_branding_active ? 1 : 0) . '" />';
-
-        if ($is_branding_active) {
-            echo '<label class="form-switch mt-1" style="padding-left: 1rem;"
-        data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-trigger="hover"
-        title="' . __('The logo will be used in the header of generated PDFs.', 'pdf') . '">';
-            echo '<input type="checkbox" class="form-check-input ms-0 me-1 mt-0"
-        id="use_branding_logo_checkbox" '
-                . (!empty($config->fields['use_branding_logo']) ? 'checked' : '') . ' />';
-            echo '</label>';
-
-            echo '<script>
-        document.getElementById("use_branding_logo_checkbox").addEventListener("change", function () {
-            document.getElementById("use_branding_logo_hidden").value = this.checked ? 1 : 0;
-        });
-    </script>';
-        } else {
-            echo '<label class="form-switch mt-1" style="padding-left: 1rem;"
-        data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-trigger="hover"
-        title="' . __('The Branding plugin is disabled or non-existent', 'pdf') . '">';
-            echo '<input type="checkbox" class="form-check-input ms-0 me-1 mt-0" disabled />';
-            echo '</label>';
-        }
-        echo '</td></tr>';
-
-
-        echo "<tr class='tab_bg_1'>";
-        echo '<td>' . __('Text to add at the end of the PDF generation', 'pdf') . '</td>';
-        echo "<td rowspan='5' class='middle' colspan='3'>";
-        Html::textarea(['name' => 'add_text',
-            'value'            => $config->fields['add_text'],
-            'rows'             => '5',
-            'style'            => 'width:95%']);
-        echo '</textarea>';
 
         $config->showFormButtons(['candel' => false]);
 
