@@ -129,7 +129,7 @@ class PluginPdfSimplePDF
             !empty($hook['logo_path'])
             && $config->getField('use_branding_logo')
         ) {
-            $this->pdf->SetHeaderData($hook['logo'], 15, $msg, '');
+            $this->pdf->SetHeaderData($hook['logo_path'], 15, $msg, '');
         } else {
             $path = Plugin::getPhpDir('pdf') . '/pics/';
             $this->pdf->SetHeaderData($path . 'fd_logo.png', 15, $msg, '');
