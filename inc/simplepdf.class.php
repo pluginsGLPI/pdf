@@ -126,7 +126,7 @@ class PluginPdfSimplePDF
         ];
         $hook = Plugin::doHookFunction('import_logo', $params);
         if (
-            !empty($hook['logo'])
+            !empty($hook['logo_path'])
             && $config->getField('use_branding_logo')
         ) {
             $this->pdf->SetHeaderData($hook['logo'], 15, $msg, '');
