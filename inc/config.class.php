@@ -30,6 +30,38 @@
  *  --------------------------------------------------------------------------
  */
 
+use Glpi\Application\View\TemplateRenderer;
+
+/**
+ *  -------------------------------------------------------------------------
+ *  LICENSE
+ *
+ *  This file is part of PDF plugin for GLPI.
+ *
+ *  PDF is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Affero General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  PDF is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *  GNU Affero General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Affero General Public License
+ *  along with Reports. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @author    Nelly Mahu-Lasson, Remi Collet, Teclib
+ * @copyright Copyright (c) 2009-2022 PDF plugin team
+ * @license   AGPL License 3.0 or (at your option) any later version
+ * @link      https://github.com/pluginsGLPI/pdf/
+ * @link      http://www.glpi-project.org/
+ * @package   pdf
+ * @since     2009
+ *             http://www.gnu.org/licenses/agpl-3.0-standalone.html
+ *  --------------------------------------------------------------------------
+ */
+
 class PluginPdfConfig extends CommonDBTM
 {
     private static $_instance = null;
@@ -83,6 +115,7 @@ class PluginPdfConfig extends CommonDBTM
                      `id` int $default_key_sign NOT NULL,
                      `currency`  VARCHAR(15) NULL,
                      `add_text`  VARCHAR(255) NULL,
+                     `use_branding_logo` BOOLEAN DEFAULT 0,
                      `date_mod` timestamp NULL DEFAULT NULL,
                      PRIMARY KEY  (`id`)
                    ) ENGINE=InnoDB  DEFAULT CHARSET= {$default_charset}
@@ -104,38 +137,37 @@ class PluginPdfConfig extends CommonDBTM
             if (!$DB->fieldExists($table, 'add_text')) {
                 $mig->addField($table, 'add_text', 'char(255) DEFAULT NULL', ['after' => 'currency']);
             }
+            //4.0.0
+            if (!$DB->fieldExists($table, 'use_branding_logo')) {
+                $mig->addField($table, 'use_branding_logo', 'boolean DEFAULT 0', ['after' => 'add_text']);
+            }
         }
     }
 
     public static function showConfigForm($item)
     {
         global $PDF_DEVICES;
-
         $config = self::getInstance();
 
         $config->showFormHeader();
 
+        $is_branding_active = Plugin::isPluginActive('branding');
 
-        echo "<tr class='tab_bg_1'>";
-        echo '<td>' . __('Choose your international currency', 'pdf') . '</td><td>';
+        $options = [];
         foreach ($PDF_DEVICES as $option => $value) {
             $options[$option] = $option . ' - ' . $value[0] . ' (' . $value[1] . ')';
         }
-        Dropdown::showFromArray(
-            'currency',
-            $options,
-            ['value' => $config->fields['currency']],
-        );
-        echo "</td></tr>\n";
 
-        echo "<tr class='tab_bg_1'>";
-        echo '<td>' . __('Text to add at the end of the PDF generation', 'pdf') . '</td>';
-        echo "<td rowspan='5' class='middle' colspan='3'>";
-        Html::textarea(['name' => 'add_text',
-            'value'            => $config->fields['add_text'],
-            'rows'             => '5',
-            'style'            => 'width:95%']);
-        echo '</textarea>';
+        TemplateRenderer::getInstance()->display(
+            '@pdf/config.html.twig',
+            [
+                'currency_options'   => $options,
+                'selected_currency'  => $config->fields['currency'],
+                'is_branding_active' => $is_branding_active,
+                'use_branding_logo'  => (!empty($config->fields['use_branding_logo']) && $is_branding_active),
+                'add_text'           => $config->fields['add_text'],
+            ],
+        );
 
         $config->showFormButtons(['candel' => false]);
 
