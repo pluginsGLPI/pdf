@@ -62,7 +62,7 @@
         {% else %}
             <label class="form-switch mt-1" style="padding-left: 1rem;"
                 data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-trigger="hover"
-                title="{{ __('The Branding plugin is disabled or non-existent', 'pdf') }}">
+                title="{{ __('The Branding plugin is either disabled, missing, or its version is below 3.0.0.', 'pdf') }}">
                 <input type="checkbox" class="form-check-input ms-0 me-1 mt-0" disabled />
             </label>
         {% endif %}
