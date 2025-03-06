@@ -33,7 +33,7 @@
  *  --------------------------------------------------------------------------
  */
 
-define('PLUGIN_PDF_VERSION', '3.0.0');
+define('PLUGIN_PDF_VERSION', '4.0.0');
 define('PLUGIN_PDF_MIN_GLPI', '10.0.0');
 define('PLUGIN_PDF_MAX_GLPI', '10.0.99');
 
