@@ -78,7 +78,7 @@ class PluginPdfSimplePDF
 
         $pdf->SetCreator('GLPI');
         $pdf->SetAuthor('GLPI');
-        $font = 'helvetica';
+        $font = 'dejavusans';
         //$subsetting = true;
         $fonsize = 8;
         if (isset($_SESSION['glpipdffont']) && $_SESSION['glpipdffont']) {
