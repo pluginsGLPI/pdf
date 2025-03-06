@@ -109,9 +109,9 @@ function plugin_version_pdf()
 {
     return ['name'       => __('Print to pdf', 'pdf'),
         'version'        => PLUGIN_PDF_VERSION,
-        'author'         => 'Remi Collet, Nelly Mahu-Lasson, Teclib',
+        'author'         => 'Teclib, Remi Collet, Nelly Mahu-Lasson',
         'license'        => 'GPLv3+',
-        'homepage'       => 'https://github.com/yllen/pdf',
+        'homepage'       => 'https://github.com/pluginsGLPI/pdf',
         'minGlpiVersion' => PLUGIN_PDF_MIN_GLPI,
         'requirements'   => [
             'glpi' => [

@@ -3,7 +3,7 @@
    <name>PDF</name>
    <key>pdf</key>
    <state>stable</state>
-   <logo>https://raw.githubusercontent.com/yllen/pdf/master/pdf.png</logo>
+   <logo>https://raw.githubusercontent.com/pluginsGLPI/pdf/master/pdf.png</logo>
    <description>
       <short>
          <fr><![CDATA[Ce plugin vous permet d’exporter en PDF la fiche d'un élément de 
@@ -30,9 +30,10 @@
 	]]></en>
        </long>
    </description>
-   <homepage>https://github.com/yllen/pdf</homepage>
-   <download>https://github.com/yllen/pdf/releases</download>
+   <homepage>https://github.com/pluginsGLPI/pdf</homepage>
+   <download>https://github.com/pluginsGLPI/pdf/releases</download>
    <authors>
+      <author>Teclib</author>
       <author>Remi COLLET</author>
       <author>Nelly MAHU-LASSON</author>
    </authors>
