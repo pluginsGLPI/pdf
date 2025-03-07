@@ -79,12 +79,8 @@ class PluginPdfSimplePDF
         $pdf->SetCreator('GLPI');
         $pdf->SetAuthor('GLPI');
         $font = 'dejavusans';
-        //$subsetting = true;
         $fonsize = 8;
-        if (isset($_SESSION['glpipdffont']) && $_SESSION['glpipdffont']) {
-            $font = $_SESSION['glpipdffont'];
-            //$subsetting = false;
-        }
+
         $pdf->setHeaderFont([$font, 'B', 8]);
         $pdf->setFooterFont([$font, 'B', 8]);
 
