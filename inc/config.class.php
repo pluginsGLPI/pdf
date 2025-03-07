@@ -152,6 +152,14 @@ class PluginPdfConfig extends CommonDBTM
         $config->showFormHeader();
 
         $is_branding_active = Plugin::isPluginActive('branding');
+        $is_branding_compatible = false;
+
+        if ($is_branding_active) {
+            $branding_info = Plugin::getInfo('branding');
+            if (isset($branding_info['version']) && version_compare($branding_info['version'], '3.0.0', '>=')) {
+                $is_branding_compatible = true;
+            }
+        }
 
         $options = [];
         foreach ($PDF_DEVICES as $option => $value) {
@@ -163,8 +171,8 @@ class PluginPdfConfig extends CommonDBTM
             [
                 'currency_options'   => $options,
                 'selected_currency'  => $config->fields['currency'],
-                'is_branding_active' => $is_branding_active,
-                'use_branding_logo'  => (!empty($config->fields['use_branding_logo']) && $is_branding_active),
+                'is_branding_active' => $is_branding_active && $is_branding_compatible,
+                'use_branding_logo'  => (!empty($config->fields['use_branding_logo']) && $is_branding_active && $is_branding_compatible),
                 'add_text'           => $config->fields['add_text'],
             ],
         );
