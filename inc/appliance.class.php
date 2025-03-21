@@ -70,7 +70,7 @@ class PluginPdfAppliance extends PluginPdfCommon
             case 'Appliance_Item$1':
                 $plugin = new Plugin();
                 if (
-                    $plugin->isActivated('appliances') 
+                    $plugin->isActivated('appliances')
                     && class_exists('PluginAppliancesAppliance_Item')
                 ) {
                     PluginAppliancesAppliance_Item::pdfForAppliance($pdf, $item);
