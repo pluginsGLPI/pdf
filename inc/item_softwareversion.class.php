@@ -41,6 +41,8 @@ class PluginPdfItem_SoftwareVersion extends PluginPdfCommon
 
     public static function pdfForSoftware(PluginPdfSimplePDF $pdf, CommonDBTM $item)
     {
+        /** @var array $CFG_GLPI */
+        /** @var DBmysql $DB */
         global $DB, $CFG_GLPI;
 
         $dbu = new DbUtils();
@@ -260,6 +262,7 @@ class PluginPdfItem_SoftwareVersion extends PluginPdfCommon
 
     public static function pdfForVersionByEntity(PluginPdfSimplePDF $pdf, SoftwareVersion $version)
     {
+        /** @var DBmysql $DB */
         global $DB;
 
         $dbu = new DbUtils();
@@ -317,6 +320,7 @@ class PluginPdfItem_SoftwareVersion extends PluginPdfCommon
 
     public static function pdfForItem(PluginPdfSimplePDF $pdf, $item)
     {
+        /** @var DBmysql $DB */
         global $DB;
 
         $ID = $item->getField('id');

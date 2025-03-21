@@ -41,6 +41,7 @@ class PluginPdfItem_Device extends PluginPdfCommon
 
     public static function pdfForItem(PluginPdfSimplePDF $pdf, $item)
     {
+        /** @var DBmysql $DB */
         global $DB;
 
         $dbu = new DbUtils();

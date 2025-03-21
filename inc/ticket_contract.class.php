@@ -41,6 +41,7 @@ class PluginPdfTicket_Contract extends PluginPdfCommon
 
     public static function pdfForTicket(PluginPdfSimplePDF $pdf, CommonDBTM $item)
     {
+        /** @var DBmysql $DB */
         global $DB;
 
         $type      = $item->getType();

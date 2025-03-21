@@ -41,6 +41,7 @@ class PluginPdfProblem_Ticket extends PluginPdfCommon
 
     public static function pdfForTicket(PluginPdfSimplePDF $pdf, Ticket $ticket)
     {
+        /** @var DBmysql $DB */
         global $DB;
 
         $dbu = new DbUtils();
@@ -280,6 +281,7 @@ class PluginPdfProblem_Ticket extends PluginPdfCommon
 
     public static function pdfForProblem(PluginPdfSimplePDF $pdf, Problem $problem)
     {
+        /** @var DBmysql $DB */
         global $DB;
 
         $dbu = new DbUtils();

@@ -36,6 +36,7 @@ class PluginPdfRemote
 
     public static function methodGetTabs($params, $protocol)
     {
+        /** @var array $PLUGIN_HOOKS */
         global $PLUGIN_HOOKS;
 
         if (isset($params['help'])) {
@@ -59,6 +60,7 @@ class PluginPdfRemote
 
         if (isset($PLUGIN_HOOKS['plugin_pdf'][$type])
             && class_exists($PLUGIN_HOOKS['plugin_pdf'][$type])) {
+            $item = new $type();
             $itempdf = new $PLUGIN_HOOKS['plugin_pdf'][$type]($item);
 
             return $itempdf->defineAllTabs();
@@ -69,6 +71,7 @@ class PluginPdfRemote
 
     public static function methodGetPdf($params, $protocol)
     {
+        /** @var array $PLUGIN_HOOKS */
         global $PLUGIN_HOOKS;
 
         if (isset($params['help'])) {

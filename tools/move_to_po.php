@@ -190,6 +190,8 @@ fclose($po);
 
 function search_in_dict($string, $context)
 {
+    /** @var array $LANG */
+    /** @var array $REFLANG */
     global $REFLANG, $LANG;
 
     if ($context) {

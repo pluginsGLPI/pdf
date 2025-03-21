@@ -104,6 +104,7 @@ class PluginPdfConfig extends CommonDBTM
 
     public static function install(Migration $mig)
     {
+        /** @var DBmysql $DB */
         global $DB;
 
         $table = 'glpi_plugin_pdf_configs';
@@ -120,13 +121,13 @@ class PluginPdfConfig extends CommonDBTM
                      PRIMARY KEY  (`id`)
                    ) ENGINE=InnoDB  DEFAULT CHARSET= {$default_charset}
                  COLLATE = {$default_collation} ROW_FORMAT=DYNAMIC";
-            $DB->queryOrDie($query, 'Error in creating glpi_plugin_pdf_configs' .
+            $DB->doQueryOrDie($query, 'Error in creating glpi_plugin_pdf_configs' .
                                     '<br>' . $DB->error());
 
             $query = "INSERT INTO `$table`
                          (id, currency)
                    VALUES (1, 'EUR')";
-            $DB->queryOrDie($query, 'Error during update glpi_plugin_pdf_configs' .
+            $DB->doQueryOrDie($query, 'Error during update glpi_plugin_pdf_configs' .
                                     '<br>' . $DB->error());
         } else {
             // 2.1.0
@@ -146,6 +147,7 @@ class PluginPdfConfig extends CommonDBTM
 
     public static function showConfigForm($item)
     {
+        /** @var array $PDF_DEVICES */
         global $PDF_DEVICES;
         $config = self::getInstance();
 
@@ -357,6 +359,7 @@ class PluginPdfConfig extends CommonDBTM
 
     public static function formatNumber($value)
     {
+        /** @var array $PDF_DEVICES */
         global $PDF_DEVICES;
 
 
@@ -385,6 +388,7 @@ class PluginPdfConfig extends CommonDBTM
 
     public static function currencyName()
     {
+        /** @var array $PDF_DEVICES */
         global $PDF_DEVICES;
 
         $config = self::getInstance();

@@ -41,6 +41,7 @@ class PluginPdfItem_Problem extends PluginPdfCommon
 
     public static function pdfForProblem(PluginPdfSimplePDF $pdf, Problem $problem)
     {
+        /** @var DBmysql $DB */
         global $DB;
 
         $dbu = new DbUtils();
@@ -156,6 +157,7 @@ class PluginPdfItem_Problem extends PluginPdfCommon
 
     public static function pdfForItem(PluginPdfSimplePDF $pdf, CommonDBTM $item, $tree = false)
     {
+        /** @var DBmysql $DB */
         global $DB;
 
         $dbu = new DbUtils();

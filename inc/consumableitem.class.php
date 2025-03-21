@@ -137,6 +137,7 @@ class PluginPdfConsumableItem extends PluginPdfCommon
 
     public static function pdfForConsumableItem(PluginPdfSimplePDF $pdf, ConsumableItem $item, $show_old = false)
     {
+        /** @var DBmysql $DB */
         global $DB;
 
         $dbu = new DbUtils();

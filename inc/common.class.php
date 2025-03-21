@@ -49,7 +49,7 @@ abstract class PluginPdfCommon extends CommonGLPI
      * @param $ong       array defined tab array
      * @param $options   array of options (for withtemplate)
      *
-     * @return nothing (set the tab array)
+     * @return void (set the tab array)
     **/
     final public function addStandardTab($itemtype, &$ong, $options)
     {
@@ -120,6 +120,7 @@ abstract class PluginPdfCommon extends CommonGLPI
                 return __('Print to pdf', 'pdf');
             }
         }
+        return '';
     }
 
     /**
@@ -154,7 +155,7 @@ abstract class PluginPdfCommon extends CommonGLPI
     {
         switch ($tab) {
             case $item->getType() . '$main':
-                static::pdfMain($pdf, $item);
+                $item::pdfMain($pdf, $item);
                 break;
 
             case 'Notepad$1':
@@ -361,7 +362,7 @@ abstract class PluginPdfCommon extends CommonGLPI
      * @param $page    Integer 1 for landscape, 0 for portrait
      * @param $render  Boolean send result if true,  return result if false
      *
-     * @return pdf output if $render is false
+     * @return string pdf output if $render is false
     **/
     final public function generatePDF($tab_id, $tabs, $page = 0, $render = true)
     {
@@ -417,6 +418,7 @@ abstract class PluginPdfCommon extends CommonGLPI
 
         if ($render) {
             $this->pdf->render();
+            return '';
         } else {
             return $this->pdf->output();
         }

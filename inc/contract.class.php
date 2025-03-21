@@ -202,6 +202,7 @@ class PluginPdfContract extends PluginPdfCommon
 
     public static function pdfCost(PluginPdfSimplePDF $pdf, Contract $contract)
     {
+        /** @var DBmysql $DB */
         global $DB;
 
         $ID = $contract->getField('id');

@@ -41,6 +41,7 @@ class PluginPdfComputerAntivirus extends PluginPdfCommon
 
     public static function pdfForComputer(PluginPdfSimplePDF $pdf, Computer $item)
     {
+        /** @var DBmysql $DB */
         global $DB;
 
         $ID = $item->getField('id');

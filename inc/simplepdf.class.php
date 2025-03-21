@@ -148,7 +148,7 @@ class PluginPdfSimplePDF
      *
      * @param $name String optional filename
      *
-     * @return String with PDF content if filename not provided
+     * @return string|void with PDF content if filename not provided
     **/
     public function output($name = false)
     {
@@ -219,7 +219,7 @@ class PluginPdfSimplePDF
     **/
     public function displayBox($gray)
     {
-        Toolbox::displayBox('PluginPdfSimplePDF::displayBox() is deprecated');
+        Toolbox::deprecated('Calling this function is deprecated');
     }
 
     /**

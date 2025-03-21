@@ -41,6 +41,7 @@ class PluginPdfDocument extends PluginPdfCommon
 
     public static function pdfForItem(PluginPdfSimplePDF $pdf, CommonDBTM $item)
     {
+        /** @var DBmysql $DB */
         global $DB;
 
         $ID   = $item->getField('id');

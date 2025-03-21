@@ -41,6 +41,7 @@ class PluginPdfCommonItilCost extends PluginPdfCommon
 
     public static function pdfForItem(PluginPdfSimplePDF $pdf, CommonDBTM $job)
     {
+        /** @var DBmysql $DB */
         global $DB;
 
         $ID        = $job->getField('id');

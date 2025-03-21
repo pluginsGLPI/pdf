@@ -41,6 +41,7 @@ class PluginPdfTicketValidation extends PluginPdfCommon
 
     public static function pdfForTicket(PluginPdfSimplePDF $pdf, Ticket $ticket)
     {
+        /** @var DBmysql $DB */
         global $DB;
 
         $dbu = new DbUtils();

@@ -41,6 +41,7 @@ class PluginPdfUser extends PluginPdfCommon
 
     public static function pdfMain(PluginPdfSimplePDF $pdf, User $item)
     {
+        /** @var DBmysql $DB */
         global $DB;
 
         $ID = $item->getField('id');
@@ -186,6 +187,8 @@ class PluginPdfUser extends PluginPdfCommon
 
     public static function pdfItems(PluginPdfSimplePDF $pdf, User $user, $tech)
     {
+        /** @var array $CFG_GLPI */
+        /** @var DBmysql $DB */
         global $CFG_GLPI, $DB;
 
         $dbu = new DbUtils();

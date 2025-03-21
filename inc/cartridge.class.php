@@ -49,6 +49,7 @@ class PluginPdfCartridge extends PluginPdfCommon
     **/
     public static function pdfForPrinter(PluginPdfSimplePDF $pdf, Printer $p, $old = false)
     {
+        /** @var DBmysql $DB */
         global $DB;
 
         $instID = $p->getField('id');
@@ -214,6 +215,7 @@ class PluginPdfCartridge extends PluginPdfCommon
 
     public static function pdfForCartridgeItem(PluginPdfSimplePDF $pdf, CartridgeItem $cartitem, $state)
     {
+        /** @var DBmysql $DB */
         global $DB;
 
         $tID = $cartitem->getField('id');

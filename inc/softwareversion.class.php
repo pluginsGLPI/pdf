@@ -86,6 +86,7 @@ class PluginPdfSoftwareVersion extends PluginPdfCommon
 
     public static function pdfForSoftware(PluginPdfSimplePDF $pdf, Software $item)
     {
+        /** @var DBmysql $DB */
         global $DB;
 
         $sID = $item->getField('id');
