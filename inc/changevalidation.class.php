@@ -41,6 +41,7 @@ class PluginPdfChangeValidation extends PluginPdfCommon
 
     public static function pdfForChange(PluginPdfSimplePDF $pdf, Change $change)
     {
+        /** @var DBmysql $DB */
         global $DB;
 
         $dbu = new DbUtils();

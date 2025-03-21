@@ -41,6 +41,7 @@ class PluginPdfProblemTask extends PluginPdfCommon
 
     public static function pdfForProblem(PluginPdfSimplePDF $pdf, Problem $job)
     {
+        /** @var DBmysql $DB */
         global $DB;
 
         $dbu = new DbUtils();

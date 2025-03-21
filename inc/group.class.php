@@ -154,6 +154,7 @@ class PluginPdfGroup extends PluginPdfCommon
     // From Group::showItems()
     public static function pdfItems(PluginPdfSimplePDF $pdf, Group $group, $tech, $tree, $user)
     {
+        /** @var array $CFG_GLPI */
         global $CFG_GLPI;
 
         $dbu = new DbUtils();
@@ -237,6 +238,7 @@ class PluginPdfGroup extends PluginPdfCommon
 
     public static function pdfChildren(PluginPdfSimplePDF $pdf, CommonTreeDropdown $item)
     {
+        /** @var DBmysql $DB */
         global $DB;
 
         $ID            = $item->getID();

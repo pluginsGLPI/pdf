@@ -144,6 +144,7 @@ class PluginPdfSoftwareLicense extends PluginPdfCommon
 
     public static function pdfForSoftware(PluginPdfSimplePDF $pdf, Software $software, $infocom = false)
     {
+        /** @var DBmysql $DB */
         global $DB;
 
         $sID     = $software->getField('id');

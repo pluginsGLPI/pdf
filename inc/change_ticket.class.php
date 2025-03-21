@@ -41,6 +41,7 @@ class PluginPdfChange_Ticket extends PluginPdfCommon
 
     public static function pdfForChange(PluginPdfSimplePDF $pdf, Change $change)
     {
+        /** @var DBmysql $DB */
         global $DB;
 
         $dbu = new DbUtils();
@@ -310,6 +311,7 @@ class PluginPdfChange_Ticket extends PluginPdfCommon
 
     public static function pdfForTicket(PluginPdfSimplePDF $pdf, Ticket $ticket)
     {
+        /** @var DBmysql $DB */
         global $DB;
 
         $dbu = new DbUtils();

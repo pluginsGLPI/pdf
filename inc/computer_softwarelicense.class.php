@@ -36,11 +36,12 @@ class PluginPdfComputer_SoftwareLicense extends PluginPdfCommon
 
     public function __construct(CommonGLPI $obj = null)
     {
-        $this->obj = ($obj ? $obj : new Iem_SoftwareLicense());
+        $this->obj = ($obj ? $obj : new Item_SoftwareLicense());
     }
 
     public static function pdfForLicenseByEntity(PluginPdfSimplePDF $pdf, SoftwareLicense $license)
     {
+        /** @var DBmysql $DB */
         global $DB;
 
         $dbu = new DbUtils();
@@ -87,6 +88,7 @@ class PluginPdfComputer_SoftwareLicense extends PluginPdfCommon
 
     public static function pdfForLicenseByComputer(PluginPdfSimplePDF $pdf, SoftwareLicense $license)
     {
+        /** @var DBmysql $DB */
         global $DB;
 
         $dbu = new DbUtils();

@@ -36,6 +36,7 @@ class PluginPdfPreference extends CommonDBTM
 
     public static function showPreferences()
     {
+        /** @var array $PLUGIN_HOOKS */
         global $PLUGIN_HOOKS;
 
         $target = Toolbox::getItemTypeFormURL(__CLASS__);
@@ -71,6 +72,8 @@ class PluginPdfPreference extends CommonDBTM
     **/
     public function menu($item, $action)
     {
+        /** @var DBmysql $DB */
+        /** @var array $PLUGIN_HOOKS */
         global $DB, $PLUGIN_HOOKS;
 
         $type = $item->getType();
@@ -198,14 +201,15 @@ class PluginPdfPreference extends CommonDBTM
 
     public static function install(Migration $mig)
     {
+        /** @var DBmysql $DB */
         global $DB;
 
         $table = 'glpi_plugin_pdf_preferences';
+        $default_key_sign  = DBConnection::getDefaultPrimaryKeySignOption();
         if (!$DB->tableExists('glpi_plugin_pdf_preference')
             && !$DB->tableExists($table)) {
             $default_charset   = DBConnection::getDefaultCharset();
             $default_collation = DBConnection::getDefaultCollation();
-            $default_key_sign  = DBConnection::getDefaultPrimaryKeySignOption();
 
             $query = 'CREATE TABLE `' . $table . "`(
                   `id` int $default_key_sign NOT NULL AUTO_INCREMENT,
@@ -215,7 +219,7 @@ class PluginPdfPreference extends CommonDBTM
                   PRIMARY KEY (`id`)
                ) ENGINE=InnoDB DEFAULT CHARSET= {$default_charset}
                  COLLATE = {$default_collation} ROW_FORMAT=DYNAMIC";
-            $DB->queryOrDie($query, $DB->error());
+            $DB->doQueryOrDie($query, $DB->error());
         } else {
             if ($DB->tableExists('glpi_plugin_pdf_preference')) {
                 $mig->renameTable('glpi_plugin_pdf_preference', 'glpi_plugin_pdf_preferences');
@@ -232,7 +236,7 @@ class PluginPdfPreference extends CommonDBTM
             }
             // 0.6.1
             if ($DB->fieldExists($table, 'FK_users')) {
-                $mig > changeField(
+                $mig->changeField(
                     $table,
                     'FK_users',
                     'users_id',
@@ -269,13 +273,6 @@ class PluginPdfPreference extends CommonDBTM
                     'string',
                     ['comment' => 'ref of tab to display, or plugname_#, or option name'],
                 );
-            }
-            //0.85
-            if (isset($main)) {
-                $query = "UPDATE `glpi_plugin_pdf_preferences`
-                      SET `tabref`= CONCAT(`itemtype`,'$main')
-                      WHERE `tabref`='_main_'";
-                $DB->queryOrDie($query, 'update tabref for main');
             }
         }
     }

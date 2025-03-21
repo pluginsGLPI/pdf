@@ -41,6 +41,7 @@ class PluginPdfChangeTask extends PluginPdfCommon
 
     public static function pdfForChange(PluginPdfSimplePDF $pdf, Change $job)
     {
+        /** @var DBmysql $DB */
         global $DB;
 
         $dbu = new DbUtils();

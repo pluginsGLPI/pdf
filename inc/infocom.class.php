@@ -41,6 +41,8 @@ class PluginPdfInfocom extends PluginPdfCommon
 
     public static function pdfForItem(PluginPdfSimplePDF $pdf, CommonDBTM $item)
     {
+        /** @var array $CFG_GLPI */
+        /** @var array $PDF_DEVICES */
         global $CFG_GLPI, $PDF_DEVICES;
 
         $ID = $item->getField('id');

@@ -69,7 +69,10 @@ class PluginPdfAppliance extends PluginPdfCommon
         switch ($tab) {
             case 'Appliance_Item$1':
                 $plugin = new Plugin();
-                if ($plugin->isActivated('appliances')) {
+                if (
+                    $plugin->isActivated('appliances')
+                    && class_exists('PluginAppliancesAppliance_Item')
+                ) {
                     PluginAppliancesAppliance_Item::pdfForAppliance($pdf, $item);
                 } else {
                     self::pdfForAppliance($pdf, $item);
@@ -77,7 +80,9 @@ class PluginPdfAppliance extends PluginPdfCommon
                 break;
 
             case 'PluginAppliancesOptvalue$1':
-                PluginAppliancesOptvalue::pdfForAppliance($pdf, $item);
+                if (class_exists('PluginAppliancesOptvalue')) {
+                    PluginAppliancesOptvalue::pdfForAppliance($pdf, $item);
+                }
                 break;
 
             default:
@@ -205,6 +210,7 @@ class PluginPdfAppliance extends PluginPdfCommon
 
     public static function pdfForAppliance(PluginPdfSimplePDF $pdf, Appliance $appli)
     {
+        /** @var DBmysql $DB */
         global $DB;
 
         $instID = $appli->fields['id'];
@@ -331,6 +337,7 @@ class PluginPdfAppliance extends PluginPdfCommon
 
     public static function showList_relation($pdf, $relID)
     {
+        /** @var DBmysql $DB */
         global $DB;
 
         $dbu = new DbUtils();
@@ -381,6 +388,7 @@ class PluginPdfAppliance extends PluginPdfCommon
      **/
     public static function showList_PDF($pdf, $ID, $appliancesID)
     {
+        /** @var DBmysql $DB */
         global $DB;
 
         $result_app_opt = $DB->request(['FIELDS' => ['id', 'champ', 'ddefault', 'vvalues'],
@@ -419,6 +427,7 @@ class PluginPdfAppliance extends PluginPdfCommon
 
     public static function pdfForItem(PluginPdfSimplePDF $pdf, CommonGLPI $item)
     {
+        /** @var DBmysql $DB */
         global $DB;
 
         $dbu = new DbUtils();
@@ -469,15 +478,15 @@ class PluginPdfAppliance extends PluginPdfCommon
                     $pdf->setColumnsSize(30, 30, 20, 20);
                     $pdf->displayLine(
                         $data['name'],
-                        Html::clean(Dropdown::getDropdownName(
+                        Toolbox::stripTags(Dropdown::getDropdownName(
                             'glpi_entities',
                             $data['entities_id'],
                         )),
-                        Html::clean(Dropdown::getDropdownName(
+                        Toolbox::stripTags(Dropdown::getDropdownName(
                             'glpi_groups',
                             $data['groups_id'],
                         )),
-                        Html::clean(Dropdown::getDropdownName(
+                        Toolbox::stripTags(Dropdown::getDropdownName(
                             'glpi_plugin_appliances_appliancetypes',
                             $data['plugin_appliances_appliancetypes_id'],
                         )),
@@ -486,18 +495,22 @@ class PluginPdfAppliance extends PluginPdfCommon
                     $pdf->setColumnsSize(50, 25, 25);
                     $pdf->displayLine(
                         $data['name'],
-                        Html::clean(Dropdown::getDropdownName(
+                        Toolbox::stripTags(Dropdown::getDropdownName(
                             'glpi_groups',
                             $data['groups_id'],
                         )),
-                        Html::clean(Dropdown::getDropdownName(
+                        Toolbox::stripTags(Dropdown::getDropdownName(
                             'glpi_plugin_appliances_appliancetypes',
                             $data['plugin_appliances_appliancetypes_id'],
                         )),
                     );
                 }
-                PluginAppliancesRelation::showList_PDF($pdf, $data['relationtype'], $data['entID']);
-                PluginAppliancesOptvalue_Item::showList_PDF($pdf, $ID, $appliancesID);
+                if (class_exists('PluginAppliancesRelation')) {
+                    PluginAppliancesRelation::showList_PDF($pdf, $data['relationtype'], $data['entID']);
+                }
+                if (class_exists('PluginAppliancesOptvalue_Item')) {
+                    PluginAppliancesOptvalue_Item::showList_PDF($pdf, $ID, $appliancesID);
+                }
                 $result->next();
             }
         }

@@ -41,6 +41,7 @@ class PluginPdfItilFollowup extends PluginPdfCommon
 
     public static function pdfForItem(PluginPdfSimplePDF $pdf, CommonDBTM $item, $private)
     {
+        /** @var DBmysql $DB */
         global $DB;
 
         $dbu = new DbUtils();

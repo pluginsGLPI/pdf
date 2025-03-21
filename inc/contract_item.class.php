@@ -41,6 +41,7 @@ class PluginPdfContract_Item extends PluginPdfCommon
 
     public static function pdfForItem(PluginPdfSimplePDF $pdf, CommonDBTM $item)
     {
+        /** @var DBmysql $DB */
         global $DB;
 
         $type      = $item->getType();
@@ -122,6 +123,7 @@ class PluginPdfContract_Item extends PluginPdfCommon
 
     public static function pdfForContract(PluginPdfSimplePDF $pdf, Contract $contract)
     {
+        /** @var DBmysql $DB */
         global $DB;
 
         $instID = $contract->fields['id'];

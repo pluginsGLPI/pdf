@@ -85,6 +85,7 @@ class PluginPdfProfile extends Profile
             echo "</div>\n";
             Html::closeForm();
         }
+        return true;
     }
 
     public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
@@ -154,6 +155,7 @@ class PluginPdfProfile extends Profile
 
     public static function initProfile()
     {
+        /** @var DBmysql $DB */
         global $DB;
 
         $profile = new self();
@@ -189,6 +191,7 @@ class PluginPdfProfile extends Profile
 
     public static function install(Migration $mig)
     {
+        /** @var DBmysql $DB */
         global $DB;
 
         $table = 'glpi_plugin_pdf_profiles';

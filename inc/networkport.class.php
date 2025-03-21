@@ -43,6 +43,7 @@ class PluginPdfNetworkPort extends PluginPdfCommon
 
     public static function pdfForItem(PluginPdfSimplePDF $pdf, CommonDBTM $item)
     {
+        /** @var DBmysql $DB */
         global $DB;
 
         $dbu  = new DbUtils();

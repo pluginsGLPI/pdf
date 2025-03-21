@@ -195,10 +195,6 @@ class PluginPdfComputer extends PluginPdfCommon
                 PluginPdfComputerAntivirus::pdfForComputer($pdf, $item);
                 break;
 
-            case 'RegistryKey$1':
-                PluginPdfRegistryKey::pdfForComputer($pdf, $item);
-                break;
-
             case 'Computer_Item$1':
                 PluginPdfComputer_Item::pdfForComputer($pdf, $item);
                 break;

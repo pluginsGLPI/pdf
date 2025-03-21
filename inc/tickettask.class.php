@@ -41,6 +41,7 @@ class PluginPdfTicketTask extends PluginPdfCommon
 
     public static function pdfForTicket(PluginPdfSimplePDF $pdf, Ticket $job, $private)
     {
+        /** @var DBmysql $DB */
         global $DB;
 
         $dbu = new DbUtils();

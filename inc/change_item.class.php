@@ -41,6 +41,7 @@ class PluginPdfChange_Item extends PluginPdfCommon
 
     public static function pdfForChange(PluginPdfSimplePDF $pdf, Change $change)
     {
+        /** @var DBmysql $DB */
         global $DB;
 
         $dbu = new DbUtils();
@@ -155,6 +156,7 @@ class PluginPdfChange_Item extends PluginPdfCommon
 
     public static function pdfForItem(PluginPdfSimplePDF $pdf, CommonDBTM $item, $tree = false)
     {
+        /** @var DBmysql $DB */
         global $DB;
 
         $dbu = new DbUtils();

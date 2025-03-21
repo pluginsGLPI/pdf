@@ -41,6 +41,7 @@ class PluginPdfChange_Problem extends PluginPdfCommon
 
     public static function pdfForChange(PluginPdfSimplePDF $pdf, Change $change)
     {
+        /** @var DBmysql $DB */
         global $DB;
 
         $dbu = new DbUtils();
@@ -282,6 +283,7 @@ class PluginPdfChange_Problem extends PluginPdfCommon
 
     public static function pdfForProblem(PluginPdfSimplePDF $pdf, Problem $problem)
     {
+        /** @var DBmysql $DB */
         global $DB;
 
         $dbu = new DbUtils();
