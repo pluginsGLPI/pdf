@@ -425,7 +425,7 @@ class PluginPdfAppliance extends PluginPdfCommon
         ));
     }
 
-    public static function pdfForItem(PluginPdfSimplePDF $pdf, CommonGLPI $item)
+    public static function pdfForItem(PluginPdfSimplePDF $pdf, CommonDBTM $item)
     {
         /** @var DBmysql $DB */
         global $DB;

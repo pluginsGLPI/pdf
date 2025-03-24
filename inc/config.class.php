@@ -82,7 +82,7 @@ class PluginPdfConfig extends CommonDBTM
         return __('Setup');
     }
 
-    public function getName($with_comment = 0)
+    public function getName($params = [])
     {
         return __('Print to pdf', 'pdf');
     }

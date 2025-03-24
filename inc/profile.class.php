@@ -99,7 +99,7 @@ class PluginPdfProfile extends Profile
 
     public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
     {
-        if ($item->getType() == 'Profile') {
+        if ($item instanceof \Profile) {
             $prof = new self();
             $ID   = $item->getField('id');
             $prof->showForm($ID);

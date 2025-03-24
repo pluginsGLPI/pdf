@@ -169,7 +169,7 @@ class PluginPdfSimplePDF
     /**
      * Configure the width and number of colums
      *
-     * @param list of size in % of the page width
+     * param list of size in % of the page width
     **/
     public function setColumnsSize()
     {
@@ -192,7 +192,7 @@ class PluginPdfSimplePDF
     /**
      * Configure the width and number of colums
      *
-     * @param list of alignment
+     * param list of alignment
     **/
     public function setColumnsAlign()
     {
@@ -301,7 +301,7 @@ class PluginPdfSimplePDF
     /**
      * display a Title row, centered with dark background
      *
-     * @param list of strings, one string per column
+     * param list of strings, one string per column
     **/
     public function displayTitle()
     {
@@ -311,7 +311,7 @@ class PluginPdfSimplePDF
     /**
      * display a nomal row, default to left, with light background
      *
-     * @param list of strings, one string per column
+     * param list of strings, one string per column
     **/
     public function displayLine()
     {
