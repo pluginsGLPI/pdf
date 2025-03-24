@@ -82,7 +82,7 @@ class PluginPdfConfig extends CommonDBTM
         return __('Setup');
     }
 
-    public function getName($with_comment = 0)
+    public function getName($params = [])
     {
         return __('Print to pdf', 'pdf');
     }
@@ -364,6 +364,7 @@ class PluginPdfConfig extends CommonDBTM
 
 
         $config = new Config();
+        $language = '';
         foreach ($config->find(['context' => 'core',
             'name'                        => 'language']) as $row) {
             $language = $row['value'];

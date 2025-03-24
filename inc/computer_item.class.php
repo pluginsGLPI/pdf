@@ -183,91 +183,90 @@ class PluginPdfComputer_Item extends PluginPdfCommon
         $pdf->setColumnsSize(100);
         $title = '<b>' . __('Direct connections') . '</b>';
 
-        if ($result = $DB->request(
+        $result = $DB->request(
             'glpi_computers_items',
             ['items_id'    => $ID,
                 'itemtype' => $type],
-        )) {
-            $resultnum = count($result);
+        );
+        $resultnum = count($result);
 
-            if (!$resultnum) {
-                $pdf->displayTitle(sprintf(__('%1$s: %2$s'), $title, __('No item to display')));
-            } else {
-                $pdf->displayTitle($title);
+        if (!$resultnum) {
+            $pdf->displayTitle(sprintf(__('%1$s: %2$s'), $title, __('No item to display')));
+        } else {
+            $pdf->displayTitle($title);
 
-                foreach ($result as $row) {
-                    $tID    = $row['computers_id'];
-                    $connID = $row['id'];
-                    $comp->getFromDB($tID);
-                    $info->getFromDBforDevice('Computer', $tID) || $info->getEmpty();
+            foreach ($result as $row) {
+                $tID    = $row['computers_id'];
+                $connID = $row['id'];
+                $comp->getFromDB($tID);
+                $info->getFromDBforDevice('Computer', $tID) || $info->getEmpty();
 
-                    $line1 = (isset($comp->fields['name']) ? $comp->fields['name'] : '(' . $comp->fields['id'] . ')');
-                    if (isset($comp->fields['states_id'])) {
-                        $line1 = sprintf(
-                            __('%1$s - %2$s'),
-                            $line1,
-                            sprintf(
-                                __('%1$s: %2$s'),
-                                '<b>' . __('Status') . '</b>',
-                                Toolbox::stripTags(Dropdown::getDropdownName(
-                                    'glpi_states',
-                                    $comp->fields['states_id'],
-                                )),
-                            ),
-                        );
-                    }
-                    if (isset($comp->fields['serial'])) {
-                        $line1 = sprintf(
-                            __('%1$s - %2$s'),
-                            $line1,
-                            sprintf(
-                                __('%1$s: %2$s'),
-                                '<b>' . __('Serial number') . '</b>',
-                                $comp->fields['serial'],
-                            ),
-                        );
-                    }
+                $line1 = (isset($comp->fields['name']) ? $comp->fields['name'] : '(' . $comp->fields['id'] . ')');
+                if (isset($comp->fields['states_id'])) {
+                    $line1 = sprintf(
+                        __('%1$s - %2$s'),
+                        $line1,
+                        sprintf(
+                            __('%1$s: %2$s'),
+                            '<b>' . __('Status') . '</b>',
+                            Toolbox::stripTags(Dropdown::getDropdownName(
+                                'glpi_states',
+                                $comp->fields['states_id'],
+                            )),
+                        ),
+                    );
+                }
+                if (isset($comp->fields['serial'])) {
+                    $line1 = sprintf(
+                        __('%1$s - %2$s'),
+                        $line1,
+                        sprintf(
+                            __('%1$s: %2$s'),
+                            '<b>' . __('Serial number') . '</b>',
+                            $comp->fields['serial'],
+                        ),
+                    );
+                }
 
 
-                    if (isset($comp->fields['otherserial'])) {
-                        $line1 = sprintf(
-                            __('%1$s - %2$s'),
-                            $line1,
-                            sprintf(
-                                __('%1$s: %2$s'),
-                                '<b>' . __('Inventory number') . '</b>',
-                                $item->getField('otherserial'),
-                            ),
-                        );
-                    }
-                    $line2 = '';
-                    if ($info->fields['immo_number']) {
-                        $line2 = sprintf(
-                            __('%1$s - %2$s'),
-                            $line2,
-                            sprintf(
-                                __('%1$s: %2$s'),
-                                '<b>' . __('Immobilization number') . '</b>',
-                                $info->fields['immo_number'],
-                            ),
-                        );
-                    }
-                    if ($line2) {
-                        $pdf->displayText(
-                            '<b>' . sprintf(__('%1$s: %2$s'), __('Computer') . '</b>', ''),
-                            $line1 . "\n" . $line2,
-                            2,
-                        );
-                    } else {
-                        $pdf->displayText(
-                            '<b>' . sprintf(__('%1$s: %2$s'), __('Computer') . '</b>', ''),
-                            $line1,
-                            1,
-                        );
-                    }
-                }// each device   of current type
-            } // No row
-        } // Result
+                if (isset($comp->fields['otherserial'])) {
+                    $line1 = sprintf(
+                        __('%1$s - %2$s'),
+                        $line1,
+                        sprintf(
+                            __('%1$s: %2$s'),
+                            '<b>' . __('Inventory number') . '</b>',
+                            $item->getField('otherserial'),
+                        ),
+                    );
+                }
+                $line2 = '';
+                if ($info->fields['immo_number']) {
+                    $line2 = sprintf(
+                        __('%1$s - %2$s'),
+                        $line2,
+                        sprintf(
+                            __('%1$s: %2$s'),
+                            '<b>' . __('Immobilization number') . '</b>',
+                            $info->fields['immo_number'],
+                        ),
+                    );
+                }
+                if ($line2) {
+                    $pdf->displayText(
+                        '<b>' . sprintf(__('%1$s: %2$s'), __('Computer') . '</b>', ''),
+                        $line1 . "\n" . $line2,
+                        2,
+                    );
+                } else {
+                    $pdf->displayText(
+                        '<b>' . sprintf(__('%1$s: %2$s'), __('Computer') . '</b>', ''),
+                        $line1,
+                        1,
+                    );
+                }
+            }// each device   of current type
+        } // No row
         $pdf->displaySpace();
     }
 }

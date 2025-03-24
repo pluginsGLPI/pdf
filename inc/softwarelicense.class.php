@@ -233,23 +233,25 @@ class PluginPdfSoftwareLicense extends PluginPdfCommon
 
     public static function displayTabContentForPDF(PluginPdfSimplePDF $pdf, CommonGLPI $item, $tab)
     {
-        switch ($tab) {
-            case '_main_':
-                $cpt = !(isset($_REQUEST['item']['Item_SoftwareLicense$1'])
-                         || isset($_REQUEST['item']['Item_SoftwareLicense$2']));
-                self::pdfMain($pdf, $item, true, $cpt);
-                break;
+        if ($item instanceof SoftwareLicense) {
+            switch ($tab) {
+                case '_main_':
+                    $cpt = !(isset($_REQUEST['item']['Item_SoftwareLicense$1'])
+                        || isset($_REQUEST['item']['Item_SoftwareLicense$2']));
+                    self::pdfMain($pdf, $item, true, $cpt);
+                    break;
 
-            case 'Item_SoftwareLicense$1':
-                PluginPdfItem_SoftwareLicense::pdfForLicenseByEntity($pdf, $item);
-                break;
+                case 'Item_SoftwareLicense$1':
+                    PluginPdfItem_SoftwareLicense::pdfForLicenseByEntity($pdf, $item);
+                    break;
 
-            case 'Item_SoftwareLicense$2':
-                PluginPdfItem_SoftwareLicense::pdfForLicenseByComputer($pdf, $item);
-                break;
+                case 'Item_SoftwareLicense$2':
+                    PluginPdfItem_SoftwareLicense::pdfForLicenseByComputer($pdf, $item);
+                    break;
 
-            default:
-                return false;
+                default:
+                    return false;
+            }
         }
 
         return true;

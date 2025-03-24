@@ -43,5 +43,9 @@ if (isset($_POST['update'])) {
 
     Html::back();
 }
+
+/** @var array $CFG_GLPI */
+global $CFG_GLPI;
+
 Html::redirect($CFG_GLPI['root_doc'] . '/front/config.form.php?forcetab=' .
                urlencode('PluginPdfConfig$1'));

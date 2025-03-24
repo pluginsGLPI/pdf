@@ -293,29 +293,31 @@ class PluginPdfGroup extends PluginPdfCommon
         $tree = isset($_REQUEST['item']['_tree']);
         $user = isset($_REQUEST['item']['_user']);
 
-        switch ($tab) {
-            case 'Group$1':
-                self::pdfItems($pdf, $item, false, $tree, $user);
-                break;
+        if ($item instanceof Group) {
+            switch ($tab) {
+                case 'Group$1':
+                    self::pdfItems($pdf, $item, false, $tree, $user);
+                    break;
 
-            case 'Group$2':
-                self::pdfItems($pdf, $item, true, $tree, $user);
-                break;
+                case 'Group$2':
+                    self::pdfItems($pdf, $item, true, $tree, $user);
+                    break;
 
-            case 'Group$3':
-                self::pdfLdapForm($pdf, $item);
-                break;
+                case 'Group$3':
+                    self::pdfLdapForm($pdf, $item);
+                    break;
 
-            case 'Group$4':
-                self::pdfChildren($pdf, $item);
-                break;
+                case 'Group$4':
+                    self::pdfChildren($pdf, $item);
+                    break;
 
-            case 'Group_User$1':
-                PluginPdfGroup_User::pdfForGroup($pdf, $item, $tree);
-                break;
+                case 'Group_User$1':
+                    PluginPdfGroup_User::pdfForGroup($pdf, $item, $tree);
+                    break;
 
-            default:
-                return false;
+                default:
+                    return false;
+            }
         }
 
         return true;

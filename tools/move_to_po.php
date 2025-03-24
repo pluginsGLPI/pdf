@@ -37,18 +37,16 @@
 
 chdir(dirname($_SERVER['SCRIPT_FILENAME']));
 
-if ($argv) {
-    for ($i = 1 ; $i < count($argv) ; $i++) {
-        //To be able to use = in search filters, enter \= instead in command line
-        //Replace the \= by ° not to match the split function
-        $arg   = str_replace('\=', '°', $argv[$i]);
-        $it    = explode('=', $arg);
-        $it[0] = preg_replace('/^--/', '', $it[0]);
+for ($i = 1 ; $i < count($argv) ; $i++) {
+    //To be able to use = in search filters, enter \= instead in command line
+    //Replace the \= by ° not to match the split function
+    $arg   = str_replace('\=', '°', $argv[$i]);
+    $it    = explode('=', $arg);
+    $it[0] = preg_replace('/^--/', '', $it[0]);
 
-        //Replace the ° by = the find the good filter
-        $it           = str_replace('°', '=', $it);
-        $_GET[$it[0]] = $it[1];
-    }
+    //Replace the ° by = the find the good filter
+    $it           = str_replace('°', '=', $it);
+    $_GET[$it[0]] = $it[1];
 }
 
 if (!isset($_GET['lang'])) {
@@ -63,6 +61,8 @@ if (!is_readable(GLPI_ROOT . '/locales/' . $_GET['lang'] . '.php')) {
     exit();
 }
 include(GLPI_ROOT . '/locales/en_GB.php');
+/** @var array $LANG */
+global $LANG;
 $REFLANG = $LANG;
 
 $lf     = fopen(GLPI_ROOT . '/locales/' . $_GET['lang'] . '.php', 'r');
@@ -86,7 +86,10 @@ if (!is_readable(GLPI_ROOT . '/locales/glpi.pot')) {
     print "Unable to read glpi.pot file\n";
     exit();
 }
+$current_string        = '';
 $current_string_plural = '';
+$sing_trans            = '';
+$plural_trans          = '';
 
 $pot = fopen(GLPI_ROOT . '/locales/glpi.pot', 'r');
 $po  = fopen(GLPI_ROOT . '/locales/' . $_GET['lang'] . '.po', 'w+');
@@ -200,6 +203,8 @@ function search_in_dict($string, $context)
 
     $ponctmatch = "([\.: \(\)]*)";
     $varmatch   = '(%s)*';
+    $left       = '';
+    $right      = '';
 
     if (preg_match("/$varmatch$ponctmatch(.*)$ponctmatch$varmatch$/U", $string, $reg)) {
         //       print_r($reg);

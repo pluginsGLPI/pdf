@@ -156,14 +156,16 @@ class PluginPdfPrinter extends PluginPdfCommon
 
     public static function displayTabContentForPDF(PluginPdfSimplePDF $pdf, CommonGLPI $item, $tab)
     {
-        switch ($tab) {
-            case 'Cartridge$1':
-                PluginPdfCartridge::pdfForPrinter($pdf, $item, false);
-                PluginPdfCartridge::pdfForPrinter($pdf, $item, true);
-                break;
+        if ($item instanceof Printer) {
+            switch ($tab) {
+                case 'Cartridge$1':
+                    PluginPdfCartridge::pdfForPrinter($pdf, $item, false);
+                    PluginPdfCartridge::pdfForPrinter($pdf, $item, true);
+                    break;
 
-            default:
-                return false;
+                default:
+                    return false;
+            }
         }
 
         return true;

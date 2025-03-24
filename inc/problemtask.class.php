@@ -121,7 +121,7 @@ class PluginPdfProblemTask extends PluginPdfCommon
                 $pdf->displayLine(
                     '</b>' . Toolbox::stripTags($lib),
                     Html::convDateTime($data['date']),
-                    Html::timestampToString($data['actiontime'], 0),
+                    Html::timestampToString($data['actiontime'], false),
                     Toolbox::stripTags($dbu->getUserName($data['users_id'])),
                     Toolbox::stripTags($planification),
                     1,

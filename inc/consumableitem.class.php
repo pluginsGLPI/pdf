@@ -122,14 +122,16 @@ class PluginPdfConsumableItem extends PluginPdfCommon
 
     public static function displayTabContentForPDF(PluginPdfSimplePDF $pdf, CommonGLPI $item, $tab)
     {
-        switch ($tab) {
-            case 'Consumable$1':
-                self::pdfForConsumableItem($pdf, $item, false);
-                self::pdfForConsumableItem($pdf, $item, true);
-                break;
+        if ($item instanceof ConsumableItem) {
+            switch ($tab) {
+                case 'Consumable$1':
+                    self::pdfForConsumableItem($pdf, $item, false);
+                    self::pdfForConsumableItem($pdf, $item, true);
+                    break;
 
-            default:
-                return false;
+                default:
+                    return false;
+            }
         }
 
         return true;
@@ -218,6 +220,7 @@ class PluginPdfConsumableItem extends PluginPdfCommon
                     $pdf->setColumnsSize(10, 45, 45);
                     $pdf->displayLine($data['id'], Consumable::getStatus($data['id']), $date_in);
                 } else {
+                    $name = '';
                     if ($item = getItemForItemtype($data['itemtype'])) {
                         if ($item->getFromDB($data['items_id'])) {
                             $name = $item->getNameID();

@@ -150,17 +150,19 @@ class PluginPdfSoftwareVersion extends PluginPdfCommon
 
     public static function displayTabContentForPDF(PluginPdfSimplePDF $pdf, CommonGLPI $item, $tab)
     {
-        switch ($tab) {
-            case 'Item_SoftwareVersion$1':
-                PluginPdfItem_SoftwareVersion::pdfForVersionByEntity($pdf, $item);
-                break;
+        if ($item instanceof SoftwareVersion) {
+            switch ($tab) {
+                case 'Item_SoftwareVersion$1':
+                    PluginPdfItem_SoftwareVersion::pdfForVersionByEntity($pdf, $item);
+                    break;
 
-            case 'Item_SoftwareVersion$2':
-                PluginPdfItem_SoftwareVersion::pdfForSoftware($pdf, $item);
-                break;
+                case 'Item_SoftwareVersion$2':
+                    PluginPdfItem_SoftwareVersion::pdfForSoftware($pdf, $item);
+                    break;
 
-            default:
-                return false;
+                default:
+                    return false;
+            }
         }
 
         return true;

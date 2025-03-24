@@ -125,19 +125,21 @@ class PluginPdfCartridgeItem extends PluginPdfCommon
 
     public static function displayTabContentForPDF(PluginPdfSimplePDF $pdf, CommonGLPI $item, $tab)
     {
-        switch ($tab) {
-            case 'Cartridge$1':
-                PluginPdfCartridge::pdfForCartridgeItem($pdf, $item, 'new');
-                PluginPdfCartridge::pdfForCartridgeItem($pdf, $item, 'used');
-                PluginPdfCartridge::pdfForCartridgeItem($pdf, $item, 'old');
-                break;
+        if ($item instanceof CartridgeItem) {
+            switch ($tab) {
+                case 'Cartridge$1':
+                    PluginPdfCartridge::pdfForCartridgeItem($pdf, $item, 'new');
+                    PluginPdfCartridge::pdfForCartridgeItem($pdf, $item, 'used');
+                    PluginPdfCartridge::pdfForCartridgeItem($pdf, $item, 'old');
+                    break;
 
-            case 'CartridgeItem_PrinterModel$1':
-                self::pdfForPrinterModel($pdf, $item);
-                break;
+                case 'CartridgeItem_PrinterModel$1':
+                    self::pdfForPrinterModel($pdf, $item);
+                    break;
 
-            default:
-                return false;
+                default:
+                    return false;
+            }
         }
 
         return true;
@@ -152,6 +154,7 @@ class PluginPdfCartridgeItem extends PluginPdfCommon
 
         $iterator = CartridgeItem_PrinterModel::getListForItem($item);
         $number   = count($iterator);
+        $datas    = [];
 
         foreach ($iterator as $data) {
             $datas[$data['linkid']] = $data;
@@ -160,7 +163,7 @@ class PluginPdfCartridgeItem extends PluginPdfCommon
         $pdf->setColumnsSize(100);
         $title = '<b>' . _n('Printer model', 'Printer models', $number) . '</b>';
         if (!$number) {
-            $pdf->displayTitle(_('No printel model associated', 'pdf'));
+            $pdf->displayTitle(__('No printel model associated', 'pdf'));
         } else {
             if ($number > $_SESSION['glpilist_limit']) {
                 $title = sprintf(__('%1$s: %2$s'), $title, $_SESSION['glpilist_limit'] . ' / ' . $number);

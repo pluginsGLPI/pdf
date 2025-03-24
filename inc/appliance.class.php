@@ -66,27 +66,29 @@ class PluginPdfAppliance extends PluginPdfCommon
     **/
     public static function displayTabContentForPDF(PluginPdfSimplePDF $pdf, CommonGLPI $item, $tab)
     {
-        switch ($tab) {
-            case 'Appliance_Item$1':
-                $plugin = new Plugin();
-                if (
-                    $plugin->isActivated('appliances')
-                    && class_exists('PluginAppliancesAppliance_Item')
-                ) {
-                    PluginAppliancesAppliance_Item::pdfForAppliance($pdf, $item);
-                } else {
-                    self::pdfForAppliance($pdf, $item);
-                }
-                break;
+        if ($item instanceof Appliance) {
+            switch ($tab) {
+                case 'Appliance_Item$1':
+                    $plugin = new Plugin();
+                    if (
+                        $plugin->isActivated('appliances')
+                        && class_exists('PluginAppliancesAppliance_Item')
+                    ) {
+                        PluginAppliancesAppliance_Item::pdfForAppliance($pdf, $item);
+                    } else {
+                        self::pdfForAppliance($pdf, $item);
+                    }
+                    break;
 
-            case 'PluginAppliancesOptvalue$1':
-                if (class_exists('PluginAppliancesOptvalue')) {
-                    PluginAppliancesOptvalue::pdfForAppliance($pdf, $item);
-                }
-                break;
+                case 'PluginAppliancesOptvalue$1':
+                    if (class_exists('PluginAppliancesOptvalue')) {
+                        PluginAppliancesOptvalue::pdfForAppliance($pdf, $item);
+                    }
+                    break;
 
-            default:
-                return false;
+                default:
+                    return false;
+            }
         }
 
         return true;
@@ -283,49 +285,48 @@ class PluginPdfAppliance extends PluginPdfCommon
                     }
                     $query['ORDER'] = ['glpi_entities.completename', $item->getTable() . '.' . $column];
 
-                    if ($result_linked = $DB->request($query)) {
-                        if (count($result_linked)) {
-                            foreach ($result_linked as $id => $data) {
-                                if (!$item->getFromDB($data['id'])) {
-                                    continue;
-                                }
+                    $result_linked = $DB->request($query);
+                    if (count($result_linked)) {
+                        foreach ($result_linked as $id => $data) {
+                            if (!$item->getFromDB($data['id'])) {
+                                continue;
+                            }
 
-                                if ($type == 'Ticket') {
-                                    $data['name'] = sprintf(__('%1$s %2$s'), __('Ticket'), $data['id']);
-                                }
-                                if ($type == 'KnowbaseItem') {
-                                    $data['name'] = $data['question'];
-                                }
-                                $name = $data['name'];
-                                if ($_SESSION['glpiis_ids_visible'] || empty($data['name'])) {
-                                    $name = sprintf(__('%1$s (%2$s)'), $name, $data['id']);
-                                }
+                            if ($type == 'Ticket') {
+                                $data['name'] = sprintf(__('%1$s %2$s'), __('Ticket'), $data['id']);
+                            }
+                            if ($type == 'KnowbaseItem') {
+                                $data['name'] = $data['question'];
+                            }
+                            $name = $data['name'];
+                            if (empty($data['name'])) {
+                                $name = sprintf(__('%1$s (%2$s)'), $name, $data['id']);
+                            }
 
-                                if (Session::isMultiEntitiesMode()) {
-                                    $pdf->setColumnsSize(12, 27, 25, 18, 18);
-                                    $pdf->displayLine(
-                                        $item->getTypeName(1),
-                                        $name,
-                                        Dropdown::getDropdownName(
-                                            'glpi_entities',
-                                            $data['entities_id'],
-                                        ),
-                                        (isset($data['serial']) ? $data['serial'] : '-'),
-                                        (isset($data['otherserial']) ? $data['otherserial'] : '-'),
-                                    );
-                                } else {
-                                    $pdf->setColumnsSize(25, 31, 22, 22);
-                                    $pdf->displayTitle(
-                                        $item->getTypeName(1),
-                                        $name,
-                                        (isset($data['serial']) ? $data['serial'] : '-'),
-                                        (isset($data['otherserial']) ? $data['otherserial'] : '-'),
-                                    );
-                                }
+                            if (Session::isMultiEntitiesMode()) {
+                                $pdf->setColumnsSize(12, 27, 25, 18, 18);
+                                $pdf->displayLine(
+                                    $item->getTypeName(1),
+                                    $name,
+                                    Dropdown::getDropdownName(
+                                        'glpi_entities',
+                                        $data['entities_id'],
+                                    ),
+                                    (isset($data['serial']) ? $data['serial'] : '-'),
+                                    (isset($data['otherserial']) ? $data['otherserial'] : '-'),
+                                );
+                            } else {
+                                $pdf->setColumnsSize(25, 31, 22, 22);
+                                $pdf->displayTitle(
+                                    $item->getTypeName(1),
+                                    $name,
+                                    (isset($data['serial']) ? $data['serial'] : '-'),
+                                    (isset($data['otherserial']) ? $data['otherserial'] : '-'),
+                                );
+                            }
 
-                                if (!empty($data['IDD'])) {
-                                    self::showList_relation($pdf, $data['IDD']);
-                                }
+                            if (!empty($data['IDD'])) {
+                                self::showList_relation($pdf, $data['IDD']);
                             }
                         }
                     }
@@ -425,7 +426,7 @@ class PluginPdfAppliance extends PluginPdfCommon
         ));
     }
 
-    public static function pdfForItem(PluginPdfSimplePDF $pdf, CommonGLPI $item)
+    public static function pdfForItem(PluginPdfSimplePDF $pdf, CommonDBTM $item)
     {
         /** @var DBmysql $DB */
         global $DB;

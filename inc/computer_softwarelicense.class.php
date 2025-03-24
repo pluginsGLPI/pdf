@@ -105,9 +105,8 @@ class PluginPdfComputer_SoftwareLicense extends PluginPdfCommon
                               + $dbu->getEntitiesRestrictCriteria('glpi_computers')];
 
         $number = 0;
-        if ($result = $DB->request($query)) {
-            $number = count($result);
-        }
+        $result = $DB->request($query);
+        $number = count($result);
 
         $pdf->setColumnsSize(100);
         $pdf->setColumnsAlign('center');
@@ -185,7 +184,7 @@ class PluginPdfComputer_SoftwareLicense extends PluginPdfCommon
             }
             foreach ($result as $data) {
                 $compname = $data['compname'];
-                if (empty($compname) || $_SESSION['glpiis_ids_visible']) {
+                if (empty($compname)) {
                     $compname = sprintf(__('%1$s (%2$s)'), $compname, $data['cID']);
                 }
                 $entname = (empty($data['entity']) ? __('Root entity') : $data['entity']);

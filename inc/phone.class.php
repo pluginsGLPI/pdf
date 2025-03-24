@@ -117,7 +117,5 @@ class PluginPdfPhone extends PluginPdfCommon
             default:
                 return false;
         }
-
-        return true;
     }
 }

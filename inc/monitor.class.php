@@ -106,7 +106,5 @@ class PluginPdfMonitor extends PluginPdfCommon
             default:
                 return false;
         }
-
-        return true;
     }
 }

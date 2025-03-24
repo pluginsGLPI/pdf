@@ -60,6 +60,7 @@ class PluginPdfItem_SoftwareVersion extends PluginPdfCommon
         }
 
         $item_version_table = 'glpi_items_softwareversions';
+        $queries = [];
         foreach ($CFG_GLPI['software_types'] as $itemtype) {
             $canshowitems[$itemtype] = $itemtype::canView();
             $itemtable               = $itemtype::getTable();
@@ -285,7 +286,7 @@ class PluginPdfItem_SoftwareVersion extends PluginPdfCommon
 
         $lig = $tot = 0;
         if (in_array(0, $_SESSION['glpiactiveentities'])) {
-            $nb = Item_SoftwareVersion::countForVersion($softwareversions_id, 0);
+            $nb = Item_SoftwareVersion::countForVersion($softwareversions_id, '0');
             if ($nb > 0) {
                 $pdf->displayLine(__('Root entity'), $nb);
                 $tot += $nb;

@@ -78,18 +78,17 @@ class PluginPdfITILSolution extends PluginPdfCommon
 
                 foreach ($res as $img) {
                     $docimg = new Document();
-                    $docimg->getFromDB($img[2]);
+                    $docimg->getFromDB((int) $img[2]);
 
                     $path = '<img src="file://' . GLPI_DOC_DIR . '/' . $docimg->fields['filepath'] . '"/>';
                     $sol = str_replace($img[0], $path, $sol);
                 }
 
+                $text = $textapprove = '';
                 if ($row['status'] == 3) {
                     $text = __('Soluce approved on ', 'pdf');
                 } elseif ($row['status'] == 4) {
                     $text = __('Soluce refused on ', 'pdf');
-                } else {
-                    $text = $textapprove = '';
                 }
                 if (isset($row['date_approval']) || !empty($row['users_id_approval'])) {
                     $textapprove = '<br /><br /><br /><i>' .

@@ -134,24 +134,23 @@ class PluginPdfCartridge extends PluginPdfCommon
 
                 $col1 = $data['id'];
                 $col2 = sprintf(__('%1$s - %2$s'), $data['type'], $data['ref']);
+                $col6 = $data['pages'];
+                $col7 = '';
 
                 $tmp_dbeg = explode('-', $data['date_in']);
                 $tmp_dend = explode('-', $data['date_use']);
 
-                $stock_time_tmp = mktime(0, 0, 0, $tmp_dend[1], $tmp_dend[2], $tmp_dend[0])
-                                  - mktime(0, 0, 0, $tmp_dbeg[1], $tmp_dbeg[2], $tmp_dbeg[0]);
+                $stock_time_tmp = mktime(0, 0, 0, (int) $tmp_dend[1], (int) $tmp_dend[2], (int) $tmp_dend[0])
+                                  - mktime(0, 0, 0, (int) $tmp_dbeg[1], (int) $tmp_dbeg[2], (int) $tmp_dbeg[0]);
                 $stock_time += $stock_time_tmp;
 
                 if ($old) {
                     $tmp_dbeg = explode('-', $data['date_use']);
                     $tmp_dend = explode('-', $data['date_out']);
 
-                    $use_time_tmp = mktime(0, 0, 0, $tmp_dend[1], $tmp_dend[2], $tmp_dend[0])
-                                    - mktime(0, 0, 0, $tmp_dbeg[1], $tmp_dbeg[2], $tmp_dbeg[0]);
+                    $use_time_tmp = mktime(0, 0, 0, (int) $tmp_dend[1], (int) $tmp_dend[2], (int) $tmp_dend[0])
+                                    - mktime(0, 0, 0, (int) $tmp_dbeg[1], (int) $tmp_dbeg[2], (int) $tmp_dbeg[0]);
                     $use_time += $use_time_tmp;
-
-                    $col6 = $data['pages'];
-                    $col7 = '';
 
                     if ($pages < $data['pages']) {
                         $pages_printed += $data['pages'] - $pages;
@@ -195,12 +194,12 @@ class PluginPdfCartridge extends PluginPdfCommon
                     '<b><i>' . sprintf(
                         __('%1$s: %2$s'),
                         __('Average time in stock') . '</i></b>',
-                        sprintf(_n('%d month', '%d months', $time_stock), $time_stock),
+                        sprintf(_n('%d month', '%d months', (int) $time_stock), $time_stock),
                     ),
                     '<b><i>' . sprintf(
                         __('%1$s: %2$s'),
                         __('Average time in use') . '</i></b>',
-                        sprintf(_n('%d month', '%d months', $time_use), $time_use),
+                        sprintf(_n('%d month', '%d months', (int) $time_use), $time_use),
                     ),
                     '<b><i>' . sprintf(
                         __('%1$s: %2$s'),
@@ -328,16 +327,16 @@ class PluginPdfCartridge extends PluginPdfCommon
                 if (!is_null($date_use)) {
                     $tmp_dbeg       = explode('-', $data['date_in']);
                     $tmp_dend       = explode('-', $data['date_use']);
-                    $stock_time_tmp = mktime(0, 0, 0, $tmp_dend[1], $tmp_dend[2], $tmp_dend[0])
-                                      - mktime(0, 0, 0, $tmp_dbeg[1], $tmp_dbeg[2], $tmp_dbeg[0]);
+                    $stock_time_tmp = mktime(0, 0, 0, (int) $tmp_dend[1], (int) $tmp_dend[2], (int) $tmp_dend[0])
+                                      - mktime(0, 0, 0, (int) $tmp_dbeg[1], (int) $tmp_dbeg[2], (int) $tmp_dbeg[0]);
                     $stock_time += $stock_time_tmp;
                 }
                 $pdfpages = '';
                 if ($state == 'old') {
                     $tmp_dbeg     = explode('-', $data['date_use']);
                     $tmp_dend     = explode('-', $data['date_out']);
-                    $use_time_tmp = mktime(0, 0, 0, $tmp_dend[1], $tmp_dend[2], $tmp_dend[0])
-                    - mktime(0, 0, 0, $tmp_dbeg[1], $tmp_dbeg[2], $tmp_dbeg[0]);
+                    $use_time_tmp = mktime(0, 0, 0, (int) $tmp_dend[1], (int) $tmp_dend[2], (int) $tmp_dend[0])
+                    - mktime(0, 0, 0, (int) $tmp_dbeg[1], (int) $tmp_dbeg[2], (int) $tmp_dbeg[0]);
                     $use_time += $use_time_tmp;
 
                     // Get initial counter page
@@ -365,7 +364,7 @@ class PluginPdfCartridge extends PluginPdfCommon
                 );
             }
 
-            if (($state == 'old') && ($number > 0)) {
+            if ($state == 'old') {
                 if ($nb_pages_printed == 0) {
                     $nb_pages_printed = 1;
                 }

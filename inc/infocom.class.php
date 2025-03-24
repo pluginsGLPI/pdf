@@ -208,6 +208,7 @@ class PluginPdfInfocom extends PluginPdfCommon
             );
 
             $currency = PluginPdfConfig::getInstance();
+            $sym = '';
 
             foreach ($PDF_DEVICES as $option => $value) {
                 if ($currency->fields['currency'] == $option) {
@@ -220,7 +221,7 @@ class PluginPdfInfocom extends PluginPdfCommon
                     __('TCO (value + tracking cost)') . '</i></b>',
                     sprintf(
                         __('%1$s %2$s'),
-                        Toolbox::stripTags(Infocom::showTco(
+                        Toolbox::stripTags((string) Infocom::showTco(
                             $item->getField('ticket_tco'),
                             $ic->fields['value'],
                         )),
@@ -232,7 +233,7 @@ class PluginPdfInfocom extends PluginPdfCommon
                     __('Monthly TCO') . '</i></b>',
                     sprintf(
                         __('%1$s %2$s'),
-                        Toolbox::stripTags(Infocom::showTco(
+                        Toolbox::stripTags((string) Infocom::showTco(
                             $item->getField('ticket_tco'),
                             $ic->fields['value'],
                             $ic->fields['buy_date'],

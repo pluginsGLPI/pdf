@@ -83,7 +83,5 @@ class PluginPdfPeripheral extends PluginPdfCommon
             default:
                 return false;
         }
-
-        return true;
     }
 }

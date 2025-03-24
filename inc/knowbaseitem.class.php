@@ -126,17 +126,19 @@ class PluginPdfKnowbaseItem extends PluginPdfCommon
 
     public static function displayTabContentForPDF(PluginPdfSimplePDF $pdf, CommonGLPI $item, $tab)
     {
-        switch ($tab) {
-            case 'KnowbaseItem$1':
-                self::pdfMain($pdf, $item);
-                break;
+        if ($item instanceof KnowbaseItem) {
+            switch ($tab) {
+                case 'KnowbaseItem$1':
+                    self::pdfMain($pdf, $item);
+                    break;
 
-            case 'KnowbaseItem$2':
-                self::pdfCible($pdf, $item);
-                break;
+                case 'KnowbaseItem$2':
+                    self::pdfCible($pdf, $item);
+                    break;
 
-            default:
-                return false;
+                default:
+                    return false;
+            }
         }
 
         return true;
@@ -200,6 +202,7 @@ class PluginPdfKnowbaseItem extends PluginPdfCommon
                             $recursive = '(' . __('R') . ')';
                         }
                         $names = Dropdown::getDropdownName('glpi_profiles', $data['profiles_id']);
+                        $profilename = '';
                         if ($data['entities_id'] >= 0) {
                             $profilename = sprintf(
                                 __('%1$s / %2$s'),
@@ -225,6 +228,7 @@ class PluginPdfKnowbaseItem extends PluginPdfCommon
                             $recursive = '(' . __('R') . ')';
                         }
                         $names = Dropdown::getDropdownName('glpi_groups', $data['groups_id']);
+                        $groupname = '';
                         if ($data['entities_id'] >= 0) {
                             $groupname = sprintf(
                                 __('%1$s / %2$s'),

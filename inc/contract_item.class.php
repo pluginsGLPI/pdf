@@ -234,8 +234,7 @@ class PluginPdfContract_Item extends PluginPdfCommon
                         } else {
                             $name = $objdata['name'];
                         }
-                        if ($_SESSION['glpiis_ids_visible']
-                              || empty($data['name'])) {
+                        if (empty($data['name'])) {
                             $name = sprintf(__('%1$s (%2$s)'), $name, $objdata['id']);
                         }
 
