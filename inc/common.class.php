@@ -54,7 +54,7 @@ abstract class PluginPdfCommon extends CommonGLPI
      * @param $ong       array defined tab array
      * @param $options   array of options (for withtemplate)
      *
-     * @return void (set the tab array)
+     * @return CommonGLPI (set the tab array)
     **/
     final public function addStandardTab($itemtype, &$ong, $options)
     {
@@ -81,6 +81,7 @@ abstract class PluginPdfCommon extends CommonGLPI
                 }
             }
         }
+        return $this;
     }
 
     /**
@@ -138,7 +139,7 @@ abstract class PluginPdfCommon extends CommonGLPI
      * @param $item         CommonGLPI object for which the tab need to be displayed
      * @param $tab   string tab number
      *
-     * @return true if display done (else will search for another handler)
+     * @return bool true if display done (else will search for another handler)
     **/
     public static function displayTabContentForPDF(PluginPdfSimplePDF $pdf, CommonGLPI $item, $tab)
     {
@@ -154,7 +155,7 @@ abstract class PluginPdfCommon extends CommonGLPI
      * @param $item         CommonGLPI object for which the tab need to be displayed
      * @param $tab   string tab number
      *
-     * @return true if display done (else will search for another handler)
+     * @return bool true if display done (else will search for another handler)
     **/
     final public static function displayCommonTabForPDF(PluginPdfSimplePDF $pdf, CommonGLPI $item, $tab)
     {
