@@ -192,6 +192,7 @@ class PluginPdfChange extends PluginPdfCommon
             $groups[] = Dropdown::getDropdownName('glpi_groups', $d['groups_id']);
         }
         if (count($groups)) {
+            $groups = array_filter($groups, 'is_string');
             $listgroups = implode(', ', $groups);
         }
         $pdf->displayText($requestergroup, $listgroups, 1);
@@ -227,6 +228,7 @@ class PluginPdfChange extends PluginPdfCommon
             $groups[] = Dropdown::getDropdownName('glpi_groups', $d['groups_id']);
         }
         if (count($groups)) {
+            $groups = array_filter($groups, 'is_string');
             $listgroups = implode(', ', $groups);
         }
         $pdf->displayText($watchergroup, $listgroups, 1);
@@ -266,6 +268,7 @@ class PluginPdfChange extends PluginPdfCommon
             $groups[] = Dropdown::getDropdownName('glpi_groups', $d['groups_id']);
         }
         if (count($groups)) {
+            $groups = array_filter($groups, 'is_string');
             $listgroups = implode(', ', $groups);
         }
         $pdf->displayText($assigngroup, $listgroups, 1);
