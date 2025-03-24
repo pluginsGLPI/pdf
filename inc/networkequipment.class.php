@@ -108,7 +108,5 @@ class PluginPdfNetworkEquipment extends PluginPdfCommon
             default:
                 return false;
         }
-
-        return true;
     }
 }

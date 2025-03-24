@@ -106,9 +106,8 @@ class PluginPdfItem_SoftwareLicense extends PluginPdfCommon
                               + $dbu->getEntitiesRestrictCriteria('glpi_computers')];
 
         $number = 0;
-        if ($result = $DB->request($query)) {
-            $number = count($result);
-        }
+        $result = $DB->request($query);
+        $number = count($result);
 
         $pdf->setColumnsSize(100);
         $pdf->setColumnsAlign('center');

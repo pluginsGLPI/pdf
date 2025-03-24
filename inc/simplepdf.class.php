@@ -49,8 +49,7 @@ class PluginPdfSimplePDF
     // Page management
     private $width;
     private $height;
-    private $start_tab;
-    private $header = '';
+    private $header = ''; // @phpstan-ignore-line - $header is never read, only written.
 
     // Columns management
     private $cols  = [];

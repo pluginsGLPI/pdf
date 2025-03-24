@@ -37,18 +37,16 @@
 
 chdir(dirname($_SERVER['SCRIPT_FILENAME']));
 
-if ($argv) {
-    for ($i = 1 ; $i < count($argv) ; $i++) {
-        //To be able to use = in search filters, enter \= instead in command line
-        //Replace the \= by ° not to match the split function
-        $arg   = str_replace('\=', '°', $argv[$i]);
-        $it    = explode('=', $arg);
-        $it[0] = preg_replace('/^--/', '', $it[0]);
+for ($i = 1 ; $i < count($argv) ; $i++) {
+    //To be able to use = in search filters, enter \= instead in command line
+    //Replace the \= by ° not to match the split function
+    $arg   = str_replace('\=', '°', $argv[$i]);
+    $it    = explode('=', $arg);
+    $it[0] = preg_replace('/^--/', '', $it[0]);
 
-        //Replace the ° by = the find the good filter
-        $it           = str_replace('°', '=', $it);
-        $_GET[$it[0]] = $it[1];
-    }
+    //Replace the ° by = the find the good filter
+    $it           = str_replace('°', '=', $it);
+    $_GET[$it[0]] = $it[1];
 }
 
 if (!isset($_GET['lang'])) {

@@ -294,9 +294,6 @@ class PluginPdfTicket extends PluginPdfCommon
                     $tmp .= ' (';
                     $first = true;
                     if ($user->fields['phone']) {
-                        if (!$first) {
-                            $tmp .= ' - ';
-                        }
                         $tmp .= sprintf(__('%1$s: %2$s'), __('Phone'), $user->fields['phone']);
                         $first = false;
                     }
@@ -479,7 +476,7 @@ class PluginPdfTicket extends PluginPdfCommon
 
         // Linked tickets
         $tickets = Ticket_Ticket::getLinkedTicketsTo($ID);
-        if (is_array($tickets) && count($tickets)) {
+        if (count($tickets)) {
             $ticket = new Ticket();
             $pdf->displayLine('<b><i>' . sprintf(
                 __('%1$s: %2$s') . '</i></b>',

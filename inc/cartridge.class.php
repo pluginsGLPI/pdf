@@ -364,7 +364,7 @@ class PluginPdfCartridge extends PluginPdfCommon
                 );
             }
 
-            if (($state == 'old') && ($number > 0)) {
+            if ($state == 'old') {
                 if ($nb_pages_printed == 0) {
                     $nb_pages_printed = 1;
                 }

@@ -74,10 +74,9 @@ class PluginPdfComputer_SoftwareVersion extends PluginPdfCommon
         }
 
         $total = 0;
-        if ($result = $DB->request($query_number)) {
-            foreach ($result as $row) {
-                $total = $row['cpt'];
-            }
+        $result = $DB->request($query_number);
+        foreach ($result as $row) {
+            $total = $row['cpt'];
         }
 
         $query = "SELECT DISTINCT `glpi_computers_softwareversions`.*,
@@ -118,8 +117,8 @@ class PluginPdfComputer_SoftwareVersion extends PluginPdfCommon
 
         $pdf->setColumnsSize(100);
 
-        if (($result = $DB->request($query))
-            && (($number = count($result)) > 0)) {
+        $result = $DB->request($query);
+        if (($number = count($result)) > 0) {
             if ($number == $total) {
                 $pdf->displayTitle('<b>' . sprintf(
                     __('%1$s: %2$s'),

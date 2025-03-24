@@ -65,7 +65,7 @@ abstract class PluginPdfCommon extends CommonGLPI
             $withtemplate = $options['withtemplate'];
         }
 
-        if (!is_integer($itemtype)
+        if (!is_numeric($itemtype)
             && ($obj = $dbu->getItemForItemtype($itemtype))) {
             if (method_exists($itemtype, 'displayTabContentForPDF')
                 && !($obj instanceof PluginPdfCommon)) {
@@ -389,7 +389,7 @@ abstract class PluginPdfCommon extends CommonGLPI
                     // Default set
                     $tabnum = (isset($data[1]) ? $data[1] : 1);
 
-                    if (!is_integer($itemtype)
+                    if (!is_numeric($itemtype)
                         && ($itemtype != 'empty')) {
                         if ($itemtype == 'Item_Devices') {
                             $PluginPdfComputer = new PluginPdfComputer();
