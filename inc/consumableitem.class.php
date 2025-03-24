@@ -122,14 +122,16 @@ class PluginPdfConsumableItem extends PluginPdfCommon
 
     public static function displayTabContentForPDF(PluginPdfSimplePDF $pdf, CommonGLPI $item, $tab)
     {
-        switch ($tab) {
-            case 'Consumable$1':
-                self::pdfForConsumableItem($pdf, $item, false);
-                self::pdfForConsumableItem($pdf, $item, true);
-                break;
+        if ($item instanceof ConsumableItem) {
+            switch ($tab) {
+                case 'Consumable$1':
+                    self::pdfForConsumableItem($pdf, $item, false);
+                    self::pdfForConsumableItem($pdf, $item, true);
+                    break;
 
-            default:
-                return false;
+                default:
+                    return false;
+            }
         }
 
         return true;

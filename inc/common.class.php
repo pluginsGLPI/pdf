@@ -159,107 +159,109 @@ abstract class PluginPdfCommon extends CommonGLPI
     **/
     final public static function displayCommonTabForPDF(PluginPdfSimplePDF $pdf, CommonGLPI $item, $tab)
     {
-        switch ($tab) {
-            case $item->getType() . '$main':
-                $item::pdfMain($pdf, $item); // @phpstan-ignore-line - Call to an undefined static method CommonGLPI::pdfMain()
-                break;
+        if ($item instanceof CommonDBTM) {
+            switch ($tab) {
+                case $item->getType() . '$main':
+                    $item::pdfMain($pdf, $item); // @phpstan-ignore-line - Call to an undefined static method CommonGLPI::pdfMain()
+                    break;
 
-            case 'Notepad$1':
-                if (Session::haveRight($item::$rightname, READNOTE)) {
-                    self::pdfNote($pdf, $item);
-                }
-                break;
+                case 'Notepad$1':
+                    if (Session::haveRight($item::$rightname, READNOTE)) {
+                        self::pdfNote($pdf, $item);
+                    }
+                    break;
 
-            case 'Document_Item$1':
-                if (Session::haveRight('document', READ)) {
-                    PluginPdfDocument::pdfForItem($pdf, $item);
-                }
-                break;
+                case 'Document_Item$1':
+                    if (Session::haveRight('document', READ)) {
+                        PluginPdfDocument::pdfForItem($pdf, $item);
+                    }
+                    break;
 
-            case 'NetworkPort$1':
-                PluginPdfNetworkPort::pdfForItem($pdf, $item);
-                break;
+                case 'NetworkPort$1':
+                    PluginPdfNetworkPort::pdfForItem($pdf, $item);
+                    break;
 
-            case 'Infocom$1':
-                if (Session::haveRight('infocom', READ)) {
-                    PluginPdfInfocom::pdfForItem($pdf, $item);
-                }
-                break;
+                case 'Infocom$1':
+                    if (Session::haveRight('infocom', READ)) {
+                        PluginPdfInfocom::pdfForItem($pdf, $item);
+                    }
+                    break;
 
-            case 'Contract_Item$1':
-                if (Session::haveRight('contract', READ)) {
-                    PluginPdfContract_Item::pdfForItem($pdf, $item);
-                }
-                break;
+                case 'Contract_Item$1':
+                    if (Session::haveRight('contract', READ)) {
+                        PluginPdfContract_Item::pdfForItem($pdf, $item);
+                    }
+                    break;
 
-            case 'Ticket$1':
-                if (Ticket::canView()) {
-                    PluginPdfItem_Ticket::pdfForItem($pdf, $item);
-                }
-                break;
+                case 'Ticket$1':
+                    if (Ticket::canView()) {
+                        PluginPdfItem_Ticket::pdfForItem($pdf, $item);
+                    }
+                    break;
 
-            case 'Item_Problem$1':
-                if (Problem::canView()) {
-                    PluginPdfItem_Problem::pdfForItem($pdf, $item);
-                }
-                break;
+                case 'Item_Problem$1':
+                    if (Problem::canView()) {
+                        PluginPdfItem_Problem::pdfForItem($pdf, $item);
+                    }
+                    break;
 
-            case 'Change_Item$1':
-                if (Change::canView()) {
-                    PluginPdfChange_Item::pdfForItem($pdf, $item);
-                }
-                break;
+                case 'Change_Item$1':
+                    if (Change::canView()) {
+                        PluginPdfChange_Item::pdfForItem($pdf, $item);
+                    }
+                    break;
 
-            case 'ManualLink$1':
-                if (Session::haveRight('link', READ)) {
-                    PluginPdfLink::pdfForItem($pdf, $item);
-                }
-                break;
+                case 'ManualLink$1':
+                    if (Session::haveRight('link', READ)) {
+                        PluginPdfLink::pdfForItem($pdf, $item);
+                    }
+                    break;
 
-            case 'Reservation$1':
-                if (Session::haveRight('reservation', READ)) {
-                    PluginPdfReservation::pdfForItem($pdf, $item);
-                }
-                break;
+                case 'Reservation$1':
+                    if (Session::haveRight('reservation', READ)) {
+                        PluginPdfReservation::pdfForItem($pdf, $item);
+                    }
+                    break;
 
-            case 'Log$1':
-                PluginPdfLog::pdfForItem($pdf, $item);
-                break;
+                case 'Log$1':
+                    PluginPdfLog::pdfForItem($pdf, $item);
+                    break;
 
-            case 'KnowbaseItem_Item$1':
-                if (KnowbaseItem::canView()) {
-                    PluginPdfItem_Knowbaseitem::pdfForItem($pdf, $item);
-                }
-                break;
+                case 'KnowbaseItem_Item$1':
+                    if (KnowbaseItem::canView()) {
+                        PluginPdfItem_Knowbaseitem::pdfForItem($pdf, $item);
+                    }
+                    break;
 
-            case 'Item_Devices$1':
-                if (Session::haveRight('device', READ)) {
-                    PluginPdfItem_Device::pdfForItem($pdf, $item);
-                }
-                break;
+                case 'Item_Devices$1':
+                    if (Session::haveRight('device', READ)) {
+                        PluginPdfItem_Device::pdfForItem($pdf, $item);
+                    }
+                    break;
 
-            case 'Item_Disk$1':
-                PluginPdfItem_Disk::pdfForItem($pdf, $item);
-                break;
+                case 'Item_Disk$1':
+                    PluginPdfItem_Disk::pdfForItem($pdf, $item);
+                    break;
 
-            case 'Computer_Item$1':
-                PluginPdfComputer_Item::pdfForItem($pdf, $item);
-                break;
+                case 'Computer_Item$1':
+                    PluginPdfComputer_Item::pdfForItem($pdf, $item);
+                    break;
 
-            case 'Item_SoftwareVersion$1':
-                PluginPdfItem_SoftwareVersion::pdfForItem($pdf, $item);
-                break;
+                case 'Item_SoftwareVersion$1':
+                    PluginPdfItem_SoftwareVersion::pdfForItem($pdf, $item);
+                    break;
 
-            case 'Domain_Item$1':
-                PluginPdfDomain_Item::pdfForItem($pdf, $item);
-                break;
+                case 'Domain_Item$1':
+                    PluginPdfDomain_Item::pdfForItem($pdf, $item);
+                    break;
 
-            case 'Item_OperatingSystem$1':
-                PluginPdfItem_OperatingSystem::pdfForItem($pdf, $item);
-                break;
+                case 'Item_OperatingSystem$1':
+                    PluginPdfItem_OperatingSystem::pdfForItem($pdf, $item);
+                    break;
 
-            default:
-                return false;
+                default:
+                    return false;
+            }
         }
 
         return true;

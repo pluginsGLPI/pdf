@@ -462,7 +462,7 @@ class PluginPdfTicket extends PluginPdfCommon
 
         foreach ($res as $img) {
             $docimg = new Document();
-            $docimg->getFromDB($img[2]);
+            $docimg->getFromDB((int) $img[2]);
 
             $path    = '<img src="file://' . GLPI_DOC_DIR . '/' . $docimg->fields['filepath'] . '"/>';
             $content = str_replace($img[0], $path, $content);
@@ -558,7 +558,7 @@ class PluginPdfTicket extends PluginPdfCommon
         if ($job->fields['takeintoaccount_delay_stat'] > 0) {
             $pdf->displayLine(
                 __('Take into account'),
-                Toolbox::stripTags(Html::timestampToString($job->fields['takeintoaccount_delay_stat'], 0)),
+                Toolbox::stripTags(Html::timestampToString($job->fields['takeintoaccount_delay_stat'], false)),
             );
         }
 
@@ -567,7 +567,7 @@ class PluginPdfTicket extends PluginPdfCommon
             if ($job->fields['solve_delay_stat'] > 0) {
                 $pdf->displayLine(
                     __('Solution'),
-                    Toolbox::stripTags(Html::timestampToString($job->fields['solve_delay_stat'], 0)),
+                    Toolbox::stripTags(Html::timestampToString($job->fields['solve_delay_stat'], false)),
                 );
             }
         }
@@ -575,14 +575,14 @@ class PluginPdfTicket extends PluginPdfCommon
             if ($job->fields['close_delay_stat'] > 0) {
                 $pdf->displayLine(
                     __('Closing'),
-                    Toolbox::stripTags(Html::timestampToString($job->fields['close_delay_stat'], 1)),
+                    Toolbox::stripTags(Html::timestampToString($job->fields['close_delay_stat'], true)),
                 );
             }
         }
         if ($job->fields['waiting_duration'] > 0) {
             $pdf->displayLine(
                 __('Pending'),
-                Toolbox::stripTags(Html::timestampToString($job->fields['waiting_duration'], 0)),
+                Toolbox::stripTags(Html::timestampToString($job->fields['waiting_duration'], false)),
             );
         }
 
@@ -612,60 +612,62 @@ class PluginPdfTicket extends PluginPdfCommon
     {
         $private = isset($_REQUEST['item']['_private_']);
 
-        switch ($tab) {
-            case '_private_':
-                // nothing to export, just a flag
-                break;
+        if ($item instanceof Ticket) {
+            switch ($tab) {
+                case '_private_':
+                    // nothing to export, just a flag
+                    break;
 
-            case '_inforequester_':
-                break;
+                case '_inforequester_':
+                    break;
 
-            case 'Ticket$main': // 0.90+
-                self::pdfMain($pdf, $item);
-                PluginPdfItilFollowup::pdfForItem($pdf, $item, $private);
-                PluginPdfTicketTask::pdfForTicket($pdf, $item, $private);
-                if (Session::haveRight('document', READ)) {
-                    PluginPdfDocument::pdfForItem($pdf, $item);
-                }
-                PluginPdfITILSolution::pdfForItem($pdf, $item);
-                break;
+                case 'Ticket$main': // 0.90+
+                    self::pdfMain($pdf, $item);
+                    PluginPdfItilFollowup::pdfForItem($pdf, $item, $private);
+                    PluginPdfTicketTask::pdfForTicket($pdf, $item, $private);
+                    if (Session::haveRight('document', READ)) {
+                        PluginPdfDocument::pdfForItem($pdf, $item);
+                    }
+                    PluginPdfITILSolution::pdfForItem($pdf, $item);
+                    break;
 
-            case 'TicketValidation$1': // 0.85
-                PluginPdfTicketValidation::pdfForTicket($pdf, $item);
-                break;
+                case 'TicketValidation$1': // 0.85
+                    PluginPdfTicketValidation::pdfForTicket($pdf, $item);
+                    break;
 
-            case 'TicketCost$1':
-                PluginPdfCommonItilCost::pdfForItem($pdf, $item);
-                break;
+                case 'TicketCost$1':
+                    PluginPdfCommonItilCost::pdfForItem($pdf, $item);
+                    break;
 
-            case 'Ticket$3':
-                PluginPdfTicketSatisfaction::pdfForTicket($pdf, $item);
-                break;
+                case 'Ticket$3':
+                    PluginPdfTicketSatisfaction::pdfForTicket($pdf, $item);
+                    break;
 
-            case 'Problem_Ticket$1':
-                PluginPdfProblem_Ticket::pdfForTicket($pdf, $item);
-                break;
+                case 'Problem_Ticket$1':
+                    PluginPdfProblem_Ticket::pdfForTicket($pdf, $item);
+                    break;
 
-            case 'Ticket$4':
-                self::pdfStat($pdf, $item);
-                break;
+                case 'Ticket$4':
+                    self::pdfStat($pdf, $item);
+                    break;
 
-            case 'Item_Ticket$1':
-                PluginPdfItem_Ticket::pdfForTicket($pdf, $item);
-                break;
+                case 'Item_Ticket$1':
+                    PluginPdfItem_Ticket::pdfForTicket($pdf, $item);
+                    break;
 
-            case 'Change_Ticket$1':
-                if (Change::canView()) {
-                    PluginPdfChange_Ticket::pdfForTicket($pdf, $item);
-                }
-                break;
+                case 'Change_Ticket$1':
+                    if (Change::canView()) {
+                        PluginPdfChange_Ticket::pdfForTicket($pdf, $item);
+                    }
+                    break;
 
-            case 'Ticket_Contract$1':
-                PluginPdfTicket_Contract::pdfForTicket($pdf, $item);
-                break;
+                case 'Ticket_Contract$1':
+                    PluginPdfTicket_Contract::pdfForTicket($pdf, $item);
+                    break;
 
-            default:
-                return false;
+                default:
+                    return false;
+            }
         }
 
         return true;

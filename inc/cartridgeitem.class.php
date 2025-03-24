@@ -125,19 +125,21 @@ class PluginPdfCartridgeItem extends PluginPdfCommon
 
     public static function displayTabContentForPDF(PluginPdfSimplePDF $pdf, CommonGLPI $item, $tab)
     {
-        switch ($tab) {
-            case 'Cartridge$1':
-                PluginPdfCartridge::pdfForCartridgeItem($pdf, $item, 'new');
-                PluginPdfCartridge::pdfForCartridgeItem($pdf, $item, 'used');
-                PluginPdfCartridge::pdfForCartridgeItem($pdf, $item, 'old');
-                break;
+        if ($item instanceof CartridgeItem) {
+            switch ($tab) {
+                case 'Cartridge$1':
+                    PluginPdfCartridge::pdfForCartridgeItem($pdf, $item, 'new');
+                    PluginPdfCartridge::pdfForCartridgeItem($pdf, $item, 'used');
+                    PluginPdfCartridge::pdfForCartridgeItem($pdf, $item, 'old');
+                    break;
 
-            case 'CartridgeItem_PrinterModel$1':
-                self::pdfForPrinterModel($pdf, $item);
-                break;
+                case 'CartridgeItem_PrinterModel$1':
+                    self::pdfForPrinterModel($pdf, $item);
+                    break;
 
-            default:
-                return false;
+                default:
+                    return false;
+            }
         }
 
         return true;

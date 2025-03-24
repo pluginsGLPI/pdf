@@ -126,17 +126,19 @@ class PluginPdfKnowbaseItem extends PluginPdfCommon
 
     public static function displayTabContentForPDF(PluginPdfSimplePDF $pdf, CommonGLPI $item, $tab)
     {
-        switch ($tab) {
-            case 'KnowbaseItem$1':
-                self::pdfMain($pdf, $item);
-                break;
+        if ($item instanceof KnowbaseItem) {
+            switch ($tab) {
+                case 'KnowbaseItem$1':
+                    self::pdfMain($pdf, $item);
+                    break;
 
-            case 'KnowbaseItem$2':
-                self::pdfCible($pdf, $item);
-                break;
+                case 'KnowbaseItem$2':
+                    self::pdfCible($pdf, $item);
+                    break;
 
-            default:
-                return false;
+                default:
+                    return false;
+            }
         }
 
         return true;

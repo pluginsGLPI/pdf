@@ -184,17 +184,19 @@ class PluginPdfContract extends PluginPdfCommon
 
     public static function displayTabContentForPDF(PluginPdfSimplePDF $pdf, CommonGLPI $item, $tab)
     {
-        switch ($tab) {
-            case 'ContractCost$1':
-                PluginPdfContract::pdfCost($pdf, $item);
-                break;
+        if ($item instanceof Contract) {
+            switch ($tab) {
+                case 'ContractCost$1':
+                    PluginPdfContract::pdfCost($pdf, $item);
+                    break;
 
-            case 'Contract_Item$1':
-                PluginPdfContract_Item::pdfForContract($pdf, $item);
-                break;
+                case 'Contract_Item$1':
+                    PluginPdfContract_Item::pdfForContract($pdf, $item);
+                    break;
 
-            default:
-                return false;
+                default:
+                    return false;
+            }
         }
 
         return true;

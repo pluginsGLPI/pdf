@@ -142,7 +142,7 @@ class PluginPdfTicketTask extends PluginPdfCommon
                 $pdf->displayLine(
                     '</b>' . Toolbox::stripTags($lib),
                     Html::convDateTime($data['date']),
-                    Html::timestampToString($data['actiontime'], 0),
+                    Html::timestampToString($data['actiontime'], false),
                     Toolbox::stripTags($dbu->getUserName($data['users_id'])),
                     $planification,
                 );
@@ -153,7 +153,7 @@ class PluginPdfTicketTask extends PluginPdfCommon
 
                 foreach ($res as $img) {
                     $docimg = new Document();
-                    $docimg->getFromDB($img[2]);
+                    $docimg->getFromDB((int) $img[2]);
 
                     $path = '<img src="file://' . GLPI_DOC_DIR . '/' . $docimg->fields['filepath'] . '"/>';
                     $content = str_replace($img[0], $path, $content);

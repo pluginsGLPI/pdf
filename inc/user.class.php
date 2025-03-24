@@ -330,7 +330,7 @@ class PluginPdfUser extends PluginPdfCommon
                         $query['WHERE']['is_deleted'] = 0;
                     }
 
-                    $result = $DB->request($query, true);
+                    $result = $DB->request($query);
 
                     $type_name = $item->getTypeName();
 
@@ -408,21 +408,23 @@ class PluginPdfUser extends PluginPdfCommon
         $tree = isset($_REQUEST['item']['_tree']);
         $user = isset($_REQUEST['item']['_user']);
 
-        switch ($tab) {
-            case 'User$1':
-                self::pdfItems($pdf, $item, false);
-                break;
+        if ($item instanceof User) {
+            switch ($tab) {
+                case 'User$1':
+                    self::pdfItems($pdf, $item, false);
+                    break;
 
-            case 'User$2':
-                self::pdfItems($pdf, $item, true);
-                break;
+                case 'User$2':
+                    self::pdfItems($pdf, $item, true);
+                    break;
 
-            case 'Reservation$1':
-                PluginPdfReservation::pdfForUser($pdf, $item);
-                break;
+                case 'Reservation$1':
+                    PluginPdfReservation::pdfForUser($pdf, $item);
+                    break;
 
-            default:
-                return false;
+                default:
+                    return false;
+            }
         }
 
         return true;

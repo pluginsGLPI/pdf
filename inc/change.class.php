@@ -374,7 +374,7 @@ class PluginPdfChange extends PluginPdfCommon
         $pdf->setColumnsSize(50, 50);
         if (isset($job->fields['takeintoaccount_delay_stat']) > 0) {
             if ($job->fields['takeintoaccount_delay_stat'] > 0) {
-                $accountdelay = Toolbox::stripTags(Html::timestampToString($job->fields['takeintoaccount_delay_stat'], 0));
+                $accountdelay = Toolbox::stripTags(Html::timestampToString($job->fields['takeintoaccount_delay_stat'], false));
             }
             $pdf->displayLine(
                 __('Take into account'),
@@ -387,7 +387,7 @@ class PluginPdfChange extends PluginPdfCommon
             if ($job->fields['solve_delay_stat'] > 0) {
                 $pdf->displayLine(
                     __('Resolution'),
-                    Toolbox::stripTags(Html::timestampToString($job->fields['solve_delay_stat'], 0)),
+                    Toolbox::stripTags(Html::timestampToString($job->fields['solve_delay_stat'], false)),
                 );
             }
         }
@@ -395,14 +395,14 @@ class PluginPdfChange extends PluginPdfCommon
             if ($job->fields['close_delay_stat'] > 0) {
                 $pdf->displayLine(
                     __('Closing'),
-                    Toolbox::stripTags(Html::timestampToString($job->fields['close_delay_stat'], 0)),
+                    Toolbox::stripTags(Html::timestampToString($job->fields['close_delay_stat'], false)),
                 );
             }
         }
         if ($job->fields['waiting_duration'] > 0) {
             $pdf->displayLine(
                 __('Pending'),
-                Toolbox::stripTags(Html::timestampToString($job->fields['waiting_duration'], 0)),
+                Toolbox::stripTags(Html::timestampToString($job->fields['waiting_duration'], false)),
             );
         }
 
@@ -428,66 +428,68 @@ class PluginPdfChange extends PluginPdfCommon
     {
         $private = isset($_REQUEST['item']['_private_']);
 
-        switch ($tab) {
-            case '_private_':
-                // nothing to export, just a flag
-                break;
+        if ($item instanceof Change) {
+            switch ($tab) {
+                case '_private_':
+                    // nothing to export, just a flag
+                    break;
 
-            case 'Change$main':
-                self::pdfMain($pdf, $item);
-                PluginPdfItilFollowup::pdfForItem($pdf, $item, $private);
-                PluginPdfChangeTask::pdfForChange($pdf, $item);
-                if (Session::haveRight('document', READ)) {
-                    PluginPdfDocument::pdfForItem($pdf, $item);
-                }
-                PluginPdfITILSolution::pdfForItem($pdf, $item);
-                self::pdfPlan($pdf, $item);
-                self::pdfAnalysis($pdf, $item);
-                break;
+                case 'Change$main':
+                    self::pdfMain($pdf, $item);
+                    PluginPdfItilFollowup::pdfForItem($pdf, $item, $private);
+                    PluginPdfChangeTask::pdfForChange($pdf, $item);
+                    if (Session::haveRight('document', READ)) {
+                        PluginPdfDocument::pdfForItem($pdf, $item);
+                    }
+                    PluginPdfITILSolution::pdfForItem($pdf, $item);
+                    self::pdfPlan($pdf, $item);
+                    self::pdfAnalysis($pdf, $item);
+                    break;
 
-            case 'Change$1':
-                self::pdfAnalysis($pdf, $item);
-                break;
+                case 'Change$1':
+                    self::pdfAnalysis($pdf, $item);
+                    break;
 
-            case 'Change$3':
-                self::pdfPlan($pdf, $item);
-                break;
+                case 'Change$3':
+                    self::pdfPlan($pdf, $item);
+                    break;
 
-            case 'Change$4':
-                self::pdfStat($pdf, $item);
-                break;
+                case 'Change$4':
+                    self::pdfStat($pdf, $item);
+                    break;
 
-            case 'Change$5':
-                PluginPdfItilFollowup::pdfForItem($pdf, $item, $private);
-                PluginPdfChangeTask::pdfForChange($pdf, $item);
-                if (Session::haveRight('document', READ)) {
-                    PluginPdfDocument::pdfForItem($pdf, $item);
-                }
-                PluginPdfITILSolution::pdfForItem($pdf, $item);
-                break;
+                case 'Change$5':
+                    PluginPdfItilFollowup::pdfForItem($pdf, $item, $private);
+                    PluginPdfChangeTask::pdfForChange($pdf, $item);
+                    if (Session::haveRight('document', READ)) {
+                        PluginPdfDocument::pdfForItem($pdf, $item);
+                    }
+                    PluginPdfITILSolution::pdfForItem($pdf, $item);
+                    break;
 
-            case 'ChangeValidation$1':
-                PluginPdfChangeValidation::pdfForChange($pdf, $item);
-                break;
+                case 'ChangeValidation$1':
+                    PluginPdfChangeValidation::pdfForChange($pdf, $item);
+                    break;
 
-            case 'ChangeCost$1':
-                PluginPdfCommonItilCost::pdfForItem($pdf, $item);
-                break;
+                case 'ChangeCost$1':
+                    PluginPdfCommonItilCost::pdfForItem($pdf, $item);
+                    break;
 
-            case 'Change_Problem$1':
-                PluginPdfChange_Problem::pdfForChange($pdf, $item);
-                break;
+                case 'Change_Problem$1':
+                    PluginPdfChange_Problem::pdfForChange($pdf, $item);
+                    break;
 
-            case 'Change_Ticket$1':
-                PluginPdfChange_Ticket::pdfForChange($pdf, $item);
-                break;
+                case 'Change_Ticket$1':
+                    PluginPdfChange_Ticket::pdfForChange($pdf, $item);
+                    break;
 
-            case 'Change_Item$1':
-                PluginPdfChange_Item::pdfForChange($pdf, $item);
-                break;
+                case 'Change_Item$1':
+                    PluginPdfChange_Item::pdfForChange($pdf, $item);
+                    break;
 
-            default:
-                return false;
+                default:
+                    return false;
+            }
         }
 
         return true;

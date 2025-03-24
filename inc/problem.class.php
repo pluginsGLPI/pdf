@@ -392,7 +392,7 @@ class PluginPdfProblem extends PluginPdfCommon
                 $pdf->displayLine(sprintf(
                     __('%1$s: %2$s'),
                     __('Solution'),
-                    Toolbox::stripTags(Html::timestampToString($job->fields['solve_delay_stat'], 0)),
+                    Toolbox::stripTags(Html::timestampToString($job->fields['solve_delay_stat'], false)),
                 ));
             }
         }
@@ -401,7 +401,7 @@ class PluginPdfProblem extends PluginPdfCommon
                 $pdf->displayLine(sprintf(
                     __('%1$s: %2$s'),
                     __('Closing'),
-                    Toolbox::stripTags(Html::timestampToString($job->fields['close_delay_stat'], 0)),
+                    Toolbox::stripTags(Html::timestampToString($job->fields['close_delay_stat'], false)),
                 ));
             }
         }
@@ -409,7 +409,7 @@ class PluginPdfProblem extends PluginPdfCommon
             $pdf->displayLine(sprintf(
                 __('%1$s: %2$s'),
                 __('Pending'),
-                Toolbox::stripTags(Html::timestampToString($job->fields['waiting_duration'], 0)),
+                Toolbox::stripTags(Html::timestampToString($job->fields['waiting_duration'], false)),
             ));
         }
 
@@ -434,56 +434,58 @@ class PluginPdfProblem extends PluginPdfCommon
     {
         $private = isset($_REQUEST['item']['_private_']);
 
-        switch ($tab) {
-            case '_private_':
-                // nothing to export, just a flag
-                break;
+        if ($item instanceof Problem) {
+            switch ($tab) {
+                case '_private_':
+                    // nothing to export, just a flag
+                    break;
 
-            case 'Problem$main':
-                self::pdfMain($pdf, $item);
-                PluginPdfItilFollowup::pdfForItem($pdf, $item, $private);
-                PluginPdfProblemTask::pdfForProblem($pdf, $item);
-                if (Session::haveRight('document', READ)) {
-                    PluginPdfDocument::pdfForItem($pdf, $item);
-                }
-                PluginPdfITILSolution::pdfForItem($pdf, $item);
-                break;
+                case 'Problem$main':
+                    self::pdfMain($pdf, $item);
+                    PluginPdfItilFollowup::pdfForItem($pdf, $item, $private);
+                    PluginPdfProblemTask::pdfForProblem($pdf, $item);
+                    if (Session::haveRight('document', READ)) {
+                        PluginPdfDocument::pdfForItem($pdf, $item);
+                    }
+                    PluginPdfITILSolution::pdfForItem($pdf, $item);
+                    break;
 
-            case 'Problem$1':
-                self::pdfAnalysis($pdf, $item);
-                break;
+                case 'Problem$1':
+                    self::pdfAnalysis($pdf, $item);
+                    break;
 
-            case 'Change_Problem$1':
-                PluginPdfChange_Problem::pdfForProblem($pdf, $item);
-                break;
+                case 'Change_Problem$1':
+                    PluginPdfChange_Problem::pdfForProblem($pdf, $item);
+                    break;
 
-            case 'Problem_Ticket$1':
-                PluginPdfProblem_Ticket::pdfForProblem($pdf, $item);
-                break;
+                case 'Problem_Ticket$1':
+                    PluginPdfProblem_Ticket::pdfForProblem($pdf, $item);
+                    break;
 
-            case 'Problem$5':
-                PluginPdfItilFollowup::pdfForItem($pdf, $item, $private);
-                PluginPdfProblemTask::pdfForProblem($pdf, $item);
-                if (Session::haveRight('document', READ)) {
-                    PluginPdfDocument::pdfForItem($pdf, $item);
-                }
-                PluginPdfITILSolution::pdfForItem($pdf, $item);
-                break;
+                case 'Problem$5':
+                    PluginPdfItilFollowup::pdfForItem($pdf, $item, $private);
+                    PluginPdfProblemTask::pdfForProblem($pdf, $item);
+                    if (Session::haveRight('document', READ)) {
+                        PluginPdfDocument::pdfForItem($pdf, $item);
+                    }
+                    PluginPdfITILSolution::pdfForItem($pdf, $item);
+                    break;
 
-            case 'Item_Problem$1':
-                PluginPdfItem_Problem::pdfForProblem($pdf, $item);
-                break;
+                case 'Item_Problem$1':
+                    PluginPdfItem_Problem::pdfForProblem($pdf, $item);
+                    break;
 
-            case 'Problem$4':
-                self::pdfStat($pdf, $item);
-                break;
+                case 'Problem$4':
+                    self::pdfStat($pdf, $item);
+                    break;
 
-            case 'ProblemCost$1':
-                PluginPdfCommonItilCost::pdfForItem($pdf, $item);
-                break;
+                case 'ProblemCost$1':
+                    PluginPdfCommonItilCost::pdfForItem($pdf, $item);
+                    break;
 
-            default:
-                return false;
+                default:
+                    return false;
+            }
         }
 
         return true;

@@ -66,27 +66,29 @@ class PluginPdfAppliance extends PluginPdfCommon
     **/
     public static function displayTabContentForPDF(PluginPdfSimplePDF $pdf, CommonGLPI $item, $tab)
     {
-        switch ($tab) {
-            case 'Appliance_Item$1':
-                $plugin = new Plugin();
-                if (
-                    $plugin->isActivated('appliances')
-                    && class_exists('PluginAppliancesAppliance_Item')
-                ) {
-                    PluginAppliancesAppliance_Item::pdfForAppliance($pdf, $item);
-                } else {
-                    self::pdfForAppliance($pdf, $item);
-                }
-                break;
+        if ($item instanceof Appliance) {
+            switch ($tab) {
+                case 'Appliance_Item$1':
+                    $plugin = new Plugin();
+                    if (
+                        $plugin->isActivated('appliances')
+                        && class_exists('PluginAppliancesAppliance_Item')
+                    ) {
+                        PluginAppliancesAppliance_Item::pdfForAppliance($pdf, $item);
+                    } else {
+                        self::pdfForAppliance($pdf, $item);
+                    }
+                    break;
 
-            case 'PluginAppliancesOptvalue$1':
-                if (class_exists('PluginAppliancesOptvalue')) {
-                    PluginAppliancesOptvalue::pdfForAppliance($pdf, $item);
-                }
-                break;
+                case 'PluginAppliancesOptvalue$1':
+                    if (class_exists('PluginAppliancesOptvalue')) {
+                        PluginAppliancesOptvalue::pdfForAppliance($pdf, $item);
+                    }
+                    break;
 
-            default:
-                return false;
+                default:
+                    return false;
+            }
         }
 
         return true;

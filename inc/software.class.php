@@ -158,26 +158,28 @@ class PluginPdfSoftware extends PluginPdfCommon
 
     public static function displayTabContentForPDF(PluginPdfSimplePDF $pdf, CommonGLPI $item, $tab)
     {
-        switch ($tab) {
-            case 'SoftwareVersion$1':
-                PluginPdfSoftwareVersion::pdfForSoftware($pdf, $item);
-                break;
+        if ($item instanceof Software) {
+            switch ($tab) {
+                case 'SoftwareVersion$1':
+                    PluginPdfSoftwareVersion::pdfForSoftware($pdf, $item);
+                    break;
 
-            case 'SoftwareLicense$1':
-                $infocom = isset($_REQUEST['item']['Infocom$1']);
-                PluginPdfSoftwareLicense::pdfForSoftware($pdf, $item, $infocom);
-                break;
+                case 'SoftwareLicense$1':
+                    $infocom = isset($_REQUEST['item']['Infocom$1']);
+                    PluginPdfSoftwareLicense::pdfForSoftware($pdf, $item, $infocom);
+                    break;
 
-            case 'Item_SoftwareVersion$1':
-                PluginPdfItem_SoftwareVersion::pdfForSoftware($pdf, $item);
-                break;
+                case 'Item_SoftwareVersion$1':
+                    PluginPdfItem_SoftwareVersion::pdfForSoftware($pdf, $item);
+                    break;
 
-            case 'Domain_Item$1':
-                PluginPdfDomain_Item::pdfForItem($pdf, $item);
-                break;
+                case 'Domain_Item$1':
+                    PluginPdfDomain_Item::pdfForItem($pdf, $item);
+                    break;
 
-            default:
-                return false;
+                default:
+                    return false;
+            }
         }
 
         return true;
