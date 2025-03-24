@@ -299,7 +299,7 @@ class PluginPdfAppliance extends PluginPdfCommon
                                 $data['name'] = $data['question'];
                             }
                             $name = $data['name'];
-                            if ($_SESSION['glpiis_ids_visible'] || empty($data['name'])) {
+                            if (empty($data['name'])) {
                                 $name = sprintf(__('%1$s (%2$s)'), $name, $data['id']);
                             }
 
