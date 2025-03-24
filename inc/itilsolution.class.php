@@ -84,12 +84,11 @@ class PluginPdfITILSolution extends PluginPdfCommon
                     $sol = str_replace($img[0], $path, $sol);
                 }
 
+                $text = $textapprove = '';
                 if ($row['status'] == 3) {
                     $text = __('Soluce approved on ', 'pdf');
                 } elseif ($row['status'] == 4) {
                     $text = __('Soluce refused on ', 'pdf');
-                } else {
-                    $text = $textapprove = '';
                 }
                 if (isset($row['date_approval']) || !empty($row['users_id_approval'])) {
                     $textapprove = '<br /><br /><br /><i>' .

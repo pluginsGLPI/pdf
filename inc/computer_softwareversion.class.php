@@ -220,7 +220,7 @@ class PluginPdfComputer_SoftwareVersion extends PluginPdfCommon
 
         $lig = $tot = 0;
         if (in_array(0, $_SESSION['glpiactiveentities'])) {
-            $nb = Item_SoftwareVersion::countForVersion('Computer', $softwareversions_id, 0);
+            $nb = Item_SoftwareVersion::countForVersion($softwareversions_id, 0);
             if ($nb > 0) {
                 $pdf->displayLine(__('Root entity'), $nb);
                 $tot += $nb;
@@ -233,7 +233,7 @@ class PluginPdfComputer_SoftwareVersion extends PluginPdfCommon
             'ORDER'      => 'completename'];
 
         foreach ($DB->request($sql) as $ID => $data) {
-            $nb = Item_SoftwareVersion::countForVersion('Computer', $softwareversions_id, $ID);
+            $nb = Item_SoftwareVersion::countForVersion($softwareversions_id, $ID);
             if ($nb > 0) {
                 $pdf->displayLine($data['completename'], $nb);
                 $tot += $nb;

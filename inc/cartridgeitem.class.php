@@ -152,6 +152,7 @@ class PluginPdfCartridgeItem extends PluginPdfCommon
 
         $iterator = CartridgeItem_PrinterModel::getListForItem($item);
         $number   = count($iterator);
+        $datas    = [];
 
         foreach ($iterator as $data) {
             $datas[$data['linkid']] = $data;
@@ -160,7 +161,7 @@ class PluginPdfCartridgeItem extends PluginPdfCommon
         $pdf->setColumnsSize(100);
         $title = '<b>' . _n('Printer model', 'Printer models', $number) . '</b>';
         if (!$number) {
-            $pdf->displayTitle(_('No printel model associated', 'pdf'));
+            $pdf->displayTitle(__('No printel model associated', 'pdf'));
         } else {
             if ($number > $_SESSION['glpilist_limit']) {
                 $title = sprintf(__('%1$s: %2$s'), $title, $_SESSION['glpilist_limit'] . ' / ' . $number);

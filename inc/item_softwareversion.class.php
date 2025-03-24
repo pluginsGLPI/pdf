@@ -60,6 +60,7 @@ class PluginPdfItem_SoftwareVersion extends PluginPdfCommon
         }
 
         $item_version_table = 'glpi_items_softwareversions';
+        $queries = [];
         foreach ($CFG_GLPI['software_types'] as $itemtype) {
             $canshowitems[$itemtype] = $itemtype::canView();
             $itemtable               = $itemtype::getTable();

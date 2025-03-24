@@ -134,6 +134,8 @@ class PluginPdfCartridge extends PluginPdfCommon
 
                 $col1 = $data['id'];
                 $col2 = sprintf(__('%1$s - %2$s'), $data['type'], $data['ref']);
+                $col6 = $data['pages'];
+                $col7 = '';
 
                 $tmp_dbeg = explode('-', $data['date_in']);
                 $tmp_dend = explode('-', $data['date_use']);
@@ -149,9 +151,6 @@ class PluginPdfCartridge extends PluginPdfCommon
                     $use_time_tmp = mktime(0, 0, 0, $tmp_dend[1], $tmp_dend[2], $tmp_dend[0])
                                     - mktime(0, 0, 0, $tmp_dbeg[1], $tmp_dbeg[2], $tmp_dbeg[0]);
                     $use_time += $use_time_tmp;
-
-                    $col6 = $data['pages'];
-                    $col7 = '';
 
                     if ($pages < $data['pages']) {
                         $pages_printed += $data['pages'] - $pages;

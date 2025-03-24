@@ -68,7 +68,7 @@ class PluginPdfProblem_Ticket extends PluginPdfCommon
         $used     = [];
 
         $pdf->setColumnsSize(100);
-        $title = '<b>' . __('Problem', 'Problems', $number) . '</b>';
+        $title = '<b>' . _n('Problem', 'Problems', $number) . '</b>';
         if (!$number) {
             $pdf->displayTitle(sprintf(__('%1$s: %2$s'), $title, __('No item to display')));
         } else {
@@ -307,7 +307,7 @@ class PluginPdfProblem_Ticket extends PluginPdfCommon
         $used     = [];
 
         $pdf->setColumnsSize(100);
-        $title = '<b>' . __('Ticket', 'Tickets', 2) . '</b>';
+        $title = '<b>' . _n('Ticket', 'Tickets', 2) . '</b>';
         if (!$number) {
             $pdf->displayTitle(sprintf(__('%1$s: %2$s'), $title, __('No item to display')));
         } else {

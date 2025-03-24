@@ -99,7 +99,7 @@ class PluginPdfItem_Device extends PluginPdfCommon
                                 && !empty($device->fields[$label['name']])) {
                                 if (($label['type'] == 'dropdownValue')
                                     && ($device->fields[$label['name']] != 0)) {
-                                    if (!isset($value) || empty($value)) {
+                                    if (empty($value)) {
                                         $table = getTableNameForForeignKeyField($label['name']);
                                         $value = Dropdown::getDropdownName(
                                             $table,
@@ -112,7 +112,7 @@ class PluginPdfItem_Device extends PluginPdfCommon
                                         Toolbox::stripTags($value) . ' ',
                                     );
                                 } else {
-                                    if (!isset($value) || empty($value)) {
+                                    if (empty($value)) {
                                         $value = $device->fields[$label['name']];
                                     }
                                     if ($label['type'] == 'bool') {

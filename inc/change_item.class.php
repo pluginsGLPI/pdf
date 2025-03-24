@@ -193,6 +193,8 @@ class PluginPdfChange_Item extends PluginPdfCommon
                 break;
         }
 
+        $SELECT = '';
+        $FROM   = '';
         if (count($_SESSION['glpiactiveentities']) > 1) {
             $SELECT = ', `glpi_entities`.`completename` AS entityname,
                       `glpi_changes`.`entities_id` AS entityID ';

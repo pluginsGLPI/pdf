@@ -61,6 +61,7 @@ class PluginPdfItem_Problem extends PluginPdfCommon
         );
 
         $number = count($result);
+        $totalnb = 0;
 
         $pdf->setColumnsSize(100);
         $title = '<b>' . _n('Item', 'Items', 2) . '</b>';
@@ -79,7 +80,6 @@ class PluginPdfItem_Problem extends PluginPdfCommon
                 __('Inventory number') . '</i>',
             );
 
-            $totalnb = 0;
             foreach ($result as $row) {
                 $itemtype = $row['itemtype'];
                 if (!($item = $dbu->getItemForItemtype($itemtype))) {
@@ -192,6 +192,8 @@ class PluginPdfItem_Problem extends PluginPdfCommon
                 break;
         }
 
+        $SELECT = '';
+        $FROM   = '';
         if (count($_SESSION['glpiactiveentities']) > 1) {
             $SELECT = ', `glpi_entities`.`completename` AS entityname,
                       `glpi_problems`.`entities_id` AS entityID ';

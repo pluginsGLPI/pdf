@@ -63,6 +63,8 @@ if (!is_readable(GLPI_ROOT . '/locales/' . $_GET['lang'] . '.php')) {
     exit();
 }
 include(GLPI_ROOT . '/locales/en_GB.php');
+/** @var array $LANG */
+global $LANG;
 $REFLANG = $LANG;
 
 $lf     = fopen(GLPI_ROOT . '/locales/' . $_GET['lang'] . '.php', 'r');
@@ -86,7 +88,10 @@ if (!is_readable(GLPI_ROOT . '/locales/glpi.pot')) {
     print "Unable to read glpi.pot file\n";
     exit();
 }
+$current_string        = '';
 $current_string_plural = '';
+$sing_trans            = '';
+$plural_trans          = '';
 
 $pot = fopen(GLPI_ROOT . '/locales/glpi.pot', 'r');
 $po  = fopen(GLPI_ROOT . '/locales/' . $_GET['lang'] . '.po', 'w+');
@@ -200,6 +205,8 @@ function search_in_dict($string, $context)
 
     $ponctmatch = "([\.: \(\)]*)";
     $varmatch   = '(%s)*';
+    $left       = '';
+    $right      = '';
 
     if (preg_match("/$varmatch$ponctmatch(.*)$ponctmatch$varmatch$/U", $string, $reg)) {
         //       print_r($reg);

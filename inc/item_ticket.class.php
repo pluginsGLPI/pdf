@@ -216,6 +216,8 @@ class PluginPdfItem_Ticket extends PluginPdfCommon
                 $order = '`glpi_tickets`.`date_mod` DESC';
         }
 
+        $SELECT = '';
+        $FROM   = '';
         if (count($_SESSION['glpiactiveentities']) > 1) {
             $SELECT = ', `glpi_entities`.`completename` AS entityname,
                       `glpi_tickets`.`entities_id` AS entityID ';

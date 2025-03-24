@@ -156,6 +156,7 @@ class PluginPdfReservation extends PluginPdfCommon
 
         $pdf->setColumnsSize(100);
         $now = $_SESSION['glpi_currenttime'];
+        $name = '';
 
         // Print reservation in progress
         $query = ['SELECT' => ['begin', 'end', 'items_id', 'glpi_reservationitems.entities_id',

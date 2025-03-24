@@ -208,6 +208,7 @@ class PluginPdfInfocom extends PluginPdfCommon
             );
 
             $currency = PluginPdfConfig::getInstance();
+            $sym = '';
 
             foreach ($PDF_DEVICES as $option => $value) {
                 if ($currency->fields['currency'] == $option) {

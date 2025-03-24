@@ -200,6 +200,7 @@ class PluginPdfKnowbaseItem extends PluginPdfCommon
                             $recursive = '(' . __('R') . ')';
                         }
                         $names = Dropdown::getDropdownName('glpi_profiles', $data['profiles_id']);
+                        $profilename = '';
                         if ($data['entities_id'] >= 0) {
                             $profilename = sprintf(
                                 __('%1$s / %2$s'),
@@ -225,6 +226,7 @@ class PluginPdfKnowbaseItem extends PluginPdfCommon
                             $recursive = '(' . __('R') . ')';
                         }
                         $names = Dropdown::getDropdownName('glpi_groups', $data['groups_id']);
+                        $groupname = '';
                         if ($data['entities_id'] >= 0) {
                             $groupname = sprintf(
                                 __('%1$s / %2$s'),

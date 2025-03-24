@@ -40,7 +40,12 @@ abstract class PluginPdfCommon extends CommonGLPI
     /**
      * Constructor, should intialize $this->obj property
     **/
-    public function __construct(CommonGLPI $obj = null) {}
+    public function __construct(CommonGLPI $obj = null)
+    {
+        if ($obj) {
+            $this->obj = $obj;
+        }
+    }
 
     /**
      * Add standard define tab
@@ -116,7 +121,7 @@ abstract class PluginPdfCommon extends CommonGLPI
     public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
     {
         if (Session::haveRight('plugin_pdf', READ)) {
-            if (!isset($withtemplate) || empty($withtemplate)) {
+            if (empty($withtemplate)) {
                 return __('Print to pdf', 'pdf');
             }
         }
@@ -343,9 +348,6 @@ abstract class PluginPdfCommon extends CommonGLPI
                 if (!empty($note['content']) && ($tot < $_SESSION['glpilist_limit'])) {
                     $id      = 'note' . $note['id'] . $rand;
                     $content = $note['content'];
-                    if (empty($content)) {
-                        $content = NOT_AVAILABLE;
-                    }
                     $pdf->displayText('', $content, 5);
                     $tot++;
                 }
@@ -608,6 +610,7 @@ abstract class PluginPdfCommon extends CommonGLPI
     ) {
         switch ($ma->getAction()) {
             case 'DoIt':
+                $tab_id = [];
                 foreach ($ids as $key => $val) {
                     if ($val) {
                         $tab_id[] = $key;

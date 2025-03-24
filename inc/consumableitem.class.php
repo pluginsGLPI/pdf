@@ -218,6 +218,7 @@ class PluginPdfConsumableItem extends PluginPdfCommon
                     $pdf->setColumnsSize(10, 45, 45);
                     $pdf->displayLine($data['id'], Consumable::getStatus($data['id']), $date_in);
                 } else {
+                    $name = '';
                     if ($item = getItemForItemtype($data['itemtype'])) {
                         if ($item->getFromDB($data['items_id'])) {
                             $name = $item->getNameID();

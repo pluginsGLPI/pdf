@@ -442,7 +442,7 @@ class PluginPdfProblem extends PluginPdfCommon
             case 'Problem$main':
                 self::pdfMain($pdf, $item);
                 PluginPdfItilFollowup::pdfForItem($pdf, $item, $private);
-                PluginPdfProblemTask::pdfForProblem($pdf, $item, $private);
+                PluginPdfProblemTask::pdfForProblem($pdf, $item);
                 if (Session::haveRight('document', READ)) {
                     PluginPdfDocument::pdfForItem($pdf, $item);
                 }

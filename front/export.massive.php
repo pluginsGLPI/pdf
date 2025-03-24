@@ -40,6 +40,9 @@ $item = new $type();
 $tab_id = unserialize($_SESSION['plugin_pdf']['tab_id']);
 unset($_SESSION['plugin_pdf']['tab_id']);
 
+/** @var \DBmysql $DB */
+global $DB;
+
 $result = $DB->request(
     'glpi_plugin_pdf_preferences',
     ['SELECT'   => 'tabref',

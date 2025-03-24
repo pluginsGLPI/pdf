@@ -436,7 +436,7 @@ class PluginPdfChange extends PluginPdfCommon
             case 'Change$main':
                 self::pdfMain($pdf, $item);
                 PluginPdfItilFollowup::pdfForItem($pdf, $item, $private);
-                PluginPdfChangeTask::pdfForChange($pdf, $item, $private);
+                PluginPdfChangeTask::pdfForChange($pdf, $item);
                 if (Session::haveRight('document', READ)) {
                     PluginPdfDocument::pdfForItem($pdf, $item);
                 }
@@ -459,7 +459,7 @@ class PluginPdfChange extends PluginPdfCommon
 
             case 'Change$5':
                 PluginPdfItilFollowup::pdfForItem($pdf, $item, $private);
-                PluginPdfChangeTask::pdfForChange($pdf, $item, $private);
+                PluginPdfChangeTask::pdfForChange($pdf, $item);
                 if (Session::haveRight('document', READ)) {
                     PluginPdfDocument::pdfForItem($pdf, $item);
                 }
