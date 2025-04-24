@@ -77,12 +77,18 @@ class PluginPdfKnowbaseItem extends PluginPdfCommon
             'UTF-8',
         )));
 
-        $answer
-        = Toolbox::stripTags(Glpi\Toolbox\Sanitizer::unsanitize(html_entity_decode(
-            $item->getField('answer'),
-            ENT_QUOTES,
-            'UTF-8',
-        )));
+        $answer = Glpi\Toolbox\Sanitizer::unsanitize(Html::entity_decode_deep($item->getField('answer')));
+        $answer = preg_replace('#data:image/[^;]+;base64,#', '@', $answer);
+
+        preg_match_all('/<img [^>]*src=[\'"]([^\'"]*docid=([0-9]*))[^>]*>/', $answer, $res, PREG_SET_ORDER);
+
+        foreach ($res as $img) {
+            $docimg = new Document();
+            $docimg->getFromDB((int) $img[2]);
+
+            $path    = '<img src="file://' . GLPI_DOC_DIR . '/' . $docimg->fields['filepath'] . '"/>';
+            $answer = str_replace($img[0], $path, $answer);
+        }
 
         $pdf->setColumnsSize(100);
 
