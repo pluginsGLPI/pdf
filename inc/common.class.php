@@ -162,7 +162,7 @@ abstract class PluginPdfCommon extends CommonGLPI
         if ($item instanceof CommonDBTM) {
             switch ($tab) {
                 case $item->getType() . '$main':
-                    $item::pdfMain($pdf, $item); // @phpstan-ignore-line - Call to an undefined static method CommonGLPI::pdfMain()
+                    static::pdfMain($pdf, $item); // @phpstan-ignore-line - Call to an undefined static method CommonGLPI::pdfMain()
                     break;
 
                 case 'Notepad$1':
