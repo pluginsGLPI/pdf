@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [UNRELEASE]
 
+- Fix missing images in exported Knowledge Base PDFs
+
 ## [4.0.1] - 2025-03-10
 
 ### Added
