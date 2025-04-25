@@ -85,8 +85,13 @@ class PluginPdfKnowbaseItem extends PluginPdfCommon
         foreach ($res as $img) {
             $docimg = new Document();
             $docimg->getFromDB((int) $img[2]);
+            $width = null;
 
-            $path    = '<img src="file://' . GLPI_DOC_DIR . '/' . $docimg->fields['filepath'] . '"/>';
+            if (preg_match('/\bwidth=["\']?(\d+)/i', $img[0], $match_width)) {
+                $width = $match_width[1];
+            }
+
+            $path    = '<img src="file://' . GLPI_DOC_DIR . '/' . $docimg->fields['filepath'] . '" width="' . $width . '"/>';
             $answer = str_replace($img[0], $path, $answer);
         }
 
