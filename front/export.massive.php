@@ -32,6 +32,8 @@
 
 include('../../../inc/includes.php');
 
+Session::checkLoginUser();
+
 Plugin::load('pdf', true);
 
 $type = $_SESSION['plugin_pdf']['type'];
