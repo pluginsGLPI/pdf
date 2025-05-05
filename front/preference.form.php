@@ -32,6 +32,8 @@
 
 include_once('../../../inc/includes.php');
 
+Session::checkLoginUser();
+
 /** @var \DBmysql $DB */
 global $DB;
 

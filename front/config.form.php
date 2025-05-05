@@ -32,6 +32,8 @@
 
 include('../../../inc/includes.php');
 
+Session::checkLoginUser();
+
 // No autoload when plugin is not activated
 require_once('../inc/config.class.php');
 
