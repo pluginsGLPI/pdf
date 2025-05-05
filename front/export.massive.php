@@ -32,7 +32,7 @@
 
 include('../../../inc/includes.php');
 
-Session::checkLoginUser();
+Session::checkRight('plugin_pdf', READ);
 
 Plugin::load('pdf', true);
 
