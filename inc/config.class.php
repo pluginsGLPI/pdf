@@ -67,12 +67,12 @@ class PluginPdfConfig extends CommonDBTM
     private static $_instance = null;
     public static $rightname  = 'config';
 
-    public static function canCreate()
+    public static function canCreate(): bool
     {
         return Session::haveRight('config', UPDATE);
     }
 
-    public static function canView()
+    public static function canView(): bool
     {
         return Session::haveRight('config', READ);
     }
