@@ -1,7 +1,5 @@
 <?php
 
-use Glpi\Asset\Asset_PeripheralAsset;
-
 /**
  *  -------------------------------------------------------------------------
  *  LICENSE
@@ -32,6 +30,7 @@ use Glpi\Asset\Asset_PeripheralAsset;
  *  --------------------------------------------------------------------------
  */
 
+use Glpi\Asset\Asset_PeripheralAsset;
 class PluginPdfComputer_Item extends PluginPdfCommon
 {
     public static $rightname = 'plugin_pdf';
