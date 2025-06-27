@@ -48,8 +48,8 @@ $result = $DB->request([
     'SELECT' => 'tabref',
     'WHERE' => [
         'users_ID' => $_SESSION['glpiID'],
-        'itemtype' => $type
-    ]
+        'itemtype' => $type,
+    ],
 ]);
 
 $tab = [];

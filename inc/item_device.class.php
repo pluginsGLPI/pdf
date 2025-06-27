@@ -84,9 +84,9 @@ class PluginPdfItem_Device extends PluginPdfCommon
                 'FROM' => $linktable,
                 'WHERE' => [
                     'items_id' => $ID,
-                    'itemtype' => $item->getType()
+                    'itemtype' => $item->getType(),
                 ],
-                'GROUPBY' => $group_by
+                'GROUPBY' => $group_by,
             ];
 
             $device     = new $associated_type();

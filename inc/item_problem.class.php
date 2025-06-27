@@ -52,7 +52,8 @@ class PluginPdfItem_Problem extends PluginPdfCommon
             return false;
         }
 
-        $result = $DB->request(['FROM' => 'glpi_items_problems'] + ['SELECT'      => 'itemtype',
+        $result = $DB->request(
+            ['FROM' => 'glpi_items_problems'] + ['SELECT'      => 'itemtype',
                 'DISTINCT' => true,
                 'WHERE'    => ['problems_id' => $instID],
                 'ORDER'    => 'itemtype'],
@@ -91,30 +92,30 @@ class PluginPdfItem_Problem extends PluginPdfCommon
                         'SELECT' => [
                             "$itemtable.*",
                             'glpi_items_problems.id AS IDD',
-                            'glpi_entities.id AS entity'
+                            'glpi_entities.id AS entity',
                         ],
                         'FROM' => 'glpi_items_problems',
                         'INNER JOIN' => [
                             $itemtable => [
                                 'ON' => [
                                     $itemtable => 'id',
-                                    'glpi_items_problems' => 'items_id'
-                                ]
-                            ]
+                                    'glpi_items_problems' => 'items_id',
+                                ],
+                            ],
                         ],
                         'WHERE' => [
                             'glpi_items_problems.itemtype' => $itemtype,
-                            'glpi_items_problems.problems_id' => $instID
+                            'glpi_items_problems.problems_id' => $instID,
                         ],
-                        'ORDER' => ['glpi_entities.completename', "$itemtable.name"]
+                        'ORDER' => ['glpi_entities.completename', "$itemtable.name"],
                     ];
 
                     if ($itemtype != 'Entity') {
                         $query_params['LEFT JOIN']['glpi_entities'] = [
                             'ON' => [
                                 $itemtable => 'entities_id',
-                                'glpi_entities' => 'id'
-                            ]
+                                'glpi_entities' => 'id',
+                            ],
                         ];
                     }
 
@@ -212,7 +213,7 @@ class PluginPdfItem_Problem extends PluginPdfCommon
 
         $select_fields = [
             'glpi_problems.*',
-            'glpi_itilcategories.completename AS catname'
+            'glpi_itilcategories.completename AS catname',
         ];
 
         if (count($_SESSION['glpiactiveentities']) > 1) {
@@ -224,41 +225,41 @@ class PluginPdfItem_Problem extends PluginPdfCommon
             'glpi_items_problems' => [
                 'ON' => [
                     'glpi_problems' => 'id',
-                    'glpi_items_problems' => 'problems_id'
-                ]
+                    'glpi_items_problems' => 'problems_id',
+                ],
             ],
             'glpi_groups_problems' => [
                 'ON' => [
                     'glpi_problems' => 'id',
-                    'glpi_groups_problems' => 'problems_id'
-                ]
+                    'glpi_groups_problems' => 'problems_id',
+                ],
             ],
             'glpi_problems_users' => [
                 'ON' => [
                     'glpi_problems' => 'id',
-                    'glpi_problems_users' => 'problems_id'
-                ]
+                    'glpi_problems_users' => 'problems_id',
+                ],
             ],
             'glpi_problems_suppliers' => [
                 'ON' => [
                     'glpi_problems' => 'id',
-                    'glpi_problems_suppliers' => 'problems_id'
-                ]
+                    'glpi_problems_suppliers' => 'problems_id',
+                ],
             ],
             'glpi_itilcategories' => [
                 'ON' => [
                     'glpi_problems' => 'itilcategories_id',
-                    'glpi_itilcategories' => 'id'
-                ]
-            ]
+                    'glpi_itilcategories' => 'id',
+                ],
+            ],
         ];
 
         if (count($_SESSION['glpiactiveentities']) > 1) {
             $left_joins['glpi_entities'] = [
                 'ON' => [
                     'glpi_entities' => 'id',
-                    'glpi_problems' => 'entities_id'
-                ]
+                    'glpi_problems' => 'entities_id',
+                ],
             ];
         }
 
@@ -282,7 +283,7 @@ class PluginPdfItem_Problem extends PluginPdfCommon
             'LEFT JOIN' => $left_joins,
             'WHERE' => $where_conditions,
             'ORDER' => $order,
-            'LIMIT' => intval($_SESSION['glpilist_limit'])
+            'LIMIT' => intval($_SESSION['glpilist_limit']),
         ];
 
         $result = $DB->request($query_params);

@@ -31,6 +31,7 @@
  */
 
 use Glpi\Asset\Asset_PeripheralAsset;
+
 class PluginPdfComputer_Item extends PluginPdfCommon
 {
     public static $rightname = 'plugin_pdf';
@@ -73,22 +74,22 @@ class PluginPdfComputer_Item extends PluginPdfCommon
                     'glpi_assets_assets_peripheralassets.computers_id AS assoc_computers_id',
                     'glpi_assets_assets_peripheralassets.itemtype',
                     'glpi_assets_assets_peripheralassets.items_id',
-                    'glpi_assets_assets_peripheralassets.is_dynamic AS assoc_is_dynamic'
+                    'glpi_assets_assets_peripheralassets.is_dynamic AS assoc_is_dynamic',
                 ],
                 'FROM' => 'glpi_assets_assets_peripheralassets',
                 'LEFT JOIN' => [
                     $itemTable => [
                         'FKEY' => [
                             $itemTable => 'id',
-                            'glpi_assets_assets_peripheralassets' => 'items_id'
-                        ]
-                    ]
+                            'glpi_assets_assets_peripheralassets' => 'items_id',
+                        ],
+                    ],
                 ],
                 'WHERE' => [
                     'computers_id' => $ID,
                     'itemtype' => $type,
-                    'glpi_assets_assets_peripheralassets.is_deleted' => 0
-                ]
+                    'glpi_assets_assets_peripheralassets.is_deleted' => 0,
+                ],
             ];
 
             if ($item->maybetemplate()) {
@@ -196,7 +197,8 @@ class PluginPdfComputer_Item extends PluginPdfCommon
         $pdf->setColumnsSize(100);
         $title = '<b>' . __('Direct connections') . '</b>';
 
-        $result = $DB->request(['FROM' => 'glpi_assets_assets_peripheralassets'] + ['items_id'    => $ID,
+        $result = $DB->request(
+            ['FROM' => 'glpi_assets_assets_peripheralassets'] + ['items_id'    => $ID,
                 'itemtype' => $type],
         );
         $resultnum = count($result);
