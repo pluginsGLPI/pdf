@@ -58,7 +58,7 @@ define('GLPI_ROOT', realpath('..'));
 
 if (!is_readable(GLPI_ROOT . '/locales/' . $_GET['lang'] . '.php')) {
     print "Unable to read dictionnary file\n";
-    exit();
+    return;
 }
 include(GLPI_ROOT . '/locales/en_GB.php');
 /** @var array $LANG */
@@ -84,7 +84,7 @@ include(GLPI_ROOT . '/locales/temp.php');
 
 if (!is_readable(GLPI_ROOT . '/locales/glpi.pot')) {
     print "Unable to read glpi.pot file\n";
-    exit();
+    return;
 }
 $current_string        = '';
 $current_string_plural = '';

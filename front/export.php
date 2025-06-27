@@ -36,8 +36,6 @@ global $PLUGIN_HOOKS;
 define('GLPI_KEEP_CSRF_TOKEN', true); // 0.90
 $token = (isset($_POST['_glpi_csrf_token']) ? $_POST['_glpi_csrf_token'] : false);
 
-include('../../../inc/includes.php');
-
 Session::checkRight('plugin_pdf', READ);
 
 Plugin::load('pdf', true);

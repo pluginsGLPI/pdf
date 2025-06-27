@@ -30,8 +30,6 @@
  *  --------------------------------------------------------------------------
  */
 
-include('../../../inc/includes.php');
-
 Session::checkRight('plugin_pdf', READ);
 
 Plugin::load('pdf', true);
