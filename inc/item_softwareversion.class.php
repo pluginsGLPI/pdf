@@ -70,7 +70,7 @@ class PluginPdfItem_SoftwareVersion extends PluginPdfCommon
                 'glpi_softwareversions.id AS vID',
                 "{$itemtable}.name AS itemname",
                 "{$itemtable}.id AS iID",
-                new QueryExpression($DB->quoteValue($itemtype) . ' AS ' . $DB::quoteName('item_type')),
+                new \Glpi\DBAL\QueryExpression($DB->quoteValue($itemtype) . ' AS ' . $DB::quoteName('item_type')),
             ],
                 'FROM'       => $item_version_table,
                 'INNER JOIN' => ['glpi_softwareversions'
@@ -91,17 +91,13 @@ class PluginPdfItem_SoftwareVersion extends PluginPdfCommon
             if ($DB->fieldExists($itemtable, 'serial')) {
                 $query['SELECT'][] = $itemtable . '.serial';
             } else {
-                $query['SELECT'][] = new QueryExpression(
-                    $DB->quoteValue('') . ' AS ' . $DB->quoteName($itemtable . '.serial'),
-                );
+                $query['SELECT'][] = new \Glpi\DBAL\QueryExpression($DB->quoteValue('') . ' AS ' . $DB->quoteName($itemtable . '.serial'));
             }
 
             if ($DB->fieldExists($itemtable, 'otherserial')) {
                 $query['SELECT'][] = $itemtable . '.otherserial';
             } else {
-                $query['SELECT'][] = new QueryExpression(
-                    $DB->quoteValue('') . ' AS ' . $DB->quoteName($itemtable . '.otherserial'),
-                );
+                $query['SELECT'][] = new \Glpi\DBAL\QueryExpression($DB->quoteValue('') . ' AS ' . $DB->quoteName($itemtable . '.otherserial'));
             }
 
             if ($DB->fieldExists($itemtable, 'users_id')) {
@@ -113,18 +109,10 @@ class PluginPdfItem_SoftwareVersion extends PluginPdfCommon
                     'glpi_users'                                           => 'id'],
                 ];
             } else {
-                $query['SELECT'][] = new QueryExpression(
-                    $DB->quoteValue('') . ' AS ' . $DB->quoteName($itemtable . '.username'),
-                );
-                $query['SELECT'][] = new QueryExpression(
-                    $DB->quoteValue('-1') . ' AS ' . $DB->quoteName($itemtable . '.userid'),
-                );
-                $query['SELECT'][] = new QueryExpression(
-                    $DB->quoteValue('') . ' AS ' . $DB->quoteName($itemtable . '.userrealname'),
-                );
-                $query['SELECT'][] = new QueryExpression(
-                    $DB->quoteValue('') . ' AS ' . $DB->quoteName($itemtable . '.userfirstname'),
-                );
+                $query['SELECT'][] = new \Glpi\DBAL\QueryExpression($DB->quoteValue('') . ' AS ' . $DB->quoteName($itemtable . '.username'));
+                $query['SELECT'][] = new \Glpi\DBAL\QueryExpression($DB->quoteValue('-1') . ' AS ' . $DB->quoteName($itemtable . '.userid'));
+                $query['SELECT'][] = new \Glpi\DBAL\QueryExpression($DB->quoteValue('') . ' AS ' . $DB->quoteName($itemtable . '.userrealname'));
+                $query['SELECT'][] = new \Glpi\DBAL\QueryExpression($DB->quoteValue('') . ' AS ' . $DB->quoteName($itemtable . '.userfirstname'));
             }
 
             if ($DB->fieldExists($itemtable, 'entities_id')) {
@@ -134,9 +122,7 @@ class PluginPdfItem_SoftwareVersion extends PluginPdfCommon
                 ];
                 $query['WHERE'] += getEntitiesRestrictCriteria($itemtable, '', '', true);
             } else {
-                $query['SELECT'][] = new QueryExpression(
-                    $DB->quoteValue('') . ' AS ' . $DB->quoteName('entity'),
-                );
+                $query['SELECT'][] = new \Glpi\DBAL\QueryExpression($DB->quoteValue('') . ' AS ' . $DB->quoteName('entity'));
             }
 
             if ($DB->fieldExists($itemtable, 'locations_id')) {
@@ -145,9 +131,7 @@ class PluginPdfItem_SoftwareVersion extends PluginPdfCommon
                     'glpi_locations'                                           => 'id'],
                 ];
             } else {
-                $query['SELECT'][] = new QueryExpression(
-                    $DB->quoteValue('') . ' AS ' . $DB->quoteName('location'),
-                );
+                $query['SELECT'][] = new \Glpi\DBAL\QueryExpression($DB->quoteValue('') . ' AS ' . $DB->quoteName('location'));
             }
             if ($DB->fieldExists($itemtable, 'states_id')) {
                 $query['SELECT'][]                 = 'glpi_states.name AS state';
@@ -155,9 +139,7 @@ class PluginPdfItem_SoftwareVersion extends PluginPdfCommon
                     'glpi_states'                                           => 'id'],
                 ];
             } else {
-                $query['SELECT'][] = new QueryExpression(
-                    $DB->quoteValue('') . ' AS ' . $DB->quoteName('state'),
-                );
+                $query['SELECT'][] = new \Glpi\DBAL\QueryExpression($DB->quoteValue('') . ' AS ' . $DB->quoteName('state'));
             }
 
             if ($DB->fieldExists($itemtable, 'groups_id')) {
@@ -166,9 +148,7 @@ class PluginPdfItem_SoftwareVersion extends PluginPdfCommon
                     'glpi_groups'                                           => 'id'],
                 ];
             } else {
-                $query['SELECT'][] = new QueryExpression(
-                    $DB->quoteValue('') . ' AS ' . $DB->quoteName('groupe'),
-                );
+                $query['SELECT'][] = new \Glpi\DBAL\QueryExpression($DB->quoteValue('') . ' AS ' . $DB->quoteName('groupe'));
             }
 
             if ($DB->fieldExists($itemtable, 'is_deleted')) {
@@ -181,12 +161,14 @@ class PluginPdfItem_SoftwareVersion extends PluginPdfCommon
 
             $queries[] = $query;
         }
-        $union    = new QueryUnion($queries, true);
-        $criteria = ['SELECT' => [],
+
+        $union    = new \Glpi\DBAL\QueryUnion($queries, true);
+        $criteria = [
             'FROM'            => $union,
             'ORDER'           => "$sort ASC",
             'LIMIT'           => $_SESSION['glpilist_limit'],
         ];
+
 
         $iterator = $DB->request($criteria);
 
@@ -252,7 +234,7 @@ class PluginPdfItem_SoftwareVersion extends PluginPdfCommon
                         $data['username'],
                         $data['userrealname'],
                         $data['userfirstname'],
-                        $linkUser,
+                        $linkUser ? 1 : 0,
                     ),
                     implode(', ', $tmp),
                 );
@@ -327,35 +309,54 @@ class PluginPdfItem_SoftwareVersion extends PluginPdfCommon
         $ID = $item->getField('id');
 
         // From Item_SoftwareVersion::showForComputer();
-        $query = "SELECT `glpi_softwares`.`softwarecategories_id`,
-                       `glpi_softwares`.`name` AS softname,
-                       `glpi_items_softwareversions`.`id`,
-                       `glpi_states`.`name` AS state,
-                       `glpi_softwareversions`.`id` AS verid,
-                       `glpi_softwareversions`.`softwares_id`,
-                       `glpi_softwareversions`.`name` AS version,
-                       `glpi_softwares`.`is_valid` AS softvalid,
-                       `glpi_items_softwareversions`.`date_install` AS dateinstall
-                FROM `glpi_items_softwareversions`
-                LEFT JOIN `glpi_softwareversions`
-                     ON (`glpi_items_softwareversions`.`softwareversions_id`
-                           = `glpi_softwareversions`.`id`
-                         AND `glpi_items_softwareversions`.`itemtype` = '" . $item->getType() . "')
-                LEFT JOIN `glpi_states`
-                     ON (`glpi_states`.`id` = `glpi_softwareversions`.`states_id`)
-                LEFT JOIN `glpi_softwares`
-                     ON (`glpi_softwareversions`.`softwares_id` = `glpi_softwares`.`id`)
-                WHERE `glpi_items_softwareversions`.`items_id` = '$ID'
-                      AND `glpi_items_softwareversions`.`itemtype` = '" . $item->getType() . "'
-                      AND `glpi_items_softwareversions`.`is_deleted` = '0'
-                ORDER BY `softwarecategories_id`, `softname`, `version`";
+        $query_params = [
+            'SELECT' => [
+                'glpi_softwares.softwarecategories_id',
+                'glpi_softwares.name AS softname',
+                'glpi_items_softwareversions.id',
+                'glpi_states.name AS state',
+                'glpi_softwareversions.id AS verid',
+                'glpi_softwareversions.softwares_id',
+                'glpi_softwareversions.name AS version',
+                'glpi_softwares.is_valid AS softvalid',
+                'glpi_items_softwareversions.date_install AS dateinstall'
+            ],
+            'FROM' => 'glpi_items_softwareversions',
+            'LEFT JOIN' => [
+                'glpi_softwareversions' => [
+                    'ON' => [
+                        'glpi_items_softwareversions' => 'softwareversions_id',
+                        'glpi_softwareversions' => 'id',
+                        ['AND' => ['glpi_items_softwareversions.itemtype' => $item->getType()]]
+                    ]
+                ],
+                'glpi_states' => [
+                    'ON' => [
+                        'glpi_states' => 'id',
+                        'glpi_softwareversions' => 'states_id'
+                    ]
+                ],
+                'glpi_softwares' => [
+                    'ON' => [
+                        'glpi_softwareversions' => 'softwares_id',
+                        'glpi_softwares' => 'id'
+                    ]
+                ]
+            ],
+            'WHERE' => [
+                'glpi_items_softwareversions.items_id' => $ID,
+                'glpi_items_softwareversions.itemtype' => $item->getType(),
+                'glpi_items_softwareversions.is_deleted' => 0
+            ],
+            'ORDER' => ['softwarecategories_id', 'softname', 'version']
+        ];
 
         $output = [];
 
         $software_category = new SoftwareCategory();
         $software_version  = new SoftwareVersion();
 
-        foreach ($DB->request($query) as $softwareversion) {
+        foreach ($DB->request($query_params) as $softwareversion) {
             $output[] = $softwareversion;
         }
 
@@ -395,23 +396,45 @@ class PluginPdfItem_SoftwareVersion extends PluginPdfCommon
 
                 // From Item_SoftwareVersion::displaySoftsByCategory()
                 $verid = $soft['verid'];
-                $query = "SELECT `glpi_softwarelicenses`.*,
-                             `glpi_softwarelicensetypes`.`name` AS type
-                      FROM `glpi_items_softwarelicenses`
-                      INNER JOIN `glpi_softwarelicenses`
-                           ON (`glpi_items_softwarelicenses`.`softwarelicenses_id`
-                                    = `glpi_softwarelicenses`.`id`)
-                      LEFT JOIN `glpi_softwarelicensetypes`
-                           ON (`glpi_softwarelicenses`.`softwarelicensetypes_id`
-                                    =`glpi_softwarelicensetypes`.`id`
-                               AND `glpi_items_softwarelicenses`.`itemtype` = 'Computer')
-                      WHERE `glpi_items_softwarelicenses`.`items_id` = '$ID'
-                            AND (`glpi_softwarelicenses`.`softwareversions_id_use` = '$verid'
-                                 OR (`glpi_softwarelicenses`.`softwareversions_id_use` = '0'
-                                     AND `glpi_softwarelicenses`.`softwareversions_id_buy` = '$verid'))";
+                $query_license_params = [
+                    'SELECT' => [
+                        'glpi_softwarelicenses.*',
+                        'glpi_softwarelicensetypes.name AS type'
+                    ],
+                    'FROM' => 'glpi_items_softwarelicenses',
+                    'INNER JOIN' => [
+                        'glpi_softwarelicenses' => [
+                            'ON' => [
+                                'glpi_items_softwarelicenses' => 'softwarelicenses_id',
+                                'glpi_softwarelicenses' => 'id'
+                            ]
+                        ]
+                    ],
+                    'LEFT JOIN' => [
+                        'glpi_softwarelicensetypes' => [
+                            'ON' => [
+                                'glpi_softwarelicenses' => 'softwarelicensetypes_id',
+                                'glpi_softwarelicensetypes' => 'id',
+                                ['AND' => ['glpi_items_softwarelicenses.itemtype' => 'Computer']]
+                            ]
+                        ]
+                    ],
+                    'WHERE' => [
+                        'glpi_items_softwarelicenses.items_id' => $ID,
+                        'OR' => [
+                            'glpi_softwarelicenses.softwareversions_id_use' => $verid,
+                            [
+                                'AND' => [
+                                    'glpi_softwarelicenses.softwareversions_id_use' => 0,
+                                    'glpi_softwarelicenses.softwareversions_id_buy' => $verid
+                                ]
+                            ]
+                        ]
+                    ]
+                ];
 
                 $lic = '';
-                foreach ($DB->request($query) as $licdata) {
+                foreach ($DB->request($query_license_params) as $licdata) {
                     $installed[] = $licdata['id'];
                     $lic .= (empty($lic) ? '' : ', ') . '<b>' . $licdata['name'] . '</b> ' . $licdata['serial'];
                     if (!empty($licdata['type'])) {
@@ -431,32 +454,68 @@ class PluginPdfItem_SoftwareVersion extends PluginPdfCommon
         }
 
         // Affected licenses NOT installed
-        $query = "SELECT `glpi_softwarelicenses`.*,
-                       `glpi_softwares`.`name` AS softname,
-                       `glpi_softwareversions`.`name` AS version,
-                       `glpi_states`.`name` AS state
-                FROM `glpi_softwarelicenses`
-                LEFT JOIN `glpi_items_softwarelicenses`
-                      ON (`glpi_items_softwarelicenses`.softwarelicenses_id
-                              = `glpi_softwarelicenses`.`id`
-                          AND `glpi_items_softwarelicenses`.`itemtype` = 'Computer')
-                INNER JOIN `glpi_softwares`
-                      ON (`glpi_softwarelicenses`.`softwares_id` = `glpi_softwares`.`id`)
-                LEFT JOIN `glpi_softwareversions`
-                      ON (`glpi_softwarelicenses`.`softwareversions_id_use`
-                              = `glpi_softwareversions`.`id`
-                           OR (`glpi_softwarelicenses`.`softwareversions_id_use` = '0'
-                               AND `glpi_softwarelicenses`.`softwareversions_id_buy`
-                                       = `glpi_softwareversions`.`id`))
-                LEFT JOIN `glpi_states`
-                     ON (`glpi_states`.`id` = `glpi_softwareversions`.`states_id`)
-                WHERE `glpi_items_softwarelicenses`.`items_id` = '$ID'";
+        $query_affected_params = [
+            'SELECT' => [
+                'glpi_softwarelicenses.*',
+                'glpi_softwares.name AS softname',
+                'glpi_softwareversions.name AS version',
+                'glpi_states.name AS state'
+            ],
+            'FROM' => 'glpi_softwarelicenses',
+            'LEFT JOIN' => [
+                'glpi_items_softwarelicenses' => [
+                    'ON' => [
+                        'glpi_items_softwarelicenses' => 'softwarelicenses_id',
+                        'glpi_softwarelicenses' => 'id',
+                        ['AND' => ['glpi_items_softwarelicenses.itemtype' => 'Computer']]
+                    ]
+                ],
+                'glpi_softwareversions' => [
+                    'ON' => [
+                        'OR' => [
+                            [
+                                'glpi_softwarelicenses' => 'softwareversions_id_use',
+                                'glpi_softwareversions' => 'id'
+                            ],
+                            [
+                                'AND' => [
+                                    'glpi_softwarelicenses.softwareversions_id_use' => 0,
+                                    [
+                                        'glpi_softwarelicenses' => 'softwareversions_id_buy',
+                                        'glpi_softwareversions' => 'id'
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ],
+                'glpi_states' => [
+                    'ON' => [
+                        'glpi_states' => 'id',
+                        'glpi_softwareversions' => 'states_id'
+                    ]
+                ]
+            ],
+            'INNER JOIN' => [
+                'glpi_softwares' => [
+                    'ON' => [
+                        'glpi_softwarelicenses' => 'softwares_id',
+                        'glpi_softwares' => 'id'
+                    ]
+                ]
+            ],
+            'WHERE' => [
+                'glpi_items_softwarelicenses.items_id' => $ID
+            ]
+        ];
 
         if (count($installed)) {
-            $query .= ' AND `glpi_softwarelicenses`.`id` NOT IN (' . implode(',', $installed) . ')';
+            $query_affected_params['WHERE'][] = new \Glpi\DBAL\QueryExpression(
+                'glpi_softwarelicenses.id NOT IN (' . implode(',', $installed) . ')'
+            );
         }
 
-        $req = $DB->request($query);
+        $req = $DB->request($query_affected_params);
         if ($req->numrows()) {
             $pdf->setColumnsSize(100);
             $pdf->displayTitle('<b>' . __('Affected licenses of not installed software', 'pdf') . '</b>');

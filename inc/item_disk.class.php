@@ -46,9 +46,7 @@ class PluginPdfItem_Disk extends PluginPdfCommon
 
         $ID = $item->getField('id');
 
-        $result = $DB->request(
-            'glpi_items_disks',
-            ['SELECT'       => ['glpi_filesystems.name', 'glpi_items_disks.*'],
+        $result = $DB->request(['FROM' => 'glpi_items_disks'] + ['SELECT'       => ['glpi_filesystems.name', 'glpi_items_disks.*'],
                 'LEFT JOIN' => ['glpi_filesystems'
                                 => ['FKEY' => ['glpi_items_disks' => 'filesystems_id',
                                     'glpi_filesystems'            => 'id']]],

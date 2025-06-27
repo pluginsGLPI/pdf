@@ -61,11 +61,11 @@ class PluginPdfChangeValidation extends PluginPdfCommon
         }
         $ID = $change->getField('id');
 
-        $result = $DB->request(
-            'glpi_changevalidations',
-            ['WHERE'    => ['changes_id' => $change->getField('id')],
-                'ORDER' => 'submission_date DESC'],
-        );
+        $result = $DB->request([
+            'FROM'      => 'glpi_changevalidations',
+            'WHERE'     => ['changes_id' => $change->getField('id')],
+            'ORDER'     => 'submission_date DESC'
+        ]);
         $number = count($result);
 
         $pdf->setColumnsSize(100);

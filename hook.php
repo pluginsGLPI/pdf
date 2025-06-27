@@ -99,7 +99,7 @@ function plugin_pdf_uninstall()
     $query = "DELETE
              FROM `glpi_profilerights`
              WHERE `name` = 'plugin_pdf'";
-    $DB->doQueryOrDie($query, $DB->error());
+    $DB->doQuery($query);
 
     $migration->executeMigration();
 

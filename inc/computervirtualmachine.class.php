@@ -36,7 +36,7 @@ class PluginPdfComputerVirtualMachine extends PluginPdfCommon
 
     public function __construct(CommonGLPI $obj = null)
     {
-        $this->obj = ($obj ? $obj : new ComputerVirtualMachine());
+        $this->obj = ($obj ? $obj : new ItemVirtualMachine());
     }
 
     public static function pdfForComputer(PluginPdfSimplePDF $pdf, Computer $item)
@@ -47,7 +47,7 @@ class PluginPdfComputerVirtualMachine extends PluginPdfCommon
 
         // From ComputerVirtualMachine::showForComputer()
         $virtualmachines = $dbu->getAllDataFromTable(
-            'glpi_computervirtualmachines',
+            'glpi_itemvirtualmachines',
             ['computers_id' => $ID],
         );
         $pdf->setColumnsSize(100);
@@ -80,7 +80,7 @@ class PluginPdfComputerVirtualMachine extends PluginPdfCommon
 
             foreach ($virtualmachines as $virtualmachine) {
                 $name = '';
-                if ($link_computer = ComputerVirtualMachine::findVirtualMachine($virtualmachine)) {
+                if ($link_computer = ItemVirtualMachine::findVirtualMachine($virtualmachine)) {
                     $computer = new Computer();
                     if ($computer->getFromDB($link_computer)) {
                         $name = $computer->getName();
@@ -114,7 +114,7 @@ class PluginPdfComputerVirtualMachine extends PluginPdfCommon
                 $item::getTable(),
                 ['RAW'
                  => ['LOWER(uuid)'
-                     => ComputerVirtualMachine::getUUIDRestrictCriteria($item->fields['uuid']),
+                     => ItemVirtualMachine::getUUIDRestrictCriteria($item->fields['uuid']),
                  ],
                 ],
             );

@@ -457,7 +457,7 @@ class PluginPdfTicket extends PluginPdfCommon
             '<b><i>' . sprintf(__('%1$s: %2$s'), __('Title') . '</i></b>', $job->fields['name']),
         );
 
-        $content = Glpi\Toolbox\Sanitizer::unsanitize(Html::entity_decode_deep($job->fields['content']));
+        $content = $job->fields['content'];
 
         $content = preg_replace('#data:image/[^;]+;base64,#', '@', $content);
 
@@ -478,7 +478,7 @@ class PluginPdfTicket extends PluginPdfCommon
         );
 
         // Linked tickets
-        $tickets = Ticket_Ticket::getLinkedTicketsTo($ID);
+        $tickets = Ticket_Ticket::getLinkedTo(Ticket::class, $ID);
         if (count($tickets)) {
             $ticket = new Ticket();
             $pdf->displayLine('<b><i>' . sprintf(

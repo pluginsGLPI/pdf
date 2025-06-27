@@ -1,5 +1,7 @@
 <?php
 
+use Glpi\Asset\Asset_PeripheralAsset;
+
 /**
  *  -------------------------------------------------------------------------
  *  LICENSE
@@ -36,7 +38,7 @@ class PluginPdfComputer_Item extends PluginPdfCommon
 
     public function __construct(CommonGLPI $obj = null)
     {
-        $this->obj = ($obj ? $obj : new Computer_Item());
+        $this->obj = ($obj ? $obj : new Asset_PeripheralAsset());
     }
 
     public static function pdfForComputer(PluginPdfSimplePDF $pdf, Computer $comp)
@@ -65,21 +67,33 @@ class PluginPdfComputer_Item extends PluginPdfCommon
             if (!$item->canView()) {
                 continue;
             }
-            $query = 'SELECT `glpi_computers_items`.`id` AS assoc_id,
-                      `glpi_computers_items`.`computers_id` AS assoc_computers_id,
-                      `glpi_computers_items`.`itemtype`,
-                      `glpi_computers_items`.`items_id`,
-                      `glpi_computers_items`.`is_dynamic` AS assoc_is_dynamic,
-                      ' . $dbu->getTableForItemType($type) . '.*
-                      FROM `glpi_computers_items`
-                      LEFT JOIN `' . $dbu->getTableForItemType($type) . '`
-                        ON (`' . $dbu->getTableForItemType($type) . "`.`id`
-                              = `glpi_computers_items`.`items_id`)
-                      WHERE `computers_id` = '$ID'
-                            AND `itemtype` = '" . $type . "'
-                            AND `glpi_computers_items`.`is_deleted` = '0'";
+            $itemTable = $dbu->getTableForItemType($type);
+            $query = [
+                'SELECT' => [
+                    'glpi_assets_assets_peripheralassets.id AS assoc_id',
+                    'glpi_assets_assets_peripheralassets.computers_id AS assoc_computers_id',
+                    'glpi_assets_assets_peripheralassets.itemtype',
+                    'glpi_assets_assets_peripheralassets.items_id',
+                    'glpi_assets_assets_peripheralassets.is_dynamic AS assoc_is_dynamic'
+                ],
+                'FROM' => 'glpi_assets_assets_peripheralassets',
+                'LEFT JOIN' => [
+                    $itemTable => [
+                        'FKEY' => [
+                            $itemTable => 'id',
+                            'glpi_assets_assets_peripheralassets' => 'items_id'
+                        ]
+                    ]
+                ],
+                'WHERE' => [
+                    'computers_id' => $ID,
+                    'itemtype' => $type,
+                    'glpi_assets_assets_peripheralassets.is_deleted' => 0
+                ]
+            ];
+
             if ($item->maybetemplate()) {
-                $query .= ' AND NOT `' . $dbu->getTableForItemType($type) . '`.`is_template` ';
+                $query['WHERE'][$itemTable . '.is_template'] = 0;
             }
 
             $result    = $DB->request($query);
@@ -183,9 +197,7 @@ class PluginPdfComputer_Item extends PluginPdfCommon
         $pdf->setColumnsSize(100);
         $title = '<b>' . __('Direct connections') . '</b>';
 
-        $result = $DB->request(
-            'glpi_computers_items',
-            ['items_id'    => $ID,
+        $result = $DB->request(['FROM' => 'glpi_assets_assets_peripheralassets'] + ['items_id'    => $ID,
                 'itemtype' => $type],
         );
         $resultnum = count($result);

@@ -49,8 +49,11 @@ class PluginPdfCommonItilCost extends PluginPdfCommon
         $table     = 'glpi_' . (strtolower($type)) . 'costs';
         $classname = $type . 'Cost';
 
-        $result = $DB->request($table, ['WHERE' => [$job->getForeignKeyField() => $ID],
-            'ORDER'                             => 'begin_date']);
+        $result = $DB->request([
+            'FROM'  => $table,
+            'WHERE' => [$job->getForeignKeyField() => $ID],
+            'ORDER' => 'begin_date'
+        ]);
 
         $number = count($result);
 

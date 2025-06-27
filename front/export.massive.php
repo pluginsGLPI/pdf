@@ -45,12 +45,14 @@ unset($_SESSION['plugin_pdf']['tab_id']);
 /** @var \DBmysql $DB */
 global $DB;
 
-$result = $DB->request(
-    'glpi_plugin_pdf_preferences',
-    ['SELECT'   => 'tabref',
-        'WHERE' => ['users_ID' => $_SESSION['glpiID'],
-            'itemtype'         => $type]],
-);
+$result = $DB->request([
+    'FROM' => 'glpi_plugin_pdf_preferences',
+    'SELECT' => 'tabref',
+    'WHERE' => [
+        'users_ID' => $_SESSION['glpiID'],
+        'itemtype' => $type
+    ]
+]);
 
 $tab = [];
 
@@ -69,5 +71,5 @@ if (isset($PLUGIN_HOOKS['plugin_pdf'][$type])) {
     $itempdf = new $PLUGIN_HOOKS['plugin_pdf'][$type]($item);
     $itempdf->generatePDF($tab_id, $tab, (isset($pag) ? $pag : 0));
 } else {
-    die('Missing hook');
+    throw new \RuntimeException('Missing PDF plugin hook for type: ' . $type);
 }

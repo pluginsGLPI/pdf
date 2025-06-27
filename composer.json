@@ -1,7 +1,7 @@
 {
     "require": {
-        "php": ">=7.4",
-        "symfony/yaml": "^5.4",
+        "php": ">=8.2",
+        "symfony/yaml": "^7.3",
         "tecnickcom/tcpdf": "^6.4"
     },
     "require-dev": {
@@ -16,7 +16,7 @@
     "config": {
         "optimize-autoloader": true,
         "platform": {
-            "php": "7.4.0"
+            "php": "8.2.99"
         },
         "sort-packages": true,
         "allow-plugins": {

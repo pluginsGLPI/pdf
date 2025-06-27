@@ -91,7 +91,13 @@ class PluginPdfProfile extends Profile
     public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
     {
         if ($item->getType() == 'Profile') {
-            return __('Print to pdf', 'pdf');
+            $icon_html = sprintf('<i class="ti ti-%s"></i>', 'file-type-pdf');
+
+            return sprintf(
+                '<span class="d-flex align-items-center">%s%s</span>',
+                $icon_html,
+                __('Print to pdf', 'pdf'),
+            );
         }
 
         return '';
@@ -171,9 +177,7 @@ class PluginPdfProfile extends Profile
             }
         }
 
-        foreach ($DB->request(
-            'glpi_profilerights',
-            ['profiles_id' => $_SESSION['glpiactiveprofile']['id'],
+        foreach ($DB->request(['FROM' => 'glpi_profilerights'] + ['profiles_id' => $_SESSION['glpiactiveprofile']['id'],
                 'name'     => ['LIKE', '%plugin_pdf%']],
         ) as $prof) {
             $_SESSION['glpiactiveprofile'][$prof['name']] = $prof['rights'];
@@ -209,7 +213,13 @@ class PluginPdfProfile extends Profile
             $profileRight = new ProfileRight();
 
             if ($DB->tableExists($table)) {
-                foreach ($DB->request($table, ['use' => 1]) as $data) {
+                $criterias = [
+                    'FROM' => $table,
+                    'WHERE' => [
+                        'use' => 1
+                    ]
+                ];
+                foreach ($DB->request($criterias) as $data) {
                     $right['profiles_id'] = $data['id'];
                     $right['name']        = 'plugin_pdf';
                     $right['rights']      = $data['use'];
