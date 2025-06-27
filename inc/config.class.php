@@ -121,14 +121,12 @@ class PluginPdfConfig extends CommonDBTM
                      PRIMARY KEY  (`id`)
                    ) ENGINE=InnoDB  DEFAULT CHARSET= {$default_charset}
                  COLLATE = {$default_collation} ROW_FORMAT=DYNAMIC";
-            $DB->doQueryOrDie($query, 'Error in creating glpi_plugin_pdf_configs' .
-                                    '<br>' . $DB->error());
+            $DB->doQuery($query);
 
             $query = "INSERT INTO `$table`
                          (id, currency)
                    VALUES (1, 'EUR')";
-            $DB->doQueryOrDie($query, 'Error during update glpi_plugin_pdf_configs' .
-                                    '<br>' . $DB->error());
+            $DB->doQuery($query);
         } else {
             // 2.1.0
             if ($DB->fieldExists($table, 'date_mod')) {
@@ -187,7 +185,13 @@ class PluginPdfConfig extends CommonDBTM
     public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
     {
         if ($item->getType() == 'Config') {
-            return $this->getName();
+            $icon_html = sprintf('<i class="ti ti-%s"></i>', 'file-type-pdf');
+
+            return sprintf(
+                '<span class="d-flex align-items-center">%s%s</span>',
+                $icon_html,
+                self::getName(),
+            );
         }
 
         return '';

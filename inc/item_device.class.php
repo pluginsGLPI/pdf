@@ -63,26 +63,35 @@ class PluginPdfItem_Device extends PluginPdfCommon
             $devicetypes   = new $itemtype();
             $specificities = $devicetypes->getSpecificities();
             $specif_fields = array_keys($specificities);
-            $specif_text   = implode(',', $specif_fields);
 
-            if (!empty($specif_text)) {
-                $specif_text = ' ,' . $specif_text . ' ';
-            }
             $associated_type = str_replace('Item_', '', $itemtype);
             $linktable       = $dbu->getTableForItemType($itemtype);
             $fk              = $dbu->getForeignKeyFieldForTable($dbu->getTableForItemType($associated_type));
 
-            $query = 'SELECT count(*) AS NB, `id`, `' . $fk . '`' . $specif_text . '
-                   FROM `' . $linktable . "`
-                   WHERE `items_id` = '" . $ID . "'
-                         AND `itemtype` = '" . $item->getType() . "'
-                   GROUP BY `" . $fk . '`' . $specif_text;
+            $select_fields = ['COUNT(*) AS NB', 'id', $fk];
+            if (!empty($specif_fields)) {
+                $select_fields = array_merge($select_fields, $specif_fields);
+            }
 
+            // Construction de la clause GROUP BY
+            $group_by = [$fk];
+            if (!empty($specif_fields)) {
+                $group_by = array_merge($group_by, $specif_fields);
+            }
 
+            $query_params = [
+                'SELECT' => $select_fields,
+                'FROM' => $linktable,
+                'WHERE' => [
+                    'items_id' => $ID,
+                    'itemtype' => $item->getType()
+                ],
+                'GROUPBY' => $group_by
+            ];
 
             $device     = new $associated_type();
             $itemdevice = new $itemtype();
-            foreach ($DB->request($query) as $data) {
+            foreach ($DB->request($query_params) as $data) {
                 $itemdevice->getFromDB($data['id']);
                 if ($device->getFromDB($data[$fk])) {
                     $spec = $device->getAdditionalFields();

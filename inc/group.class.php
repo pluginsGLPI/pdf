@@ -160,17 +160,15 @@ class PluginPdfGroup extends PluginPdfCommon
         $dbu = new DbUtils();
 
         if ($tech) {
-            $types = $CFG_GLPI['linkgroup_tech_types'];
             $field = 'groups_id_tech';
             $title = __('Managed items');
         } else {
-            $types = $CFG_GLPI['linkgroup_types'];
             $field = 'groups_id';
             $title = __('Used items');
         }
 
         $datas = [];
-        $max   = $group->getDataItems($types, $field, $tree, $user, 0, $datas);
+        $max   = $group->getDataItems($tech, $tree, $user, 0, $datas);
         $nb    = count($datas);
 
         if ($nb < $max) {
@@ -247,8 +245,13 @@ class PluginPdfGroup extends PluginPdfCommon
         $entity_assign = $item->isEntityAssign();
 
         $fk   = $item->getForeignKeyField();
-        $crit = [$fk => $item->getID(),
-            'ORDER'  => 'name'];
+        $crit = [
+            'FROM' => $item->getTable(),
+            'WHERE' => [
+                $fk => $item->getID()
+            ],
+            'ORDER' => 'name'
+        ];
 
         if ($item->haveChildren()) {
             $pdf->setColumnsSize(100);
@@ -256,10 +259,9 @@ class PluginPdfGroup extends PluginPdfCommon
 
             if ($entity_assign) {
                 if ($fk == 'entities_id') {
-                    $crit['id'] = $_SESSION['glpiactiveentities'];
-                    $crit['id'] += $_SESSION['glpiparententities'];
+                    $crit['WHERE']['id'] = $_SESSION['glpiactiveentities'] + $_SESSION['glpiparententities'];
                 } else {
-                    $crit['entities_id'] = $_SESSION['glpiactiveentities'];
+                    $crit['WHERE']['entities_id'] = $_SESSION['glpiactiveentities'];
                 }
 
                 $pdf->setColumnsSize(30, 30, 40);
@@ -269,7 +271,7 @@ class PluginPdfGroup extends PluginPdfCommon
                 $pdf->displayTitle(__('Name'), __('Comments'));
             }
 
-            foreach ($DB->request($item->getTable(), $crit) as $data) {
+            foreach ($DB->request($crit) as $data) {
                 if ($entity_assign) {
                     $pdf->displayLine(
                         $data['name'],

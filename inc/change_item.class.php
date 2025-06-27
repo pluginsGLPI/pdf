@@ -52,13 +52,13 @@ class PluginPdfChange_Item extends PluginPdfCommon
             return false;
         }
 
-        $result = $DB->request(
-            'glpi_changes_items',
-            ['SELECT'      => 'itemtype',
-                'DISTINCT' => true,
-                'WHERE'    => ['changes_id' => $instID],
-                'ORDER'    => 'itemtype'],
-        );
+        $result = $DB->request([
+            'FROM'     => 'glpi_changes_items',
+            'SELECT'   => 'itemtype',
+            'DISTINCT' => true,
+            'WHERE'    => ['changes_id' => $instID],
+            'ORDER'    => 'itemtype'
+        ]);
         $number = count($result);
 
         $pdf->setColumnsSize(100);
@@ -115,7 +115,7 @@ class PluginPdfChange_Item extends PluginPdfCommon
 
                     $query['ORDER'] = ['glpi_entities.completename', $itemtable . '.name'];
 
-                    $result_linked = $DB->request($query, '', true);
+                    $result_linked = $DB->request($query);
                     $nb            = count($result_linked);
 
                     $prem = true;
@@ -193,33 +193,42 @@ class PluginPdfChange_Item extends PluginPdfCommon
                 break;
         }
 
-        $SELECT = '';
-        $FROM   = '';
+        $SELECT = ['glpi_changes.*', 'glpi_itilcategories.completename AS catname'];
+        $LEFT_JOIN = [
+            'glpi_changes_items' => [
+                'FKEY' => ['glpi_changes' => 'id', 'glpi_changes_items' => 'changes_id']
+            ],
+            'glpi_changes_groups' => [
+                'FKEY' => ['glpi_changes' => 'id', 'glpi_changes_groups' => 'changes_id']
+            ],
+            'glpi_changes_users' => [
+                'FKEY' => ['glpi_changes' => 'id', 'glpi_changes_users' => 'changes_id']
+            ],
+            'glpi_changes_suppliers' => [
+                'FKEY' => ['glpi_changes' => 'id', 'glpi_changes_suppliers' => 'changes_id']
+            ],
+            'glpi_itilcategories' => [
+                'FKEY' => ['glpi_changes' => 'itilcategories_id', 'glpi_itilcategories' => 'id']
+            ]
+        ];
+
         if (count($_SESSION['glpiactiveentities']) > 1) {
-            $SELECT = ', `glpi_entities`.`completename` AS entityname,
-                      `glpi_changes`.`entities_id` AS entityID ';
-            $FROM = ' LEFT JOIN `glpi_entities`
-                        ON (`glpi_entities`.`id` = `glpi_changes`.`entities_id`) ';
+            $SELECT[] = 'glpi_entities.completename AS entityname';
+            $SELECT[] = 'glpi_changes.entities_id AS entityID';
+            $LEFT_JOIN['glpi_entities'] = [
+                'FKEY' => ['glpi_entities' => 'id', 'glpi_changes' => 'entities_id']
+            ];
         }
-        $query = "SELECT DISTINCT `glpi_changes`.*,
-                        `glpi_itilcategories`.`completename` AS catname
-                        $SELECT
-                FROM `glpi_changes`
-                LEFT JOIN `glpi_changes_items`
-                              ON (`glpi_changes`.`id` = `glpi_changes_items`.`changes_id`)
-                LEFT JOIN `glpi_changes_groups`
-                  ON (`glpi_changes`.`id` = `glpi_changes_groups`.`changes_id`)
-                LEFT JOIN `glpi_changes_users`
-                  ON (`glpi_changes`.`id` = `glpi_changes_users`.`changes_id`)
-                LEFT JOIN `glpi_changes_suppliers`
-                  ON (`glpi_changes`.`id` = `glpi_changes_suppliers`.`changes_id`)
-                LEFT JOIN `glpi_itilcategories`
-                  ON (`glpi_changes`.`itilcategories_id` = `glpi_itilcategories`.`id`)
-                $FROM
-                WHERE $restrict " .
-                        $dbu->getEntitiesRestrictRequest('AND', 'glpi_changes') . "
-                ORDER BY $order
-                LIMIT " . intval($_SESSION['glpilist_limit']);
+
+        $query = [
+            'SELECT' => $SELECT,
+            'DISTINCT' => true,
+            'FROM' => 'glpi_changes',
+            'LEFT JOIN' => $LEFT_JOIN,
+            'WHERE' => [$restrict] + $dbu->getEntitiesRestrictCriteria('glpi_changes'),
+            'ORDER' => $order,
+            'LIMIT' => (int)$_SESSION['glpilist_limit']
+        ];
 
         $result = $DB->request($query);
         $number = count($result);

@@ -52,9 +52,7 @@ class PluginPdfItem_Ticket extends PluginPdfCommon
             return false;
         }
 
-        $result = $DB->request(
-            'glpi_items_tickets',
-            ['SELECT'      => 'itemtype',
+        $result = $DB->request(['FROM' => 'glpi_items_tickets'] + ['SELECT'      => 'itemtype',
                 'DISTINCT' => true,
                 'WHERE'    => ['tickets_id' => $instID],
                 'ORDER'    => 'itemtype'],
@@ -88,35 +86,61 @@ class PluginPdfItem_Ticket extends PluginPdfCommon
                 if ($item->canView()) {
                     $itemtable = $dbu->getTableForItemType($itemtype);
 
-                    $query = "SELECT `$itemtable`.*,
-                                `glpi_items_tickets`.`id` AS IDD,
-                                `glpi_entities`.`id` AS entity
-                         FROM `glpi_items_tickets`,
-                              `$itemtable`";
+                    $select_fields = [
+                        "$itemtable.*",
+                        'glpi_items_tickets.id AS IDD',
+                        'glpi_entities.id AS entity'
+                    ];
+
+                    $joins = [
+                        'glpi_items_tickets' => [
+                            'ON' => [
+                                $itemtable => 'id',
+                                'glpi_items_tickets' => 'items_id'
+                            ]
+                        ]
+                    ];
 
                     if ($itemtype != 'Entity') {
-                        $query .= " LEFT JOIN `glpi_entities`
-                                    ON (`$itemtable`.`entities_id`=`glpi_entities`.`id`) ";
+                        $joins['glpi_entities'] = [
+                            'ON' => [
+                                $itemtable => 'entities_id',
+                                'glpi_entities' => 'id'
+                            ]
+                        ];
                     }
 
-                    $query .= " WHERE `$itemtable`.`id` = `glpi_items_tickets`.`items_id`
-                                 AND `glpi_items_tickets`.`itemtype` = '$itemtype'
-                                 AND `glpi_items_tickets`.`tickets_id` = '$instID'";
+                    $where_conditions = [
+                        'glpi_items_tickets.itemtype' => $itemtype,
+                        'glpi_items_tickets.tickets_id' => $instID
+                    ];
 
                     if ($item->maybeTemplate()) {
-                        $query .= " AND `$itemtable`.`is_template` = '0'";
+                        $where_conditions["$itemtable.is_template"] = 0;
                     }
 
-                    $query .= $dbu->getEntitiesRestrictRequest(
-                        ' AND',
+                    $entity_restrict = $dbu->getEntitiesRestrictRequest(
+                        '',
                         $itemtable,
                         '',
                         '',
                         $item->maybeRecursive(),
-                    ) . "
-                         ORDER BY `glpi_entities`.`completename`, `$itemtable`.`name`";
+                    );
 
-                    $result_linked = $DB->request($query);
+                    if (!empty($entity_restrict)) {
+                        $where_conditions[] = new \Glpi\DBAL\QueryExpression($entity_restrict);
+                    }
+
+                    // Construction de la requête finale
+                    $query_params = [
+                        'SELECT' => $select_fields,
+                        'FROM' => $itemtable,
+                        'LEFT JOIN' => $joins,
+                        'WHERE' => $where_conditions,
+                        'ORDER' => ['glpi_entities.completename', "$itemtable.name"]
+                    ];
+
+                    $result_linked = $DB->request($query_params);
                     $nb            = count($result_linked);
 
                     $prem = true;
@@ -216,38 +240,88 @@ class PluginPdfItem_Ticket extends PluginPdfCommon
                 $order = '`glpi_tickets`.`date_mod` DESC';
         }
 
-        $SELECT = '';
-        $FROM   = '';
+        $select_fields = [
+            'glpi_tickets.*',
+            'glpi_itilcategories.completename AS catname'
+        ];
+
         if (count($_SESSION['glpiactiveentities']) > 1) {
-            $SELECT = ', `glpi_entities`.`completename` AS entityname,
-                      `glpi_tickets`.`entities_id` AS entityID ';
-            $FROM = ' LEFT JOIN `glpi_entities`
-                        ON (`glpi_entities`.`id` = `glpi_tickets`.`entities_id`) ';
+            $select_fields[] = 'glpi_entities.completename AS entityname';
+            $select_fields[] = 'glpi_tickets.entities_id AS entityID';
         }
 
-        $query = "SELECT DISTINCT `glpi_tickets`.*,
-                       `glpi_itilcategories`.`completename` AS catname
-                       $SELECT
-                FROM `glpi_tickets`
-                LEFT JOIN `glpi_groups_tickets`
-                     ON (`glpi_tickets`.`id` = `glpi_groups_tickets`.`tickets_id`)
-                LEFT JOIN `glpi_tickets_users`
-                     ON (`glpi_tickets`.`id` = `glpi_tickets_users`.`tickets_id`)
-                LEFT JOIN `glpi_suppliers_tickets`
-                     ON (`glpi_tickets`.`id` = `glpi_suppliers_tickets`.`tickets_id`)
-                LEFT JOIN `glpi_itilcategories`
-                     ON (`glpi_tickets`.`itilcategories_id` = `glpi_itilcategories`.`id`)
-                LEFT JOIN `glpi_tickettasks`
-                     ON (`glpi_tickets`.`id` = `glpi_tickettasks`.`tickets_id`)
-                LEFT JOIN `glpi_items_tickets`
-                     ON (`glpi_tickets`.`id` = `glpi_items_tickets`.`tickets_id`)
-                $FROM
-                WHERE $restrict " .
-                        $dbu->getEntitiesRestrictRequest('AND', 'glpi_tickets') . "
-                ORDER BY $order
-                LIMIT " . intval($_SESSION['glpilist_limit']);
+        $left_joins = [
+            'glpi_groups_tickets' => [
+                'ON' => [
+                    'glpi_tickets' => 'id',
+                    'glpi_groups_tickets' => 'tickets_id'
+                ]
+            ],
+            'glpi_tickets_users' => [
+                'ON' => [
+                    'glpi_tickets' => 'id',
+                    'glpi_tickets_users' => 'tickets_id'
+                ]
+            ],
+            'glpi_suppliers_tickets' => [
+                'ON' => [
+                    'glpi_tickets' => 'id',
+                    'glpi_suppliers_tickets' => 'tickets_id'
+                ]
+            ],
+            'glpi_itilcategories' => [
+                'ON' => [
+                    'glpi_tickets' => 'itilcategories_id',
+                    'glpi_itilcategories' => 'id'
+                ]
+            ],
+            'glpi_tickettasks' => [
+                'ON' => [
+                    'glpi_tickets' => 'id',
+                    'glpi_tickettasks' => 'tickets_id'
+                ]
+            ],
+            'glpi_items_tickets' => [
+                'ON' => [
+                    'glpi_tickets' => 'id',
+                    'glpi_items_tickets' => 'tickets_id'
+                ]
+            ]
+        ];
 
-        $result = $DB->request($query);
+        if (count($_SESSION['glpiactiveentities']) > 1) {
+            $left_joins['glpi_entities'] = [
+                'ON' => [
+                    'glpi_entities' => 'id',
+                    'glpi_tickets' => 'entities_id'
+                ]
+            ];
+        }
+
+        $where_conditions = [];
+
+        if (strpos($restrict, 'OR') !== false || strpos($restrict, 'AND') !== false) {
+            $where_conditions[] = new \Glpi\DBAL\QueryExpression($restrict);
+        } else {
+            $where_conditions[] = $restrict;
+        }
+
+        $entity_restrict = $dbu->getEntitiesRestrictRequest('', 'glpi_tickets');
+        if (!empty($entity_restrict)) {
+            $where_conditions[] = new \Glpi\DBAL\QueryExpression($entity_restrict);
+        }
+
+        $query_params = [
+            'SELECT' => $select_fields,
+            'DISTINCT' => true,
+            'FROM' => 'glpi_tickets',
+            'LEFT JOIN' => $left_joins,
+            'WHERE' => $where_conditions,
+            'ORDER' => $order,
+            'LIMIT' => intval($_SESSION['glpilist_limit'])
+        ];
+
+        $result = $DB->request($query_params);
         $number = count($result);
 
         $pdf->setColumnsSize(100);
@@ -456,9 +530,7 @@ class PluginPdfItem_Ticket extends PluginPdfCommon
 
                 $first     = true;
                 $listitems = $texteitem = '';
-                foreach ($DB->request(
-                    'glpi_items_tickets',
-                    ['WHERE' => ['tickets_id' => $job->fields['id']]],
+                foreach ($DB->request(['FROM' => 'glpi_items_tickets'] + ['WHERE' => ['tickets_id' => $job->fields['id']]],
                 ) as $data) {
                     if (!($item = $dbu->getItemForItemtype($data['itemtype']))) {
                         continue;

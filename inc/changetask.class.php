@@ -48,11 +48,11 @@ class PluginPdfChangeTask extends PluginPdfCommon
 
         $ID = $job->getField('id');
 
-        $result = $DB->request(
-            'glpi_changetasks',
-            ['WHERE'    => ['changes_id' => $ID],
-                'ORDER' => 'date DESC'],
-        );
+        $result = $DB->request([
+            'FROM'      => 'glpi_changetasks',
+            'WHERE'     => ['changes_id' => $ID],
+            'ORDER'     => 'date DESC'
+        ]);
 
         $number = count($result);
 

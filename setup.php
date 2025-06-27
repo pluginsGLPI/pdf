@@ -33,9 +33,11 @@
  *  --------------------------------------------------------------------------
  */
 
-define('PLUGIN_PDF_VERSION', '4.0.2');
-define('PLUGIN_PDF_MIN_GLPI', '10.0.11');
-define('PLUGIN_PDF_MAX_GLPI', '10.0.99');
+use Glpi\Http\Firewall;
+
+define('PLUGIN_PDF_VERSION', '4.0.1');
+define('PLUGIN_PDF_MIN_GLPI', '11.0.0');
+define('PLUGIN_PDF_MAX_GLPI', '11.0.99');
 
 function plugin_init_pdf()
 {

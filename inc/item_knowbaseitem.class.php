@@ -46,9 +46,7 @@ class PluginPdfItem_Knowbaseitem extends PluginPdfCommon
 
         $ID = $item->getField('id');
 
-        $result = $DB->request(
-            'glpi_knowbaseitems',
-            ['SELECT' => ['glpi_knowbaseitems.*',
+        $result = $DB->request(['FROM' => 'glpi_knowbaseitems'] + ['SELECT' => ['glpi_knowbaseitems.*',
                 'glpi_knowbaseitems_items.itemtype',
                 'glpi_knowbaseitems_items.items_id'],
                 'LEFT JOIN' => ['glpi_knowbaseitems_items'

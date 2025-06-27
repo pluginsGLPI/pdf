@@ -47,9 +47,7 @@ class PluginPdfDocument extends PluginPdfCommon
         $ID   = $item->getField('id');
         $type = get_class($item);
 
-        $result = $DB->request(
-            'glpi_documents_items',
-            ['SELECT' => ['glpi_documents_items.id',
+        $result = $DB->request(['FROM' => 'glpi_documents_items'] + ['SELECT' => ['glpi_documents_items.id',
                 'glpi_documents_items.date_mod',
                 'glpi_documents.*', 'glpi_entities.id',
                 'completename'],
