@@ -248,9 +248,9 @@ class PluginPdfGroup extends PluginPdfCommon
         $crit = [
             'FROM' => $item->getTable(),
             'WHERE' => [
-                $fk => $item->getID()
+                $fk => $item->getID(),
             ],
-            'ORDER' => 'name'
+            'ORDER' => 'name',
         ];
 
         if ($item->haveChildren()) {

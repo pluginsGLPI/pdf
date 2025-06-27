@@ -319,7 +319,7 @@ class PluginPdfItem_SoftwareVersion extends PluginPdfCommon
                 'glpi_softwareversions.softwares_id',
                 'glpi_softwareversions.name AS version',
                 'glpi_softwares.is_valid AS softvalid',
-                'glpi_items_softwareversions.date_install AS dateinstall'
+                'glpi_items_softwareversions.date_install AS dateinstall',
             ],
             'FROM' => 'glpi_items_softwareversions',
             'LEFT JOIN' => [
@@ -327,28 +327,28 @@ class PluginPdfItem_SoftwareVersion extends PluginPdfCommon
                     'ON' => [
                         'glpi_items_softwareversions' => 'softwareversions_id',
                         'glpi_softwareversions' => 'id',
-                        ['AND' => ['glpi_items_softwareversions.itemtype' => $item->getType()]]
-                    ]
+                        ['AND' => ['glpi_items_softwareversions.itemtype' => $item->getType()]],
+                    ],
                 ],
                 'glpi_states' => [
                     'ON' => [
                         'glpi_states' => 'id',
-                        'glpi_softwareversions' => 'states_id'
-                    ]
+                        'glpi_softwareversions' => 'states_id',
+                    ],
                 ],
                 'glpi_softwares' => [
                     'ON' => [
                         'glpi_softwareversions' => 'softwares_id',
-                        'glpi_softwares' => 'id'
-                    ]
-                ]
+                        'glpi_softwares' => 'id',
+                    ],
+                ],
             ],
             'WHERE' => [
                 'glpi_items_softwareversions.items_id' => $ID,
                 'glpi_items_softwareversions.itemtype' => $item->getType(),
-                'glpi_items_softwareversions.is_deleted' => 0
+                'glpi_items_softwareversions.is_deleted' => 0,
             ],
-            'ORDER' => ['softwarecategories_id', 'softname', 'version']
+            'ORDER' => ['softwarecategories_id', 'softname', 'version'],
         ];
 
         $output = [];
@@ -399,25 +399,25 @@ class PluginPdfItem_SoftwareVersion extends PluginPdfCommon
                 $query_license_params = [
                     'SELECT' => [
                         'glpi_softwarelicenses.*',
-                        'glpi_softwarelicensetypes.name AS type'
+                        'glpi_softwarelicensetypes.name AS type',
                     ],
                     'FROM' => 'glpi_items_softwarelicenses',
                     'INNER JOIN' => [
                         'glpi_softwarelicenses' => [
                             'ON' => [
                                 'glpi_items_softwarelicenses' => 'softwarelicenses_id',
-                                'glpi_softwarelicenses' => 'id'
-                            ]
-                        ]
+                                'glpi_softwarelicenses' => 'id',
+                            ],
+                        ],
                     ],
                     'LEFT JOIN' => [
                         'glpi_softwarelicensetypes' => [
                             'ON' => [
                                 'glpi_softwarelicenses' => 'softwarelicensetypes_id',
                                 'glpi_softwarelicensetypes' => 'id',
-                                ['AND' => ['glpi_items_softwarelicenses.itemtype' => 'Computer']]
-                            ]
-                        ]
+                                ['AND' => ['glpi_items_softwarelicenses.itemtype' => 'Computer']],
+                            ],
+                        ],
                     ],
                     'WHERE' => [
                         'glpi_items_softwarelicenses.items_id' => $ID,
@@ -426,11 +426,11 @@ class PluginPdfItem_SoftwareVersion extends PluginPdfCommon
                             [
                                 'AND' => [
                                     'glpi_softwarelicenses.softwareversions_id_use' => 0,
-                                    'glpi_softwarelicenses.softwareversions_id_buy' => $verid
-                                ]
-                            ]
-                        ]
-                    ]
+                                    'glpi_softwarelicenses.softwareversions_id_buy' => $verid,
+                                ],
+                            ],
+                        ],
+                    ],
                 ];
 
                 $lic = '';
@@ -459,7 +459,7 @@ class PluginPdfItem_SoftwareVersion extends PluginPdfCommon
                 'glpi_softwarelicenses.*',
                 'glpi_softwares.name AS softname',
                 'glpi_softwareversions.name AS version',
-                'glpi_states.name AS state'
+                'glpi_states.name AS state',
             ],
             'FROM' => 'glpi_softwarelicenses',
             'LEFT JOIN' => [
@@ -467,51 +467,51 @@ class PluginPdfItem_SoftwareVersion extends PluginPdfCommon
                     'ON' => [
                         'glpi_items_softwarelicenses' => 'softwarelicenses_id',
                         'glpi_softwarelicenses' => 'id',
-                        ['AND' => ['glpi_items_softwarelicenses.itemtype' => 'Computer']]
-                    ]
+                        ['AND' => ['glpi_items_softwarelicenses.itemtype' => 'Computer']],
+                    ],
                 ],
                 'glpi_softwareversions' => [
                     'ON' => [
                         'OR' => [
                             [
                                 'glpi_softwarelicenses' => 'softwareversions_id_use',
-                                'glpi_softwareversions' => 'id'
+                                'glpi_softwareversions' => 'id',
                             ],
                             [
                                 'AND' => [
                                     'glpi_softwarelicenses.softwareversions_id_use' => 0,
                                     [
                                         'glpi_softwarelicenses' => 'softwareversions_id_buy',
-                                        'glpi_softwareversions' => 'id'
-                                    ]
-                                ]
-                            ]
-                        ]
-                    ]
+                                        'glpi_softwareversions' => 'id',
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
                 ],
                 'glpi_states' => [
                     'ON' => [
                         'glpi_states' => 'id',
-                        'glpi_softwareversions' => 'states_id'
-                    ]
-                ]
+                        'glpi_softwareversions' => 'states_id',
+                    ],
+                ],
             ],
             'INNER JOIN' => [
                 'glpi_softwares' => [
                     'ON' => [
                         'glpi_softwarelicenses' => 'softwares_id',
-                        'glpi_softwares' => 'id'
-                    ]
-                ]
+                        'glpi_softwares' => 'id',
+                    ],
+                ],
             ],
             'WHERE' => [
-                'glpi_items_softwarelicenses.items_id' => $ID
-            ]
+                'glpi_items_softwarelicenses.items_id' => $ID,
+            ],
         ];
 
         if (count($installed)) {
             $query_affected_params['WHERE'][] = new \Glpi\DBAL\QueryExpression(
-                'glpi_softwarelicenses.id NOT IN (' . implode(',', $installed) . ')'
+                'glpi_softwarelicenses.id NOT IN (' . implode(',', $installed) . ')',
             );
         }
 

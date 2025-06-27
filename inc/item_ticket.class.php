@@ -52,7 +52,8 @@ class PluginPdfItem_Ticket extends PluginPdfCommon
             return false;
         }
 
-        $result = $DB->request(['FROM' => 'glpi_items_tickets'] + ['SELECT'      => 'itemtype',
+        $result = $DB->request(
+            ['FROM' => 'glpi_items_tickets'] + ['SELECT'      => 'itemtype',
                 'DISTINCT' => true,
                 'WHERE'    => ['tickets_id' => $instID],
                 'ORDER'    => 'itemtype'],
@@ -89,30 +90,30 @@ class PluginPdfItem_Ticket extends PluginPdfCommon
                     $select_fields = [
                         "$itemtable.*",
                         'glpi_items_tickets.id AS IDD',
-                        'glpi_entities.id AS entity'
+                        'glpi_entities.id AS entity',
                     ];
 
                     $joins = [
                         'glpi_items_tickets' => [
                             'ON' => [
                                 $itemtable => 'id',
-                                'glpi_items_tickets' => 'items_id'
-                            ]
-                        ]
+                                'glpi_items_tickets' => 'items_id',
+                            ],
+                        ],
                     ];
 
                     if ($itemtype != 'Entity') {
                         $joins['glpi_entities'] = [
                             'ON' => [
                                 $itemtable => 'entities_id',
-                                'glpi_entities' => 'id'
-                            ]
+                                'glpi_entities' => 'id',
+                            ],
                         ];
                     }
 
                     $where_conditions = [
                         'glpi_items_tickets.itemtype' => $itemtype,
-                        'glpi_items_tickets.tickets_id' => $instID
+                        'glpi_items_tickets.tickets_id' => $instID,
                     ];
 
                     if ($item->maybeTemplate()) {
@@ -137,7 +138,7 @@ class PluginPdfItem_Ticket extends PluginPdfCommon
                         'FROM' => $itemtable,
                         'LEFT JOIN' => $joins,
                         'WHERE' => $where_conditions,
-                        'ORDER' => ['glpi_entities.completename', "$itemtable.name"]
+                        'ORDER' => ['glpi_entities.completename', "$itemtable.name"],
                     ];
 
                     $result_linked = $DB->request($query_params);
@@ -242,7 +243,7 @@ class PluginPdfItem_Ticket extends PluginPdfCommon
 
         $select_fields = [
             'glpi_tickets.*',
-            'glpi_itilcategories.completename AS catname'
+            'glpi_itilcategories.completename AS catname',
         ];
 
         if (count($_SESSION['glpiactiveentities']) > 1) {
@@ -254,47 +255,47 @@ class PluginPdfItem_Ticket extends PluginPdfCommon
             'glpi_groups_tickets' => [
                 'ON' => [
                     'glpi_tickets' => 'id',
-                    'glpi_groups_tickets' => 'tickets_id'
-                ]
+                    'glpi_groups_tickets' => 'tickets_id',
+                ],
             ],
             'glpi_tickets_users' => [
                 'ON' => [
                     'glpi_tickets' => 'id',
-                    'glpi_tickets_users' => 'tickets_id'
-                ]
+                    'glpi_tickets_users' => 'tickets_id',
+                ],
             ],
             'glpi_suppliers_tickets' => [
                 'ON' => [
                     'glpi_tickets' => 'id',
-                    'glpi_suppliers_tickets' => 'tickets_id'
-                ]
+                    'glpi_suppliers_tickets' => 'tickets_id',
+                ],
             ],
             'glpi_itilcategories' => [
                 'ON' => [
                     'glpi_tickets' => 'itilcategories_id',
-                    'glpi_itilcategories' => 'id'
-                ]
+                    'glpi_itilcategories' => 'id',
+                ],
             ],
             'glpi_tickettasks' => [
                 'ON' => [
                     'glpi_tickets' => 'id',
-                    'glpi_tickettasks' => 'tickets_id'
-                ]
+                    'glpi_tickettasks' => 'tickets_id',
+                ],
             ],
             'glpi_items_tickets' => [
                 'ON' => [
                     'glpi_tickets' => 'id',
-                    'glpi_items_tickets' => 'tickets_id'
-                ]
-            ]
+                    'glpi_items_tickets' => 'tickets_id',
+                ],
+            ],
         ];
 
         if (count($_SESSION['glpiactiveentities']) > 1) {
             $left_joins['glpi_entities'] = [
                 'ON' => [
                     'glpi_entities' => 'id',
-                    'glpi_tickets' => 'entities_id'
-                ]
+                    'glpi_tickets' => 'entities_id',
+                ],
             ];
         }
 
@@ -318,7 +319,7 @@ class PluginPdfItem_Ticket extends PluginPdfCommon
             'LEFT JOIN' => $left_joins,
             'WHERE' => $where_conditions,
             'ORDER' => $order,
-            'LIMIT' => intval($_SESSION['glpilist_limit'])
+            'LIMIT' => intval($_SESSION['glpilist_limit']),
         ];
 
         $result = $DB->request($query_params);
@@ -530,7 +531,8 @@ class PluginPdfItem_Ticket extends PluginPdfCommon
 
                 $first     = true;
                 $listitems = $texteitem = '';
-                foreach ($DB->request(['FROM' => 'glpi_items_tickets'] + ['WHERE' => ['tickets_id' => $job->fields['id']]],
+                foreach ($DB->request(
+                    ['FROM' => 'glpi_items_tickets'] + ['WHERE' => ['tickets_id' => $job->fields['id']]],
                 ) as $data) {
                     if (!($item = $dbu->getItemForItemtype($data['itemtype']))) {
                         continue;

@@ -64,7 +64,7 @@ class PluginPdfChangeValidation extends PluginPdfCommon
         $result = $DB->request([
             'FROM'      => 'glpi_changevalidations',
             'WHERE'     => ['changes_id' => $change->getField('id')],
-            'ORDER'     => 'submission_date DESC'
+            'ORDER'     => 'submission_date DESC',
         ]);
         $number = count($result);
 

@@ -51,7 +51,8 @@ class PluginPdfNetworkPort extends PluginPdfCommon
         $type = get_class($item);
 
         $pdf->setColumnsSize(100);
-        $result = $DB->request(['FROM' => 'glpi_networkports'] + ['SELECT'   => ['id', 'name', 'logical_number'],
+        $result = $DB->request(
+            ['FROM' => 'glpi_networkports'] + ['SELECT'   => ['id', 'name', 'logical_number'],
                 'WHERE' => ['items_id' => $ID,
                     'itemtype'         => $type],
                 'ORDER' => ['name', 'logical_number']],

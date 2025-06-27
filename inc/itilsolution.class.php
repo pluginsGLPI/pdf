@@ -48,7 +48,8 @@ class PluginPdfITILSolution extends PluginPdfCommon
 
         $pdf->setColumnsSize(100);
 
-        $soluce = $DB->request(['FROM' => 'glpi_itilsolutions'] + ['itemtype'    => $item->getType(),
+        $soluce = $DB->request(
+            ['FROM' => 'glpi_itilsolutions'] + ['itemtype'    => $item->getType(),
                 'items_id' => $item->fields['id']],
         );
 

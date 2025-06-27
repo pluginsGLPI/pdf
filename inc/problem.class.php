@@ -318,7 +318,8 @@ class PluginPdfProblem extends PluginPdfCommon
             $text = Toolbox::stripTags(
                 html_entity_decode(
                     $job->getField('impactcontent'),
-            ));
+                ),
+            );
         }
         $pdf->displayText('<b><i>' . sprintf(__('%1$s: %2$s'), __('Impacts') . '</i></b>', $text));
 
@@ -326,7 +327,8 @@ class PluginPdfProblem extends PluginPdfCommon
             $text = Toolbox::stripTags(
                 html_entity_decode(
                     $job->getField('causecontent'),
-            ));
+                ),
+            );
         }
 
         $pdf->displayText('<b><i>' . sprintf(__('%1$s: %2$s'), __('Causes') . '</i></b>', $text));
@@ -335,7 +337,8 @@ class PluginPdfProblem extends PluginPdfCommon
             $text = Toolbox::stripTags(
                 html_entity_decode(
                     $job->getField('symptomcontent'),
-            ));
+                ),
+            );
         }
 
         $pdf->displayText('<b><i>' . sprintf(__('%1$s: %2$s'), __('Symptoms') . '</i></b>', $text));
