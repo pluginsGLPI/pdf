@@ -61,7 +61,7 @@ class PluginPdfChange_Ticket extends PluginPdfCommon
                               => ['FKEY' => ['glpi_changes_tickets' => 'tickets_id',
                                   'glpi_tickets'                    => 'id']]],
             'WHERE'        => ['changes_id' => $ID],
-            'ORDER'        => 'name'
+            'ORDER'        => 'name',
         ]);
         $number = count($result);
 
@@ -276,7 +276,7 @@ class PluginPdfChange_Ticket extends PluginPdfCommon
                 $listitems = $texteitem = '';
                 foreach ($DB->request([
                     'FROM'  => 'glpi_items_tickets',
-                    'WHERE' => ['tickets_id' => $job->fields['id']]
+                    'WHERE' => ['tickets_id' => $job->fields['id']],
                 ]) as $data) {
                     if (!($item = $dbu->getItemForItemtype($data['itemtype']))) {
                         continue;
@@ -331,7 +331,7 @@ class PluginPdfChange_Ticket extends PluginPdfCommon
                              => ['FKEY' => ['glpi_changes_tickets' => 'changes_id',
                                  'glpi_changes'                    => 'id']]],
             'WHERE'        => ['tickets_id' => $ID],
-            'ORDER'        => 'name'
+            'ORDER'        => 'name',
         ]);
         $number = count($result);
 

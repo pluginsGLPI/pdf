@@ -73,34 +73,34 @@ class PluginPdfCartridge extends PluginPdfCommon
                 'glpi_cartridges.date_use',
                 'glpi_cartridges.date_out',
                 'glpi_cartridges.date_in',
-                'glpi_cartridgeitemtypes.name AS typename'
+                'glpi_cartridgeitemtypes.name AS typename',
             ],
             'FROM' => 'glpi_cartridges',
             'INNER JOIN' => [
                 'glpi_cartridgeitems' => [
                     'FKEY' => [
                         'glpi_cartridges' => 'cartridgeitems_id',
-                        'glpi_cartridgeitems' => 'id'
-                    ]
-                ]
+                        'glpi_cartridgeitems' => 'id',
+                    ],
+                ],
             ],
             'LEFT JOIN' => [
                 'glpi_cartridgeitemtypes' => [
                     'FKEY' => [
                         'glpi_cartridgeitems' => 'cartridgeitemtypes_id',
-                        'glpi_cartridgeitemtypes' => 'id'
-                    ]
-                ]
+                        'glpi_cartridgeitemtypes' => 'id',
+                    ],
+                ],
             ],
             'WHERE' => [
                 'glpi_cartridges.printers_id' => $instID,
-                'glpi_cartridges.date_out' => ($old ? ['NOT' => null] : null)
+                'glpi_cartridges.date_out' => ($old ? ['NOT' => null] : null),
             ],
             'ORDER' => [
                 'glpi_cartridges.date_out ASC',
                 'glpi_cartridges.date_use DESC',
-                'glpi_cartridges.date_in'
-            ]
+                'glpi_cartridges.date_in',
+            ],
         ];
 
         $result = $DB->request($query);
@@ -271,18 +271,18 @@ class PluginPdfCartridge extends PluginPdfCommon
                 'glpi_cartridges.*',
                 'glpi_printers.id AS printID',
                 'glpi_printers.name AS printname',
-                'glpi_printers.init_pages_counter'
+                'glpi_printers.init_pages_counter',
             ],
             'LEFT JOIN' => [
                 'glpi_printers' => [
                     'FKEY' => [
                         Cartridge::getTable() => 'printers_id',
-                        'glpi_printers' => 'id'
-                    ]
-                ]
+                        'glpi_printers' => 'id',
+                    ],
+                ],
             ],
             'WHERE' => $where,
-            'ORDER' => $order
+            'ORDER' => $order,
         ]);
 
         $number = count($iterator);

@@ -177,7 +177,8 @@ class PluginPdfProfile extends Profile
             }
         }
 
-        foreach ($DB->request(['FROM' => 'glpi_profilerights'] + ['profiles_id' => $_SESSION['glpiactiveprofile']['id'],
+        foreach ($DB->request(
+            ['FROM' => 'glpi_profilerights'] + ['profiles_id' => $_SESSION['glpiactiveprofile']['id'],
                 'name'     => ['LIKE', '%plugin_pdf%']],
         ) as $prof) {
             $_SESSION['glpiactiveprofile'][$prof['name']] = $prof['rights'];
@@ -216,8 +217,8 @@ class PluginPdfProfile extends Profile
                 $criterias = [
                     'FROM' => $table,
                     'WHERE' => [
-                        'use' => 1
-                    ]
+                        'use' => 1,
+                    ],
                 ];
                 foreach ($DB->request($criterias) as $data) {
                     $right['profiles_id'] = $data['id'];

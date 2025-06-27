@@ -52,7 +52,7 @@ class PluginPdfCommonItilCost extends PluginPdfCommon
         $result = $DB->request([
             'FROM'  => $table,
             'WHERE' => [$job->getForeignKeyField() => $ID],
-            'ORDER' => 'begin_date'
+            'ORDER' => 'begin_date',
         ]);
 
         $number = count($result);

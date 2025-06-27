@@ -134,63 +134,63 @@ class PluginPdfComputer_SoftwareLicense extends PluginPdfCommon
                     'glpi_states.name AS state',
                     'glpi_groups.name AS groupe',
                     'glpi_softwarelicenses.name AS lname',
-                    'glpi_softwarelicenses.id AS lID'
+                    'glpi_softwarelicenses.id AS lID',
                 ],
                 'FROM' => 'glpi_computers_softwarelicenses',
                 'INNER JOIN' => [
                     'glpi_softwarelicenses' => [
                         'ON' => [
                             'glpi_computers_softwarelicenses' => 'softwarelicenses_id',
-                            'glpi_softwarelicenses' => 'id'
-                        ]
+                            'glpi_softwarelicenses' => 'id',
+                        ],
                     ],
                     'glpi_computers' => [
                         'ON' => [
                             'glpi_computers_softwarelicenses' => 'computers_id',
-                            'glpi_computers' => 'id'
-                        ]
-                    ]
+                            'glpi_computers' => 'id',
+                        ],
+                    ],
                 ],
                 'LEFT JOIN' => [
                     'glpi_entities' => [
                         'ON' => [
                             'glpi_computers' => 'entities_id',
-                            'glpi_entities' => 'id'
-                        ]
+                            'glpi_entities' => 'id',
+                        ],
                     ],
                     'glpi_locations' => [
                         'ON' => [
                             'glpi_computers' => 'locations_id',
-                            'glpi_locations' => 'id'
-                        ]
+                            'glpi_locations' => 'id',
+                        ],
                     ],
                     'glpi_states' => [
                         'ON' => [
                             'glpi_computers' => 'states_id',
-                            'glpi_states' => 'id'
-                        ]
+                            'glpi_states' => 'id',
+                        ],
                     ],
                     'glpi_groups' => [
                         'ON' => [
                             'glpi_computers' => 'groups_id',
-                            'glpi_groups' => 'id'
-                        ]
+                            'glpi_groups' => 'id',
+                        ],
                     ],
                     'glpi_users' => [
                         'ON' => [
                             'glpi_computers' => 'users_id',
-                            'glpi_users' => 'id'
-                        ]
-                    ]
+                            'glpi_users' => 'id',
+                        ],
+                    ],
                 ],
                 'WHERE' => [
                     'glpi_softwarelicenses.id' => $ID,
                     'glpi_computers.is_deleted' => 0,
-                    'glpi_computers.is_template' => 0
+                    'glpi_computers.is_template' => 0,
                 ],
                 'ORDER' => ['entity', 'compname'],
                 'START' => 0,
-                'LIMIT' => intval($_SESSION['glpilist_limit'])
+                'LIMIT' => intval($_SESSION['glpilist_limit']),
             ];
 
             // Ajout de la restriction d'entités

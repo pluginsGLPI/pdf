@@ -160,7 +160,8 @@ class PluginPdfConsumableItem extends PluginPdfCommon
 
         $number = $dbu->countElementsInTable('glpi_consumables', $where);
 
-        $iterator = $DB->request(['FROM' => 'glpi_consumables'] + ['WHERE'    => $where,
+        $iterator = $DB->request(
+            ['FROM' => 'glpi_consumables'] + ['WHERE'    => $where,
                 'ORDER' => $order],
         );
 

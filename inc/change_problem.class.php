@@ -61,7 +61,7 @@ class PluginPdfChange_Problem extends PluginPdfCommon
                               => ['FKEY' => ['glpi_changes_problems' => 'problems_id',
                                   'glpi_problems'                    => 'id']]],
             'WHERE'        => ['changes_id' => $ID],
-            'ORDER'        => 'name'
+            'ORDER'        => 'name',
         ]);
         $number = count($result);
 
@@ -303,7 +303,7 @@ class PluginPdfChange_Problem extends PluginPdfCommon
                              => ['FKEY' => ['glpi_changes_problems' => 'changes_id',
                                  'glpi_changes'                     => 'id']]],
             'WHERE'        => ['problems_id' => $ID],
-            'ORDER'        => 'name'
+            'ORDER'        => 'name',
         ]);
         $number = count($result);
 

@@ -223,7 +223,7 @@ class PluginPdfAppliance extends PluginPdfCommon
         $result = $DB->request([
             'SELECT' => 'DISTINCT itemtype',
             'FROM'   => 'glpi_appliances_items',
-            'WHERE'  => ['appliances_id' => $instID]
+            'WHERE'  => ['appliances_id' => $instID],
         ]);
         $number = count($result);
 

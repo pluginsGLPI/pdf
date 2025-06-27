@@ -57,7 +57,7 @@ class PluginPdfChange_Item extends PluginPdfCommon
             'SELECT'   => 'itemtype',
             'DISTINCT' => true,
             'WHERE'    => ['changes_id' => $instID],
-            'ORDER'    => 'itemtype'
+            'ORDER'    => 'itemtype',
         ]);
         $number = count($result);
 
@@ -196,27 +196,27 @@ class PluginPdfChange_Item extends PluginPdfCommon
         $SELECT = ['glpi_changes.*', 'glpi_itilcategories.completename AS catname'];
         $LEFT_JOIN = [
             'glpi_changes_items' => [
-                'FKEY' => ['glpi_changes' => 'id', 'glpi_changes_items' => 'changes_id']
+                'FKEY' => ['glpi_changes' => 'id', 'glpi_changes_items' => 'changes_id'],
             ],
             'glpi_changes_groups' => [
-                'FKEY' => ['glpi_changes' => 'id', 'glpi_changes_groups' => 'changes_id']
+                'FKEY' => ['glpi_changes' => 'id', 'glpi_changes_groups' => 'changes_id'],
             ],
             'glpi_changes_users' => [
-                'FKEY' => ['glpi_changes' => 'id', 'glpi_changes_users' => 'changes_id']
+                'FKEY' => ['glpi_changes' => 'id', 'glpi_changes_users' => 'changes_id'],
             ],
             'glpi_changes_suppliers' => [
-                'FKEY' => ['glpi_changes' => 'id', 'glpi_changes_suppliers' => 'changes_id']
+                'FKEY' => ['glpi_changes' => 'id', 'glpi_changes_suppliers' => 'changes_id'],
             ],
             'glpi_itilcategories' => [
-                'FKEY' => ['glpi_changes' => 'itilcategories_id', 'glpi_itilcategories' => 'id']
-            ]
+                'FKEY' => ['glpi_changes' => 'itilcategories_id', 'glpi_itilcategories' => 'id'],
+            ],
         ];
 
         if (count($_SESSION['glpiactiveentities']) > 1) {
             $SELECT[] = 'glpi_entities.completename AS entityname';
             $SELECT[] = 'glpi_changes.entities_id AS entityID';
             $LEFT_JOIN['glpi_entities'] = [
-                'FKEY' => ['glpi_entities' => 'id', 'glpi_changes' => 'entities_id']
+                'FKEY' => ['glpi_entities' => 'id', 'glpi_changes' => 'entities_id'],
             ];
         }
 
@@ -227,7 +227,7 @@ class PluginPdfChange_Item extends PluginPdfCommon
             'LEFT JOIN' => $LEFT_JOIN,
             'WHERE' => [$restrict] + $dbu->getEntitiesRestrictCriteria('glpi_changes'),
             'ORDER' => $order,
-            'LIMIT' => (int)$_SESSION['glpilist_limit']
+            'LIMIT' => (int) $_SESSION['glpilist_limit'],
         ];
 
         $result = $DB->request($query);
