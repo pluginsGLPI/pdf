@@ -118,42 +118,88 @@ class PluginPdfComputer_SoftwareLicense extends PluginPdfCommon
             $title = sprintf(__('%1$s: %2$s'), $title, $number);
             $pdf->displayTitle($title);
 
-            $query = "SELECT `glpi_computers_softwarelicenses`.*,
-                          `glpi_computers`.`name` AS compname,
-                          `glpi_computers`.`id` AS cID,
-                          `glpi_computers`.`serial`,
-                          `glpi_computers`.`otherserial`,
-                          `glpi_users`.`name` AS username,
-                          `glpi_softwarelicenses`.`name` AS license,
-                          `glpi_softwarelicenses`.`id` AS vID,
-                          `glpi_softwarelicenses`.`name` AS vername,
-                          `glpi_entities`.`name` AS entity,
-                          `glpi_locations`.`completename` AS location,
-                          `glpi_states`.`name` AS state,
-                          `glpi_groups`.`name` AS groupe,
-                          `glpi_softwarelicenses`.`name` AS lname,
-                          `glpi_softwarelicenses`.`id` AS lID
-                   FROM `glpi_computers_softwarelicenses`
-                   INNER JOIN `glpi_softwarelicenses`
-                        ON (`glpi_computers_softwarelicenses`.`softwarelicenses_id`
-                                = `glpi_softwarelicenses`.`id`)
-                   INNER JOIN `glpi_computers`
-                        ON (`glpi_computers_softwarelicenses`.`computers_id` = `glpi_computers`.`id`)
-                   LEFT JOIN `glpi_entities`
-                        ON (`glpi_computers`.`entities_id` = `glpi_entities`.`id`)
-                   LEFT JOIN `glpi_locations`
-                        ON (`glpi_computers`.`locations_id` = `glpi_locations`.`id`)
-                   LEFT JOIN `glpi_states` ON (`glpi_computers`.`states_id` = `glpi_states`.`id`)
-                   LEFT JOIN `glpi_groups` ON (`glpi_computers`.`groups_id` = `glpi_groups`.`id`)
-                   LEFT JOIN `glpi_users` ON (`glpi_computers`.`users_id` = `glpi_users`.`id`)
-                   WHERE (`glpi_softwarelicenses`.`id` = '" . $ID . "') " .
-                            $dbu->getEntitiesRestrictRequest(' AND', 'glpi_computers') . "
-                         AND `glpi_computers`.`is_deleted` = '0'
-                         AND `glpi_computers`.`is_template` = '0'
-                   ORDER BY `entity`, `compname`
-                   LIMIT 0," . intval($_SESSION['glpilist_limit']);
+            $query_params = [
+                'SELECT' => [
+                    'glpi_computers_softwarelicenses.*',
+                    'glpi_computers.name AS compname',
+                    'glpi_computers.id AS cID',
+                    'glpi_computers.serial',
+                    'glpi_computers.otherserial',
+                    'glpi_users.name AS username',
+                    'glpi_softwarelicenses.name AS license',
+                    'glpi_softwarelicenses.id AS vID',
+                    'glpi_softwarelicenses.name AS vername',
+                    'glpi_entities.name AS entity',
+                    'glpi_locations.completename AS location',
+                    'glpi_states.name AS state',
+                    'glpi_groups.name AS groupe',
+                    'glpi_softwarelicenses.name AS lname',
+                    'glpi_softwarelicenses.id AS lID'
+                ],
+                'FROM' => 'glpi_computers_softwarelicenses',
+                'INNER JOIN' => [
+                    'glpi_softwarelicenses' => [
+                        'ON' => [
+                            'glpi_computers_softwarelicenses' => 'softwarelicenses_id',
+                            'glpi_softwarelicenses' => 'id'
+                        ]
+                    ],
+                    'glpi_computers' => [
+                        'ON' => [
+                            'glpi_computers_softwarelicenses' => 'computers_id',
+                            'glpi_computers' => 'id'
+                        ]
+                    ]
+                ],
+                'LEFT JOIN' => [
+                    'glpi_entities' => [
+                        'ON' => [
+                            'glpi_computers' => 'entities_id',
+                            'glpi_entities' => 'id'
+                        ]
+                    ],
+                    'glpi_locations' => [
+                        'ON' => [
+                            'glpi_computers' => 'locations_id',
+                            'glpi_locations' => 'id'
+                        ]
+                    ],
+                    'glpi_states' => [
+                        'ON' => [
+                            'glpi_computers' => 'states_id',
+                            'glpi_states' => 'id'
+                        ]
+                    ],
+                    'glpi_groups' => [
+                        'ON' => [
+                            'glpi_computers' => 'groups_id',
+                            'glpi_groups' => 'id'
+                        ]
+                    ],
+                    'glpi_users' => [
+                        'ON' => [
+                            'glpi_computers' => 'users_id',
+                            'glpi_users' => 'id'
+                        ]
+                    ]
+                ],
+                'WHERE' => [
+                    'glpi_softwarelicenses.id' => $ID,
+                    'glpi_computers.is_deleted' => 0,
+                    'glpi_computers.is_template' => 0
+                ],
+                'ORDER' => ['entity', 'compname'],
+                'START' => 0,
+                'LIMIT' => intval($_SESSION['glpilist_limit'])
+            ];
 
-            $result = $DB->request($query);
+            // Ajout de la restriction d'entités
+            $entity_restrict = $dbu->getEntitiesRestrictRequest('', 'glpi_computers');
+            if (!empty($entity_restrict)) {
+                $query_params['WHERE'][] = new \Glpi\DBAL\QueryExpression($entity_restrict);
+            }
+
+            $result = $DB->request($query_params);
 
             $showEntity = ($license->isRecursive());
             if ($showEntity) {

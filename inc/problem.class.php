@@ -263,10 +263,10 @@ class PluginPdfProblem extends PluginPdfCommon
         );
         foreach ($job->getGroups(CommonITILActor::ASSIGN) as $d) {
             $groups[]
-            = Toolbox::stripTags(Glpi\Toolbox\Sanitizer::unsanitize(Dropdown::getDropdownName(
+            = Toolbox::stripTags(Dropdown::getDropdownName(
                 'glpi_groups',
                 $d['groups_id'],
-            )));
+            ));
         }
         if (count($groups)) {
             $listgroups = implode(', ', $groups);
@@ -315,35 +315,26 @@ class PluginPdfProblem extends PluginPdfCommon
 
         $text = '';
         if ($job->fields['impactcontent']) {
-            $text = Toolbox::stripTags(Glpi\Toolbox\Sanitizer::unsanitize(
+            $text = Toolbox::stripTags(
                 html_entity_decode(
                     $job->getField('impactcontent'),
-                    ENT_QUOTES,
-                    'UTF-8',
-                ),
             ));
         }
         $pdf->displayText('<b><i>' . sprintf(__('%1$s: %2$s'), __('Impacts') . '</i></b>', $text));
 
         if ($job->fields['causecontent']) {
-            $text = Toolbox::stripTags(Glpi\Toolbox\Sanitizer::unsanitize(
+            $text = Toolbox::stripTags(
                 html_entity_decode(
                     $job->getField('causecontent'),
-                    ENT_QUOTES,
-                    'UTF-8',
-                ),
             ));
         }
 
         $pdf->displayText('<b><i>' . sprintf(__('%1$s: %2$s'), __('Causes') . '</i></b>', $text));
 
         if ($job->fields['symptomcontent']) {
-            $text = Toolbox::stripTags(Glpi\Toolbox\Sanitizer::unsanitize(
+            $text = Toolbox::stripTags(
                 html_entity_decode(
                     $job->getField('symptomcontent'),
-                    ENT_QUOTES,
-                    'UTF-8',
-                ),
             ));
         }
 

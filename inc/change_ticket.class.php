@@ -52,17 +52,17 @@ class PluginPdfChange_Ticket extends PluginPdfCommon
             return false;
         }
 
-        $result = $DB->request(
-            'glpi_changes_tickets',
-            ['SELECT'       => 'glpi_changes_tickets.id',
-                'DISTINCT'  => true,
-                'FIELDS'    => ['glpi_tickets.*', 'name'],
-                'LEFT JOIN' => ['glpi_tickets'
-                                  => ['FKEY' => ['glpi_changes_tickets' => 'tickets_id',
-                                      'glpi_tickets'                    => 'id']]],
-                'WHERE' => ['changes_id' => $ID],
-                'ORDER' => 'name'],
-        );
+        $result = $DB->request([
+            'SELECT'       => ['glpi_changes_tickets.id'],
+            'DISTINCT'     => true,
+            'FROM'         => 'glpi_changes_tickets',
+            'FIELDS'       => ['glpi_tickets.*', 'name'],
+            'LEFT JOIN'    => ['glpi_tickets'
+                              => ['FKEY' => ['glpi_changes_tickets' => 'tickets_id',
+                                  'glpi_tickets'                    => 'id']]],
+            'WHERE'        => ['changes_id' => $ID],
+            'ORDER'        => 'name'
+        ]);
         $number = count($result);
 
         $pdf->setColumnsSize(100);
@@ -274,10 +274,10 @@ class PluginPdfChange_Ticket extends PluginPdfCommon
 
                 $first     = true;
                 $listitems = $texteitem = '';
-                foreach ($DB->request(
-                    'glpi_items_tickets',
-                    ['WHERE' => ['tickets_id' => $job->fields['id']]],
-                ) as $data) {
+                foreach ($DB->request([
+                    'FROM'  => 'glpi_items_tickets',
+                    'WHERE' => ['tickets_id' => $job->fields['id']]
+                ]) as $data) {
                     if (!($item = $dbu->getItemForItemtype($data['itemtype']))) {
                         continue;
                     }
@@ -322,17 +322,17 @@ class PluginPdfChange_Ticket extends PluginPdfCommon
             return false;
         }
 
-        $result = $DB->request(
-            'glpi_changes_tickets',
-            ['SELECT'       => 'glpi_changes_tickets.id',
-                'DISTINCT'  => true,
-                'FIELDS'    => ['glpi_changes.*', 'name'],
-                'LEFT JOIN' => ['glpi_changes'
-                                 => ['FKEY' => ['glpi_changes_tickets' => 'changes_id',
-                                     'glpi_changes'                    => 'id']]],
-                'WHERE' => ['tickets_id' => $ID],
-                'ORDER' => 'name'],
-        );
+        $result = $DB->request([
+            'SELECT'       => ['glpi_changes_tickets.id'],
+            'DISTINCT'     => true,
+            'FROM'         => 'glpi_changes_tickets',
+            'FIELDS'       => ['glpi_changes.*', 'name'],
+            'LEFT JOIN'    => ['glpi_changes'
+                             => ['FKEY' => ['glpi_changes_tickets' => 'changes_id',
+                                 'glpi_changes'                    => 'id']]],
+            'WHERE'        => ['tickets_id' => $ID],
+            'ORDER'        => 'name'
+        ]);
         $number = count($result);
 
         $pdf->setColumnsSize(100);

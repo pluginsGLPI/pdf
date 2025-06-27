@@ -91,7 +91,7 @@ class PluginPdfUser extends PluginPdfCommon
         );
 
         $emails = [];
-        foreach ($DB->request('glpi_useremails', ['users_id' => $item->getField('id')]) as $key => $email) {
+        foreach ($DB->request(['FROM' => 'glpi_useremails', 'WHERE' => ['users_id' => $item->getField('id')]]) as $key => $email) {
             if ($email['is_default'] == 1) {
                 $emails[] = $email['email'] . ' (' . __('Default email') . ')';
             } else {

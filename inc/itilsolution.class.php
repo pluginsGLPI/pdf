@@ -48,9 +48,7 @@ class PluginPdfITILSolution extends PluginPdfCommon
 
         $pdf->setColumnsSize(100);
 
-        $soluce = $DB->request(
-            'glpi_itilsolutions',
-            ['itemtype'    => $item->getType(),
+        $soluce = $DB->request(['FROM' => 'glpi_itilsolutions'] + ['itemtype'    => $item->getType(),
                 'items_id' => $item->fields['id']],
         );
 
@@ -71,7 +69,7 @@ class PluginPdfITILSolution extends PluginPdfCommon
                 } else {
                     $title = __('Solution');
                 }
-                $sol = Glpi\Toolbox\Sanitizer::unsanitize(Html::entity_decode_deep($row['content']));
+                $sol = $row['content'];
                 $sol = preg_replace('#data:image/[^;]+;base64,#', '@', $sol);
 
                 preg_match_all('/<img [^>]*src=[\'"]([^\'"]*docid=([0-9]*))[^>]*>/', $sol, $res, PREG_SET_ORDER);

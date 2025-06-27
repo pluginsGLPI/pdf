@@ -52,9 +52,7 @@ class PluginPdfItem_Problem extends PluginPdfCommon
             return false;
         }
 
-        $result = $DB->request(
-            'glpi_items_problems',
-            ['SELECT'      => 'itemtype',
+        $result = $DB->request(['FROM' => 'glpi_items_problems'] + ['SELECT'      => 'itemtype',
                 'DISTINCT' => true,
                 'WHERE'    => ['problems_id' => $instID],
                 'ORDER'    => 'itemtype'],
@@ -89,35 +87,55 @@ class PluginPdfItem_Problem extends PluginPdfCommon
                 if ($item->canView()) {
                     $itemtable = $dbu->getTableForItemType($itemtype);
 
-                    $query = "SELECT `$itemtable`.*,
-                             `glpi_items_problems`.`id` AS IDD,
-                             `glpi_entities`.`id` AS entity
-                         FROM `glpi_items_problems`,
-                              `$itemtable`";
+                    $query_params = [
+                        'SELECT' => [
+                            "$itemtable.*",
+                            'glpi_items_problems.id AS IDD',
+                            'glpi_entities.id AS entity'
+                        ],
+                        'FROM' => 'glpi_items_problems',
+                        'INNER JOIN' => [
+                            $itemtable => [
+                                'ON' => [
+                                    $itemtable => 'id',
+                                    'glpi_items_problems' => 'items_id'
+                                ]
+                            ]
+                        ],
+                        'WHERE' => [
+                            'glpi_items_problems.itemtype' => $itemtype,
+                            'glpi_items_problems.problems_id' => $instID
+                        ],
+                        'ORDER' => ['glpi_entities.completename', "$itemtable.name"]
+                    ];
 
                     if ($itemtype != 'Entity') {
-                        $query .= " LEFT JOIN `glpi_entities`
-                                 ON (`$itemtable`.`entities_id`=`glpi_entities`.`id`) ";
+                        $query_params['LEFT JOIN']['glpi_entities'] = [
+                            'ON' => [
+                                $itemtable => 'entities_id',
+                                'glpi_entities' => 'id'
+                            ]
+                        ];
                     }
-
-                    $query .= " WHERE `$itemtable`.`id` = `glpi_items_problems`.`items_id`
-                              AND `glpi_items_problems`.`itemtype` = '$itemtype'
-                              AND `glpi_items_problems`.`problems_id` = '$instID'";
 
                     if ($item->maybeTemplate()) {
-                        $query .= " AND `$itemtable`.`is_template` = '0'";
+                        $query_params['WHERE']["$itemtable.is_template"] = 0;
                     }
 
-                    $query .= $dbu->getEntitiesRestrictRequest(
-                        ' AND',
+                    // Ajout de la restriction d'entités
+                    $entity_restrict = $dbu->getEntitiesRestrictRequest(
+                        '',
                         $itemtable,
                         '',
                         '',
                         $item->maybeRecursive(),
-                    ) . "
-                      ORDER BY `glpi_entities`.`completename`, `$itemtable`.`name`";
+                    );
 
-                    $result_linked = $DB->request($query);
+                    if (!empty($entity_restrict)) {
+                        $query_params['WHERE'][] = new \Glpi\DBAL\QueryExpression($entity_restrict);
+                    }
+
+                    $result_linked = $DB->request($query_params);
                     $nb            = count($result_linked);
 
                     $prem = true;
@@ -192,36 +210,82 @@ class PluginPdfItem_Problem extends PluginPdfCommon
                 break;
         }
 
-        $SELECT = '';
-        $FROM   = '';
+        $select_fields = [
+            'glpi_problems.*',
+            'glpi_itilcategories.completename AS catname'
+        ];
+
         if (count($_SESSION['glpiactiveentities']) > 1) {
-            $SELECT = ', `glpi_entities`.`completename` AS entityname,
-                      `glpi_problems`.`entities_id` AS entityID ';
-            $FROM = ' LEFT JOIN `glpi_entities`
-                        ON (`glpi_entities`.`id` = `glpi_problems`.`entities_id`) ';
+            $select_fields[] = 'glpi_entities.completename AS entityname';
+            $select_fields[] = 'glpi_problems.entities_id AS entityID';
         }
 
-        $query = "SELECT DISTINCT `glpi_problems`.*,
-                        `glpi_itilcategories`.`completename` AS catname
-                        $SELECT
-                FROM `glpi_problems`
-                LEFT JOIN `glpi_items_problems`
-                  ON (`glpi_problems`.`id` = `glpi_items_problems`.`problems_id`)
-                LEFT JOIN `glpi_groups_problems`
-                  ON (`glpi_problems`.`id` = `glpi_groups_problems`.`problems_id`)
-                LEFT JOIN `glpi_problems_users`
-                  ON (`glpi_problems`.`id` = `glpi_problems_users`.`problems_id`)
-                LEFT JOIN `glpi_problems_suppliers`
-                  ON (`glpi_problems`.`id` = `glpi_problems_suppliers`.`problems_id`)
-                LEFT JOIN `glpi_itilcategories`
-                  ON (`glpi_problems`.`itilcategories_id` = `glpi_itilcategories`.`id`)
-               $FROM
-                WHERE $restrict " .
-                        $dbu->getEntitiesRestrictRequest('AND', 'glpi_problems') . "
-                ORDER BY $order
-                LIMIT " . intval($_SESSION['glpilist_limit']);
+        $left_joins = [
+            'glpi_items_problems' => [
+                'ON' => [
+                    'glpi_problems' => 'id',
+                    'glpi_items_problems' => 'problems_id'
+                ]
+            ],
+            'glpi_groups_problems' => [
+                'ON' => [
+                    'glpi_problems' => 'id',
+                    'glpi_groups_problems' => 'problems_id'
+                ]
+            ],
+            'glpi_problems_users' => [
+                'ON' => [
+                    'glpi_problems' => 'id',
+                    'glpi_problems_users' => 'problems_id'
+                ]
+            ],
+            'glpi_problems_suppliers' => [
+                'ON' => [
+                    'glpi_problems' => 'id',
+                    'glpi_problems_suppliers' => 'problems_id'
+                ]
+            ],
+            'glpi_itilcategories' => [
+                'ON' => [
+                    'glpi_problems' => 'itilcategories_id',
+                    'glpi_itilcategories' => 'id'
+                ]
+            ]
+        ];
 
-        $result = $DB->request($query);
+        if (count($_SESSION['glpiactiveentities']) > 1) {
+            $left_joins['glpi_entities'] = [
+                'ON' => [
+                    'glpi_entities' => 'id',
+                    'glpi_problems' => 'entities_id'
+                ]
+            ];
+        }
+
+        $where_conditions = [];
+
+        if (strpos($restrict, 'IN (') !== false || strpos($restrict, 'AND') !== false || strpos($restrict, 'OR') !== false) {
+            $where_conditions[] = new \Glpi\DBAL\QueryExpression($restrict);
+        } else {
+            $where_conditions[] = new \Glpi\DBAL\QueryExpression($restrict);
+        }
+
+        $entity_restrict = $dbu->getEntitiesRestrictRequest('', 'glpi_problems');
+        if (!empty($entity_restrict)) {
+            $where_conditions[] = new \Glpi\DBAL\QueryExpression($entity_restrict);
+        }
+
+        $query_params = [
+            'SELECT' => $select_fields,
+            'DISTINCT' => true,
+            'FROM' => 'glpi_problems',
+            'LEFT JOIN' => $left_joins,
+            'WHERE' => $where_conditions,
+            'ORDER' => $order,
+            'LIMIT' => intval($_SESSION['glpilist_limit'])
+        ];
+
+        $result = $DB->request($query_params);
         $number = count($result);
 
         $pdf->setColumnsSize(100);
