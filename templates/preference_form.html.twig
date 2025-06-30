@@ -28,7 +28,7 @@
  #  --------------------------------------------------------------------------
  #}
 
-<form name="{{ form_id }}" id="{{ form_id }}" action="{{ action }}" method="post" {{ item_id ? 'target="_blank"' : '' }}>
+<form name="{{ form_id }}" id="{{ form_id }}" action="{{ action }}" class="gap-2" method="post" {{ item_id ? 'target="_blank"' : '' }}>
 
     <div class="card">
         <div class="card-header">
@@ -78,8 +78,8 @@
                                                 <input class="form-check-input" type="checkbox" name="item[{{ option_key }}]" value="1" id="item_{{ option_key|replace({'.': '_', '$': '_', '[': '_', ']': '_'}) }}_{{ form_id }}" {{ values[option_key] is defined ? 'checked' : '' }}>
                                                 <label class="form-check-label text-wrap" for="item_{{ option_key|replace({'.': '_', '$': '_', '[': '_', ']': '_'}) }}_{{ form_id }}">
                                                     {% if debug_mode %}
-                                                        <strong>{{ option_title }}</strong><br>
-                                                        <small class="text-muted">{{ option_key }}</small>
+                                                        <strong>{{ option_title|raw }}</strong>
+                                                        <small class="text-muted">{{ option_key|raw }}</small>
                                                     {% else %}
                                                         {{ option_title|raw }}
                                                     {% endif %}

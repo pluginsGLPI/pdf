@@ -60,8 +60,22 @@ class PluginPdfRemote
 
         if (isset($PLUGIN_HOOKS['plugin_pdf'][$type])
             && class_exists($PLUGIN_HOOKS['plugin_pdf'][$type])) {
-            $item = new $type();
-            $itempdf = new $PLUGIN_HOOKS['plugin_pdf'][$type]($item);
+            $dbu = new DbUtils();
+            if (!$item = $dbu->getItemForItemtype($type)) {
+                return PluginWebservicesMethodCommon::Error(
+                    $protocol,
+                    WEBSERVICES_ERROR_BADPARAMETER,
+                    '',
+                    'type',
+                );
+            }
+
+            $pdf_class = $PLUGIN_HOOKS['plugin_pdf'][$type];
+            if (!is_a($pdf_class, PluginPdfCommon::class, true)) {
+                return PluginWebservicesMethodCommon::Error($protocol, WEBSERVICES_ERROR_FAILED);
+            }
+
+            $itempdf = new $pdf_class($item);
 
             return $itempdf->defineAllTabs();
         }
@@ -142,7 +156,12 @@ class PluginPdfRemote
             $tabs = [$type . '$main'];
         }
         if (isset($PLUGIN_HOOKS['plugin_pdf'][$type]) && class_exists($PLUGIN_HOOKS['plugin_pdf'][$type])) {
-            $itempdf = new $PLUGIN_HOOKS['plugin_pdf'][$type]($item);
+            $pdf_class = $PLUGIN_HOOKS['plugin_pdf'][$type];
+            if (!is_a($pdf_class, PluginPdfCommon::class, true)) {
+                return PluginWebservicesMethodCommon::Error($protocol, WEBSERVICES_ERROR_FAILED);
+            }
+
+            $itempdf = new $pdf_class($item);
             if (isset($params['alltabs'])) {
                 $tabs = $itempdf->defineAllTabs();
                 $tabs = array_keys($tabs);

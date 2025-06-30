@@ -72,7 +72,7 @@ while (($content = fgets($lf, 4096)) !== false) {
     if (!preg_match('/string to be translated/', $content, $reg)) {
         if (fwrite($lf_new, $content) === false) {
             echo 'unable to write in clean lang file';
-            exit;
+            return;
         }
     }
 }
@@ -183,7 +183,7 @@ if ($pot && $po) {
 
         if (fwrite($po, $content) === false) {
             echo 'unable to write in po file';
-            exit;
+            return;
         }
     }
 }

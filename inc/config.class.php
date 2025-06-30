@@ -79,12 +79,17 @@ class PluginPdfConfig extends CommonDBTM
 
     public static function getTypeName($nb = 0)
     {
-        return __('Setup');
+        return __('PDF settings', 'pdf');
     }
 
     public function getName($params = [])
     {
         return __('Print to pdf', 'pdf');
+    }
+
+    public static function getIcon()
+    {
+        return "ti ti-file-type-pdf";
     }
 
     /**
@@ -185,13 +190,7 @@ class PluginPdfConfig extends CommonDBTM
     public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
     {
         if ($item->getType() == 'Config') {
-            $icon_html = sprintf('<i class="ti ti-%s"></i>', 'file-type-pdf');
-
-            return sprintf(
-                '<span class="d-flex align-items-center">%s%s</span>',
-                $icon_html,
-                self::getName(),
-            );
+            return self::createTabEntry(self::getTypeName(), 0, $item::getType(), self::getIcon());
         }
 
         return '';

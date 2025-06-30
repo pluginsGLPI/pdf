@@ -20,5 +20,3 @@ parameters:
     ignoreErrors:
         - '#Call to static method Error\(\) on an unknown class PluginWebservicesMethodCommon#'
         - '#Constant WEBSERVICES_ERROR_[A-Z]+ not found#'
-rules:
-    - GlpiProject\Tools\PHPStan\Rules\GlobalVarTypeRule

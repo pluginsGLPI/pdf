@@ -87,7 +87,7 @@ $pdf->displayTitle('End of Part 1');
 $pdf->setHeader('Another header');
 $pdf->newPage();
 $pdf->displayTitle('Part 2');
-$pdf->addPngFromFile(GLPI_ROOT . '/pics/logo-glpi-login.png', 168, 81);
+$pdf->addPngFromFile(GLPI_ROOT . '/public/pics/logo-glpi-login.png', 168, 81);
 $pdf->displayTitle('End of Part 2');
 
 if (file_put_contents('pdftest.pdf', $pdf->output())) {

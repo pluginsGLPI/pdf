@@ -350,7 +350,10 @@ class PluginPdfAppliance extends PluginPdfCommon
 
         $item = $relation->fields['itemtype'];
 
-        $objtype = new $item();
+        $objtype = $dbu->getItemForItemtype($item);
+        if (!$objtype) {
+            return;
+        }
 
         // selects all the attached relations
         $tablename = $dbu->getTableForItemType($item);
