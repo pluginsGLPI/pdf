@@ -123,13 +123,7 @@ abstract class PluginPdfCommon extends CommonGLPI
     {
         if (Session::haveRight('plugin_pdf', READ)) {
             if (empty($withtemplate)) {
-                $icon_html = sprintf('<i class="ti ti-%s"></i>', 'file-type-pdf');
-
-                return sprintf(
-                    '<span class="d-flex align-items-center">%s%s</span>',
-                    $icon_html,
-                    __('Print to pdf', 'pdf'),
-                );
+                return self::createTabEntry(__('Print to pdf', 'pdf'), 0, $item::getType(), PluginPdfConfig::getIcon());
             }
         }
         return '';
@@ -620,6 +614,9 @@ abstract class PluginPdfCommon extends CommonGLPI
         CommonDBTM $item,
         array $ids
     ) {
+        /** @var array $CFG_GLPI */
+        global $CFG_GLPI;
+
         switch ($ma->getAction()) {
             case 'DoIt':
                 $tab_id = [];
@@ -630,9 +627,8 @@ abstract class PluginPdfCommon extends CommonGLPI
                 }
                 $_SESSION['plugin_pdf']['type']   = $item->getType();
                 $_SESSION['plugin_pdf']['tab_id'] = serialize($tab_id);
-                $webDir                           = Plugin::getPhpDir('pdf', false);
                 echo "<script type='text/javascript'>
-                      location.href='/plugins/pdf/front/export.massive.php'</script>";
+                      location.href='" . $CFG_GLPI['root_doc'] . "/plugins/pdf/front/export.massive.php'</script>";
                 break;
         }
     }

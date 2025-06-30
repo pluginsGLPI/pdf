@@ -34,6 +34,11 @@ class PluginPdfProfile extends Profile
 {
     public static $rightname = 'profile';
 
+    public static function getTypeName($nb = 0)
+    {
+        return _n('PDF profile', 'PDF profiles', $nb, 'pdf');
+    }
+
     public function rawSearchOptions()
     {
         $tab = [];
@@ -91,13 +96,7 @@ class PluginPdfProfile extends Profile
     public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
     {
         if ($item->getType() == 'Profile') {
-            $icon_html = sprintf('<i class="ti ti-%s"></i>', 'file-type-pdf');
-
-            return sprintf(
-                '<span class="d-flex align-items-center">%s%s</span>',
-                $icon_html,
-                __('Print to pdf', 'pdf'),
-            );
+            return self::createTabEntry(self::getTypeName(), 0, $item::getType(), PluginPdfConfig::getIcon());
         }
 
         return '';
