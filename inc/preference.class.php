@@ -36,6 +36,11 @@ class PluginPdfPreference extends CommonDBTM
 {
     public static $rightname = 'plugin_pdf';
 
+    public static function getTypeName($nb = 0)
+    {
+        return __('PDF preferences', 'pdf');
+    }
+
     public static function showPreferences()
     {
         /** @var array $PLUGIN_HOOKS */
@@ -80,7 +85,13 @@ class PluginPdfPreference extends CommonDBTM
             || !class_exists($PLUGIN_HOOKS['plugin_pdf'][$type])) {
             return;
         }
-        $itempdf = new $PLUGIN_HOOKS['plugin_pdf'][$type]($item);
+
+        $pdf_class = $PLUGIN_HOOKS['plugin_pdf'][$type];
+        if (!is_a($pdf_class, PluginPdfCommon::class, true)) {
+            return;
+        }
+
+        $itempdf = new $pdf_class($item);
         $options = $itempdf->defineAllTabsPDF();
 
         $landscape = false;
@@ -127,15 +138,8 @@ class PluginPdfPreference extends CommonDBTM
     public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
     {
         if (($item->getType() == 'Preference')) {
-            $icon_html = sprintf('<i class="ti ti-%s"></i>', 'file-type-pdf');
-
-            return sprintf(
-                '<span class="d-flex align-items-center">%s%s</span>',
-                $icon_html,
-                __('Print to pdf', 'pdf'),
-            );
+            return self::createTabEntry(self::getTypeName(), 0, $item::getType(), PluginPdfConfig::getIcon());
         }
-
         return '';
     }
 

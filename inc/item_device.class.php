@@ -60,7 +60,11 @@ class PluginPdfItem_Device extends PluginPdfCommon
 
         $vide = true;
         foreach ($devtypes as $itemtype) {
-            $devicetypes   = new $itemtype();
+            $dbu_local = new DbUtils();
+            $devicetypes = $dbu_local->getItemForItemtype($itemtype);
+            if (!$devicetypes) {
+                continue;
+            }
             $specificities = $devicetypes->getSpecificities();
             $specif_fields = array_keys($specificities);
 
@@ -89,9 +93,15 @@ class PluginPdfItem_Device extends PluginPdfCommon
                 'GROUPBY' => $group_by,
             ];
 
-            $device     = new $associated_type();
-            $itemdevice = new $itemtype();
+            $dbu = new DbUtils();
+            // Validate that the types are valid before using them
+            if (!$dbu->getItemForItemtype($associated_type) || !$dbu->getItemForItemtype($itemtype)) {
+                continue;
+            }
+
             foreach ($DB->request($query_params) as $data) {
+                $device = $dbu->getItemForItemtype($associated_type);
+                $itemdevice = $dbu->getItemForItemtype($itemtype);
                 $itemdevice->getFromDB($data['id']);
                 if ($device->getFromDB($data[$fk])) {
                     $spec = $device->getAdditionalFields();
