@@ -38,7 +38,7 @@ class PluginPdfPreference extends CommonDBTM
 
     public static function getTypeName($nb = 0)
     {
-        return __('PDF preferences', 'pdf');
+        return __('PDF export', 'pdf');
     }
 
     public static function showPreferences()

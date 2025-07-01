@@ -36,7 +36,7 @@ class PluginPdfProfile extends Profile
 
     public static function getTypeName($nb = 0)
     {
-        return _n('PDF profile', 'PDF profiles', $nb, 'pdf');
+        return _n('PDF export', 'PDF export', $nb, 'pdf');
     }
 
     public function rawSearchOptions()
@@ -44,7 +44,7 @@ class PluginPdfProfile extends Profile
         $tab = [];
 
         $tab[] = ['id' => 'common',
-            'name'     => __('Print to pdf', 'pdf')];
+            'name'     => __('PDF export', 'pdf')];
 
 
         $tab[] = ['id'  => '2',
@@ -72,11 +72,11 @@ class PluginPdfProfile extends Profile
             $checked = 1;
         }
         echo "<table class='tab_cadre_fixe'>";
-        echo "<tr><th colspan='2' class='center b'>" . __('Print to pdf', 'pdf');
+        echo "<tr><th colspan='2' class='center b'>" . __('PDF export', 'pdf');
         echo '</th></tr>';
 
         echo "<tr class='tab_bg_1'>";
-        echo '<td>' . __('Print to pdf', 'pdf') . '</td><td>';
+        echo '<td>' . __('PDF export', 'pdf') . '</td><td>';
         Html::showCheckbox(['name' => '_plugin_pdf',
             'checked'              => $checked]);
         echo "</td></tr></table>\n";
@@ -152,7 +152,7 @@ class PluginPdfProfile extends Profile
     public static function getAllRights($all = false)
     {
         $rights = [['itemtype' => 'PluginPdf',
-            'label'            => __('Print to pdf', 'pdf'),
+            'label'            => __('PDF export', 'pdf'),
             'field'            => 'plugin_pdf']];
 
         return $rights;
