@@ -17,5 +17,3 @@ parameters:
         - ../../src
     stubFiles:
         - ../../stubs/glpi_constants.php
-    ignoreErrors:
-        - '#Constant WEBSERVICES_ERROR_[A-Z]+ not found#'
