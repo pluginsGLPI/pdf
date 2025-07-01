@@ -79,12 +79,12 @@ class PluginPdfConfig extends CommonDBTM
 
     public static function getTypeName($nb = 0)
     {
-        return __('PDF settings', 'pdf');
+        return __('PDF export', 'pdf');
     }
 
     public function getName($params = [])
     {
-        return __('Print to pdf', 'pdf');
+        return __('PDF exportf', 'pdf');
     }
 
     public static function getIcon()

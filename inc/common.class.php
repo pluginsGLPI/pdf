@@ -123,7 +123,7 @@ abstract class PluginPdfCommon extends CommonGLPI
     {
         if (Session::haveRight('plugin_pdf', READ)) {
             if (empty($withtemplate)) {
-                return self::createTabEntry(__('Print to pdf', 'pdf'), 0, $item::getType(), PluginPdfConfig::getIcon());
+                return self::createTabEntry(__('PDF export', 'pdf'), 0, $item::getType(), PluginPdfConfig::getIcon());
             }
         }
         return '';
