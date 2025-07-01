@@ -105,16 +105,3 @@ function plugin_pdf_uninstall()
 
     return true;
 }
-
-
-/**
- * @since version 1.0.2
-**/
-function plugin_pdf_registerMethods()
-{
-    /** @var array $WEBSERVICES_METHOD */
-    global $WEBSERVICES_METHOD;
-
-    $WEBSERVICES_METHOD['pdf.getTabs'] = ['PluginPdfRemote', 'methodGetTabs'];
-    $WEBSERVICES_METHOD['pdf.getPdf']  = ['PluginPdfRemote', 'methodGetPdf'];
-}
