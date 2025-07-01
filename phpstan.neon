@@ -18,5 +18,4 @@ parameters:
     stubFiles:
         - ../../stubs/glpi_constants.php
     ignoreErrors:
-        - '#Call to static method Error\(\) on an unknown class PluginWebservicesMethodCommon#'
         - '#Constant WEBSERVICES_ERROR_[A-Z]+ not found#'
