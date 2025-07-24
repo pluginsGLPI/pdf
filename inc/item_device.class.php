@@ -77,7 +77,7 @@ class PluginPdfItem_Device extends PluginPdfCommon
                 $select_fields = array_merge($select_fields, $specif_fields);
             }
 
-            // Construction de la clause GROUP BY
+            // Construction of the GROUP BY clause
             $group_by = [$fk];
             if (!empty($specif_fields)) {
                 $group_by = array_merge($group_by, $specif_fields);
