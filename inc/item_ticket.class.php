@@ -132,7 +132,7 @@ class PluginPdfItem_Ticket extends PluginPdfCommon
                         $where_conditions[] = new \Glpi\DBAL\QueryExpression($entity_restrict);
                     }
 
-                    // Construction de la requête finale
+                    // Building the final query
                     $query_params = [
                         'SELECT' => $select_fields,
                         'FROM' => $itemtable,
