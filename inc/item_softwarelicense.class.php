@@ -195,7 +195,7 @@ class PluginPdfItem_SoftwareLicense extends PluginPdfCommon
                 'LIMIT' => intval($_SESSION['glpilist_limit']),
             ];
 
-            // Ajout de la restriction d'entités
+            // Addition of entity restriction
             $entity_restrict = $dbu->getEntitiesRestrictRequest('', 'glpi_computers');
             if (!empty($entity_restrict)) {
                 $query_params['WHERE'][] = new \Glpi\DBAL\QueryExpression($entity_restrict);
