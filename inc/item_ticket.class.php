@@ -534,7 +534,10 @@ class PluginPdfItem_Ticket extends PluginPdfCommon
                 $first     = true;
                 $listitems = $texteitem = '';
                 foreach ($DB->request(
-                    ['FROM' => 'glpi_items_tickets'] + ['WHERE' => ['tickets_id' => $job->fields['id']]],
+                    [
+                        'FROM' => 'glpi_items_tickets',
+                        'WHERE' => ['tickets_id' => $job->fields['id']]
+                    ],
                 ) as $data) {
                     if (!($item = $dbu->getItemForItemtype($data['itemtype']))) {
                         continue;
