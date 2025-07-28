@@ -53,7 +53,9 @@ class PluginPdfItem_Ticket extends PluginPdfCommon
         }
 
         $result = $DB->request(
-            ['FROM' => 'glpi_items_tickets'] + ['SELECT'      => 'itemtype',
+            [
+                'SELECT'      => 'itemtype',
+                'FROM' => 'glpi_items_tickets'
                 'DISTINCT' => true,
                 'WHERE'    => ['tickets_id' => $instID],
                 'ORDER'    => 'itemtype'],
