@@ -377,7 +377,7 @@ class PluginPdfConfig extends CommonDBTM
         $currency = PluginPdfConfig::getInstance();
 
         $fmt = numfmt_create($language, NumberFormatter::CURRENCY);
-        $val = numfmt_format_currency($fmt, $value, $currency->getField('currency'));
+        $val = numfmt_format_currency($fmt, (float) $value, $currency->getField('currency'));
         foreach ($PDF_DEVICES as $option => $value) {
             if ($currency->fields['currency'] == $option) {
                 $sym = $value[1];
