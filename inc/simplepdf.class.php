@@ -358,12 +358,12 @@ class PluginPdfSimplePDF
             function ($matches) use ($allowed) {
                 $tag = strtolower($matches[1]);
                 if (in_array($tag, $allowed)) {
-                    return $matches[0]; // balise autorisée → on garde
+                    return $matches[0];
                 } else {
-                    return htmlspecialchars($matches[0], ENT_NOQUOTES, 'UTF-8'); // balise non autorisée → on escape
+                    return htmlspecialchars($matches[0], ENT_NOQUOTES, 'UTF-8');
                 }
             },
-            $content
+            $content,
         );
         if (!preg_match("/<br\s?\/?>/", $content) && !preg_match('/<p>/', $content)) {
             $content = nl2br($content);
