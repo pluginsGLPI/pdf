@@ -346,6 +346,25 @@ class PluginPdfSimplePDF
         $this->setColumnsSize(100);
         $text    = $name . ' ' . $content;
         $content = Html::entity_decode_deep($text);
+        $allowed = [
+            'p','b','i','u','em','strong','br','span','div',
+            'table','thead','tbody','tr','td','th',
+            'ul','ol','li',
+            'h1','h2','h3','h4','h5','h6',
+            'a','pre','code','img', 'colgroup', 'col',
+        ];
+        $content = preg_replace_callback(
+            '/<\/?([a-zA-Z0-9]+)(\s[^>]*)?>/',
+            function ($matches) use ($allowed) {
+                $tag = strtolower($matches[1]);
+                if (in_array($tag, $allowed)) {
+                    return $matches[0]; // balise autorisée → on garde
+                } else {
+                    return htmlspecialchars($matches[0], ENT_NOQUOTES, 'UTF-8'); // balise non autorisée → on escape
+                }
+            },
+            $content
+        );
         if (!preg_match("/<br\s?\/?>/", $content) && !preg_match('/<p>/', $content)) {
             $content = nl2br($content);
         }
