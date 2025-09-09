@@ -40,7 +40,7 @@ abstract class PluginPdfCommon extends CommonGLPI
     /**
      * Constructor, should intialize $this->obj property
     **/
-    public function __construct(CommonGLPI $obj = null)
+    public function __construct(?CommonGLPI $obj = null)
     {
         if ($obj) {
             $this->obj = $obj;

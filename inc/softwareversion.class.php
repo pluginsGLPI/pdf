@@ -34,7 +34,7 @@ class PluginPdfSoftwareVersion extends PluginPdfCommon
 {
     public static $rightname = 'plugin_pdf';
 
-    public function __construct(CommonGLPI $obj = null)
+    public function __construct(?CommonGLPI $obj = null)
     {
         $this->obj = ($obj ? $obj : new SoftwareVersion());
     }

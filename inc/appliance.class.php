@@ -37,7 +37,7 @@ class PluginPdfAppliance extends PluginPdfCommon
     /**
      * @param $obj (defult NULL)
      **/
-    public function __construct(CommonGLPI $obj = null)
+    public function __construct(?CommonGLPI $obj = null)
     {
         $this->obj = ($obj ? $obj : new Appliance());
     }
