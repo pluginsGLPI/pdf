@@ -133,7 +133,7 @@ class PluginPdfSimplePDF
         ) {
             $this->pdf->SetHeaderData($hook['logo_path'], 15, $msg, '');
         } else {
-            $path = $CFG_GLPI['root_doc'] . '/plugins/pdf/public/pics/';
+            $path = GLPI_ROOT . '/plugins/pdf/public/pics/';
             $this->pdf->SetHeaderData($path . 'fd_logo.png', 15, $msg, '');
         }
     }
