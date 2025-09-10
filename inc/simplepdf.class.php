@@ -113,6 +113,10 @@ class PluginPdfSimplePDF
     **/
     public function setHeader($msg)
     {
+        /** @var array $CFG_GLPI */
+        global $CFG_GLPI;
+
+
         $this->header = $msg;
         $this->pdf->resetHeaderTemplate();
         $this->pdf->SetTitle($msg);
@@ -129,7 +133,7 @@ class PluginPdfSimplePDF
         ) {
             $this->pdf->SetHeaderData($hook['logo_path'], 15, $msg, '');
         } else {
-            $path = Plugin::getPhpDir('pdf') . '/public/pics/';
+            $path = $CFG_GLPI['root_doc'] . '/plugins/pdf/public/pics/';
             $this->pdf->SetHeaderData($path . 'fd_logo.png', 15, $msg, '');
         }
     }
