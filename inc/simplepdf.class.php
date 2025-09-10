@@ -113,10 +113,6 @@ class PluginPdfSimplePDF
     **/
     public function setHeader($msg)
     {
-        /** @var array $CFG_GLPI */
-        global $CFG_GLPI;
-
-
         $this->header = $msg;
         $this->pdf->resetHeaderTemplate();
         $this->pdf->SetTitle($msg);
