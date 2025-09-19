@@ -228,7 +228,11 @@ class PluginPdfContract_Item extends PluginPdfCommon
                     $prem = true;
                     $nb   = count($datas);
                     foreach ($datas as $objdata) {
-                        $item = new $itemtype();
+                        $dbu = new DbUtils();
+                        $item = $dbu->getItemForItemtype($itemtype);
+                        if (!$item) {
+                            continue;
+                        }
                         if ($item instanceof Item_Devices) {
                             $name = $objdata['name_device'];
                         } else {

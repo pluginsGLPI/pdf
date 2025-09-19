@@ -71,13 +71,9 @@ class PluginPdfKnowbaseItem extends PluginPdfCommon
         ));
 
         $question
-        = Toolbox::stripTags(Glpi\Toolbox\Sanitizer::unsanitize(html_entity_decode(
-            $item->getField('name'),
-            ENT_QUOTES,
-            'UTF-8',
-        )));
+        = Toolbox::stripTags(html_entity_decode($item->getField('name')));
 
-        $answer = Glpi\Toolbox\Sanitizer::unsanitize(Html::entity_decode_deep($item->getField('answer')));
+        $answer = $item->getField('answer');
         $answer = preg_replace('#data:image/[^;]+;base64,#', '@', $answer);
 
         preg_match_all('/<img [^>]*src=[\'"]([^\'"]*docid=([0-9]*))[^>]*>/', $answer, $res, PREG_SET_ORDER);

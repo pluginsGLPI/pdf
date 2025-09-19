@@ -1,12 +1,13 @@
 {
     "require": {
-        "php": ">=7.4",
-        "symfony/yaml": "^5.4",
+        "php": ">=8.2",
+        "symfony/yaml": "^7.3",
         "tecnickcom/tcpdf": "^6.4"
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^3.73",
         "friendsoftwig/twigcs": "^6.1",
+        "glpi-project/phpstan-glpi": "^1.0",
         "glpi-project/tools": "^0.7.4",
         "php-parallel-lint/php-parallel-lint": "^1.4",
         "phpstan/extension-installer": "^1.4",
@@ -16,7 +17,7 @@
     "config": {
         "optimize-autoloader": true,
         "platform": {
-            "php": "7.4.0"
+            "php": "8.2.99"
         },
         "sort-packages": true,
         "allow-plugins": {

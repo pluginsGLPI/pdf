@@ -79,12 +79,17 @@ class PluginPdfConfig extends CommonDBTM
 
     public static function getTypeName($nb = 0)
     {
-        return __('Setup');
+        return __('PDF export', 'pdf');
     }
 
     public function getName($params = [])
     {
-        return __('Print to pdf', 'pdf');
+        return __('PDF exportf', 'pdf');
+    }
+
+    public static function getIcon()
+    {
+        return "ti ti-file-type-pdf";
     }
 
     /**
@@ -121,14 +126,12 @@ class PluginPdfConfig extends CommonDBTM
                      PRIMARY KEY  (`id`)
                    ) ENGINE=InnoDB  DEFAULT CHARSET= {$default_charset}
                  COLLATE = {$default_collation} ROW_FORMAT=DYNAMIC";
-            $DB->doQueryOrDie($query, 'Error in creating glpi_plugin_pdf_configs' .
-                                    '<br>' . $DB->error());
+            $DB->doQuery($query);
 
             $query = "INSERT INTO `$table`
                          (id, currency)
                    VALUES (1, 'EUR')";
-            $DB->doQueryOrDie($query, 'Error during update glpi_plugin_pdf_configs' .
-                                    '<br>' . $DB->error());
+            $DB->doQuery($query);
         } else {
             // 2.1.0
             if ($DB->fieldExists($table, 'date_mod')) {
@@ -187,7 +190,7 @@ class PluginPdfConfig extends CommonDBTM
     public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
     {
         if ($item->getType() == 'Config') {
-            return $this->getName();
+            return self::createTabEntry(self::getTypeName(), 0, $item::getType(), self::getIcon());
         }
 
         return '';

@@ -3,7 +3,8 @@ parameters:
         maximumNumberOfProcesses: 2
     level: 5
     bootstrapFiles:
-        - ../../inc/based_config.php
+        - ../../stubs/glpi_constants.php
+        - ../../vendor/autoload.php
     paths:
         - front
         - inc
@@ -14,10 +15,3 @@ parameters:
     scanDirectories:
         - ../../inc
         - ../../src
-    stubFiles:
-        - ../../stubs/glpi_constants.php
-    ignoreErrors:
-        - '#Call to static method Error\(\) on an unknown class PluginWebservicesMethodCommon#'
-        - '#Constant WEBSERVICES_ERROR_[A-Z]+ not found#'
-rules:
-    - GlpiProject\Tools\PHPStan\Rules\GlobalVarTypeRule

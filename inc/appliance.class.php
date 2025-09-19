@@ -220,9 +220,11 @@ class PluginPdfAppliance extends PluginPdfCommon
         $pdf->setColumnsSize(100);
         $pdf->displayTitle('<b>' . _n('Associated item', 'Associated items', 2) . '</b>');
 
-        $result = $DB->request('SELECT DISTINCT `itemtype`
-                              FROM `glpi_appliances_items`
-                              WHERE `appliances_id` = ' . $instID);
+        $result = $DB->request([
+            'SELECT' => 'DISTINCT itemtype',
+            'FROM'   => 'glpi_appliances_items',
+            'WHERE'  => ['appliances_id' => $instID],
+        ]);
         $number = count($result);
 
         if (Session::isMultiEntitiesMode()) {
@@ -348,7 +350,10 @@ class PluginPdfAppliance extends PluginPdfCommon
 
         $item = $relation->fields['itemtype'];
 
-        $objtype = new $item();
+        $objtype = $dbu->getItemForItemtype($item);
+        if (!$objtype) {
+            return;
+        }
 
         // selects all the attached relations
         $tablename = $dbu->getTableForItemType($item);

@@ -123,7 +123,7 @@ abstract class PluginPdfCommon extends CommonGLPI
     {
         if (Session::haveRight('plugin_pdf', READ)) {
             if (empty($withtemplate)) {
-                return __('Print to pdf', 'pdf');
+                return self::createTabEntry(__('PDF export', 'pdf'), 0, $item::getType(), PluginPdfConfig::getIcon());
             }
         }
         return '';
@@ -280,8 +280,11 @@ abstract class PluginPdfCommon extends CommonGLPI
     **/
     public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
     {
+        /** @var array $CFG_GLPI */
+        global $CFG_GLPI;
+
         $pref = new PluginPdfPreference();
-        $pref->menu($item, Plugin::getWebDir('pdf') . '/front/export.php');
+        $pref->menu($item, $CFG_GLPI['root_doc'] . '/plugins/pdf/front/export.php');
 
         return true;
     }
@@ -308,7 +311,7 @@ abstract class PluginPdfCommon extends CommonGLPI
             if (Session::isMultiEntitiesMode() && $this->obj->isEntityAssign()) {
                 $entity = ' (' . Dropdown::getDropdownName('glpi_entities', $this->obj->getEntityID()) . ')';
             }
-            $header = Glpi\Toolbox\Sanitizer::unsanitize(sprintf(
+            $header = sprintf(
                 __('%1$s - %2$s'),
                 $this->obj->getTypeName(),
                 sprintf(
@@ -316,7 +319,7 @@ abstract class PluginPdfCommon extends CommonGLPI
                     $name,
                     $entity,
                 ),
-            ));
+            );
             $this->pdf->setHeader($header);
 
             return true;
@@ -611,6 +614,9 @@ abstract class PluginPdfCommon extends CommonGLPI
         CommonDBTM $item,
         array $ids
     ) {
+        /** @var array $CFG_GLPI */
+        global $CFG_GLPI;
+
         switch ($ma->getAction()) {
             case 'DoIt':
                 $tab_id = [];
@@ -621,9 +627,8 @@ abstract class PluginPdfCommon extends CommonGLPI
                 }
                 $_SESSION['plugin_pdf']['type']   = $item->getType();
                 $_SESSION['plugin_pdf']['tab_id'] = serialize($tab_id);
-                $webDir                           = Plugin::getWebDir('pdf');
                 echo "<script type='text/javascript'>
-                      location.href='$webDir/front/export.massive.php'</script>";
+                      location.href='" . $CFG_GLPI['root_doc'] . "/plugins/pdf/front/export.massive.php'</script>";
                 break;
         }
     }

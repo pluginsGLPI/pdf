@@ -146,7 +146,7 @@ class PluginPdfTicketTask extends PluginPdfCommon
                     Toolbox::stripTags($dbu->getUserName($data['users_id'])),
                     $planification,
                 );
-                $content = Glpi\Toolbox\Sanitizer::unsanitize(Html::entity_decode_deep($data['content']));
+                $content = $data['content'];
                 $content = preg_replace('#data:image/[^;]+;base64,#', '@', $content);
 
                 preg_match_all('/<img [^>]*src=[\'"]([^\'"]*docid=([0-9]*))[^>]*>/', $content, $res, PREG_SET_ORDER);

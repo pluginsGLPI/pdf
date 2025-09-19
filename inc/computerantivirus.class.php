@@ -36,7 +36,7 @@ class PluginPdfComputerAntivirus extends PluginPdfCommon
 
     public function __construct(?CommonGLPI $obj = null)
     {
-        $this->obj = ($obj ? $obj : new ComputerAntivirus());
+        $this->obj = ($obj ? $obj : new ItemAntivirus());
     }
 
     public static function pdfForComputer(PluginPdfSimplePDF $pdf, Computer $item)
@@ -46,7 +46,7 @@ class PluginPdfComputerAntivirus extends PluginPdfCommon
 
         $ID = $item->getField('id');
 
-        $result = $DB->request('glpi_computerantiviruses', ['computers_id' => $ID,
+        $result = $DB->request(['FROM' => 'glpi_itemantiviruses'] + ['computers_id' => $ID,
             'is_deleted'                                                   => 0]);
         $number = count($result);
 
@@ -74,7 +74,7 @@ class PluginPdfComputerAntivirus extends PluginPdfCommon
                 __('Expiration date'),
             );
 
-            $antivirus = new ComputerAntivirus();
+            $antivirus = new ItemAntivirus();
             foreach ($result as $data) {
                 $pdf->displayLine(
                     $data['name'],

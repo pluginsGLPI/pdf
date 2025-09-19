@@ -30,17 +30,13 @@
  *  --------------------------------------------------------------------------
  */
 
+/** @var array $PLUGIN_HOOKS */
+global $PLUGIN_HOOKS;
+
 define('GLPI_KEEP_CSRF_TOKEN', true); // 0.90
 $token = (isset($_POST['_glpi_csrf_token']) ? $_POST['_glpi_csrf_token'] : false);
 
-include('../../../inc/includes.php');
-
 Session::checkRight('plugin_pdf', READ);
-
-/* 0.85 Hack to allow multiple exports, yes this is an hack, yes an awful one */
-if (!isset($_SESSION['glpicsrftokens'][$token])) {
-    $_SESSION['glpicsrftokens'][$token] = time() + GLPI_CSRF_EXPIRES;
-}
 
 Plugin::load('pdf', true);
 
@@ -69,13 +65,20 @@ if (isset($_POST['plugin_pdf_inventory_type'])
         $tab[] = $type . '$main';
     }
 
-    if (isset($PLUGIN_HOOKS['plugin_pdf'][$type])
-        && class_exists($PLUGIN_HOOKS['plugin_pdf'][$type])) {
-        $itempdf = new $PLUGIN_HOOKS['plugin_pdf'][$type]($item);
+    if (
+        isset($PLUGIN_HOOKS['plugin_pdf'][$type])
+        && class_exists($PLUGIN_HOOKS['plugin_pdf'][$type])
+    ) {
+        $pdf_class = $PLUGIN_HOOKS['plugin_pdf'][$type];
+        if (!is_a($pdf_class, PluginPdfCommon::class, true)) {
+            throw new \RuntimeException('Invalid PDF plugin class for type: ' . $type);
+        }
+
+        $itempdf = new $pdf_class($item);
         $itempdf->generatePDF([$_POST['itemID']], $tab, (isset($_POST['page']) ? $_POST['page'] : 0));
     } else {
-        die('Missing hook');
+        throw new \RuntimeException('Missing PDF plugin hook for type: ' . $type);
     }
 } else {
-    die('Missing context');
+    throw new \InvalidArgumentException('Missing required context or parameters for PDF generation');
 }

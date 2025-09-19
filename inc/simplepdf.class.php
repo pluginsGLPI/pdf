@@ -129,7 +129,7 @@ class PluginPdfSimplePDF
         ) {
             $this->pdf->SetHeaderData($hook['logo_path'], 15, $msg, '');
         } else {
-            $path = Plugin::getPhpDir('pdf') . '/pics/';
+            $path = Plugin::getPhpDir('pdf') . '/public/pics/';
             $this->pdf->SetHeaderData($path . 'fd_logo.png', 15, $msg, '');
         }
     }
@@ -345,7 +345,7 @@ class PluginPdfSimplePDF
 
         $this->setColumnsSize(100);
         $text    = $name . ' ' . $content;
-        $content = Html::entity_decode_deep($text);
+        $content = $text;
         if (!preg_match("/<br\s?\/?>/", $content) && !preg_match('/<p>/', $content)) {
             $content = nl2br($content);
         }

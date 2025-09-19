@@ -60,29 +60,48 @@ class PluginPdfItem_Device extends PluginPdfCommon
 
         $vide = true;
         foreach ($devtypes as $itemtype) {
-            $devicetypes   = new $itemtype();
+            $dbu_local = new DbUtils();
+            $devicetypes = $dbu_local->getItemForItemtype($itemtype);
+            if (!$devicetypes) {
+                continue;
+            }
             $specificities = $devicetypes->getSpecificities();
             $specif_fields = array_keys($specificities);
-            $specif_text   = implode(',', $specif_fields);
 
-            if (!empty($specif_text)) {
-                $specif_text = ' ,' . $specif_text . ' ';
-            }
             $associated_type = str_replace('Item_', '', $itemtype);
             $linktable       = $dbu->getTableForItemType($itemtype);
             $fk              = $dbu->getForeignKeyFieldForTable($dbu->getTableForItemType($associated_type));
 
-            $query = 'SELECT count(*) AS NB, `id`, `' . $fk . '`' . $specif_text . '
-                   FROM `' . $linktable . "`
-                   WHERE `items_id` = '" . $ID . "'
-                         AND `itemtype` = '" . $item->getType() . "'
-                   GROUP BY `" . $fk . '`' . $specif_text;
+            $select_fields = ['COUNT(*) AS NB', 'id', $fk];
+            if (!empty($specif_fields)) {
+                $select_fields = array_merge($select_fields, $specif_fields);
+            }
 
+            // Construction of the GROUP BY clause
+            $group_by = [$fk];
+            if (!empty($specif_fields)) {
+                $group_by = array_merge($group_by, $specif_fields);
+            }
 
+            $query_params = [
+                'SELECT' => $select_fields,
+                'FROM' => $linktable,
+                'WHERE' => [
+                    'items_id' => $ID,
+                    'itemtype' => $item->getType(),
+                ],
+                'GROUPBY' => $group_by,
+            ];
 
-            $device     = new $associated_type();
-            $itemdevice = new $itemtype();
-            foreach ($DB->request($query) as $data) {
+            $dbu = new DbUtils();
+            // Validate that the types are valid before using them
+            if (!$dbu->getItemForItemtype($associated_type) || !$dbu->getItemForItemtype($itemtype)) {
+                continue;
+            }
+
+            foreach ($DB->request($query_params) as $data) {
+                $device = $dbu->getItemForItemtype($associated_type);
+                $itemdevice = $dbu->getItemForItemtype($itemtype);
                 $itemdevice->getFromDB($data['id']);
                 if ($device->getFromDB($data[$fk])) {
                     $spec = $device->getAdditionalFields();

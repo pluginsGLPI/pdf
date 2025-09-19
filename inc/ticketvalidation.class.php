@@ -55,8 +55,7 @@ class PluginPdfTicketValidation extends PluginPdfCommon
         $ID = $ticket->getField('id');
 
         $result = $DB->request(
-            'glpi_ticketvalidations',
-            ['WHERE'    => ['tickets_id' => $ticket->getField('id')],
+            ['FROM' => 'glpi_ticketvalidations'] + ['WHERE'    => ['tickets_id' => $ticket->getField('id')],
                 'ORDER' => 'submission_date DESC'],
         );
 
