@@ -71,11 +71,11 @@ class PluginPdfReservation extends PluginPdfCommon
             $pdf->setColumnsSize(100);
 
             if (count($result) === 0) {
-                $pdf->displayTitle('<b>' . __('No current and future reservations', 'pdf') . '</b>');
+                $pdf->displayTitle('<b>' . __s('No current and future reservations', 'pdf') . '</b>');
             } else {
-                $pdf->displayTitle('<b>' . __('Current and future reservations') . '</b>');
+                $pdf->displayTitle('<b>' . __s('Current and future reservations') . '</b>');
                 $pdf->setColumnsSize(14, 14, 26, 46);
-                $pdf->displayTitle('<i>' . __('Start date'), __('End date'), __('By'), __('Comments') .
+                $pdf->displayTitle('<i>' . __s('Start date'), __s('End date'), __s('By'), __s('Comments') .
                                    '</i>');
 
                 foreach ($result as $data) {
@@ -111,11 +111,11 @@ class PluginPdfReservation extends PluginPdfCommon
             $pdf->setColumnsSize(100);
 
             if (count($result) === 0) {
-                $pdf->displayTitle('<b>' . __('No past reservations', 'pdf') . '</b>');
+                $pdf->displayTitle('<b>' . __s('No past reservations', 'pdf') . '</b>');
             } else {
-                $pdf->displayTitle('<b>' . __('Past reservations') . '</b>');
+                $pdf->displayTitle('<b>' . __s('Past reservations') . '</b>');
                 $pdf->setColumnsSize(14, 14, 26, 46);
-                $pdf->displayTitle('<i>' . __('Start date'), __('End date'), __('By'), __('Comments') .
+                $pdf->displayTitle('<i>' . __s('Start date'), __s('End date'), __s('By'), __s('Comments') .
                                    '</i>');
 
                 foreach ($result as $data) {
@@ -138,7 +138,7 @@ class PluginPdfReservation extends PluginPdfCommon
                 }
             }
         } else {
-            $pdf->displayTitle('<b>' . __('Item not reservable', 'pdf') . '</b>');
+            $pdf->displayTitle('<b>' . __s('Item not reservable', 'pdf') . '</b>');
         }
 
         $pdf->displaySpace();
@@ -176,27 +176,25 @@ class PluginPdfReservation extends PluginPdfCommon
         $result = $DB->request($query);
 
         if (count($result) === 0) {
-            $pdf->displayTitle('<b>' . __('No current and future reservations', 'pdf') . '</b>');
+            $pdf->displayTitle('<b>' . __s('No current and future reservations', 'pdf') . '</b>');
         } else {
-            $pdf->displayTitle('<b>' . __('Current and future reservations') . '</b>');
+            $pdf->displayTitle('<b>' . __s('Current and future reservations') . '</b>');
             $pdf->setColumnsSize(10, 10, 10, 20, 15, 35);
             $pdf->displayTitle(
-                '<i>' . __('Start date'),
-                __('End date'),
-                __('Item'),
-                __('Entity'),
-                __('By'),
-                __('Comments') .
+                '<i>' . __s('Start date'),
+                __s('End date'),
+                __s('Item'),
+                __s('Entity'),
+                __s('By'),
+                __s('Comments') .
                            '</i>',
             );
         }
         $ri = new ReservationItem();
 
         foreach ($result as $data) {
-            if ($ri->getFromDB($data['reservationitems_id']) && $item = getItemForItemtype($ri->fields['itemtype'])) {
-                if ($item->getFromDB($ri->fields['items_id'])) {
-                    $name = $item->fields['name'];
-                }
+            if ($ri->getFromDB($data['reservationitems_id']) && ($item = getItemForItemtype($ri->fields['itemtype'])) && $item->getFromDB($ri->fields['items_id'])) {
+                $name = $item->fields['name'];
             }
             $pdf->displayLine(
                 Html::convDateTime($data['begin']),
@@ -227,26 +225,24 @@ class PluginPdfReservation extends PluginPdfCommon
         $result = $DB->request($query);
 
         if (count($result) === 0) {
-            $pdf->displayTitle('<b>' . __('No past reservations', 'pdf') . '</b>');
+            $pdf->displayTitle('<b>' . __s('No past reservations', 'pdf') . '</b>');
         } else {
-            $pdf->displayTitle('<b>' . __('Past reservations') . '</b>');
+            $pdf->displayTitle('<b>' . __s('Past reservations') . '</b>');
             $pdf->setColumnsSize(10, 10, 10, 20, 15, 35);
             $pdf->displayTitle(
-                '<i>' . __('Start date'),
-                __('End date'),
-                __('Item'),
-                __('Entity'),
-                __('By'),
-                __('Comments') .
+                '<i>' . __s('Start date'),
+                __s('End date'),
+                __s('Item'),
+                __s('Entity'),
+                __s('By'),
+                __s('Comments') .
                             '</i>',
             );
         }
 
         foreach ($result as $data) {
-            if ($ri->getFromDB($data['reservationitems_id']) && $item = getItemForItemtype($ri->fields['itemtype'])) {
-                if ($item->getFromDB($ri->fields['items_id'])) {
-                    $name = $item->fields['name'];
-                }
+            if ($ri->getFromDB($data['reservationitems_id']) && ($item = getItemForItemtype($ri->fields['itemtype'])) && $item->getFromDB($ri->fields['items_id'])) {
+                $name = $item->fields['name'];
             }
             $pdf->displayLine(
                 Html::convDateTime($data['begin']),

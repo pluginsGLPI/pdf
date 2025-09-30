@@ -47,7 +47,7 @@ class PluginPdfChangeValidation extends PluginPdfCommon
         $dbu = new DbUtils();
 
         $pdf->setColumnsSize(100);
-        $pdf->displayTitle('<b>' . __('Approvals for the change', 'pdf') . '</b>');
+        $pdf->displayTitle('<b>' . __s('Approvals for the change', 'pdf') . '</b>');
 
         if (!Session::haveRightsOr(
             'changevalidation',
@@ -71,20 +71,20 @@ class PluginPdfChangeValidation extends PluginPdfCommon
         $pdf->setColumnsSize(100);
         $title = '<b>' . ChangeValidation::getTypeName(2) . '</b>';
         if ($number === 0) {
-            $pdf->displayTitle(sprintf(__('%1$s: %2$s'), $title, __('No item to display')));
+            $pdf->displayTitle(sprintf(__s('%1$s: %2$s'), $title, __s('No item to display')));
         } else {
-            $title = sprintf(__('%1$s: %2$s'), $title, $number);
+            $title = sprintf(__s('%1$s: %2$s'), $title, $number);
             $pdf->displayTitle($title);
 
             $pdf->setColumnsSize(10, 10, 15, 20, 10, 15, 20);
             $pdf->displayTitle(
                 _x('item', 'State'),
-                __('Request date'),
-                __('Approval requester'),
-                __('Request comments'),
-                __('Approval status'),
-                __('Approver'),
-                __('Approval comments'),
+                __s('Request date'),
+                __s('Approval requester'),
+                __s('Request comments'),
+                __s('Approval status'),
+                __s('Approver'),
+                __s('Approval comments'),
             );
 
             foreach ($result as $row) {

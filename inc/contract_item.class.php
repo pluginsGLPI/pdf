@@ -66,19 +66,19 @@ class PluginPdfContract_Item extends PluginPdfCommon
         $pdf->setColumnsSize(100);
         $title = '<b>' . _n('Associated contract', 'Associated contracts', $number) . '</b>';
         if ($number === 0) {
-            $pdf->displayTitle(sprintf(__('%1$s: %2$s'), $title, __('No item to display')));
+            $pdf->displayTitle(sprintf(__s('%1$s: %2$s'), $title, __s('No item to display')));
         } else {
-            $pdf->displayTitle(sprintf(__('%1$s: %2$s'), $title, $number));
+            $pdf->displayTitle(sprintf(__s('%1$s: %2$s'), $title, $number));
 
             $pdf->setColumnsSize(19, 19, 15, 10, 16, 11, 10);
             $pdf->displayTitle(
-                __('Name'),
-                __('Entity'),
+                __s('Name'),
+                __s('Entity'),
                 _x('phone', 'Number'),
-                __('Contract type'),
-                __('Supplier'),
-                __('Start date'),
-                __('Initial contract period'),
+                __s('Contract type'),
+                __s('Supplier'),
+                __s('Start date'),
+                __s('Initial contract period'),
             );
 
             foreach ($result as $row) {
@@ -89,7 +89,7 @@ class PluginPdfContract_Item extends PluginPdfCommon
                     $textduration = '';
                     if ($con->fields['duration'] > 0) {
                         $textduration = sprintf(
-                            __('Valid to %s'),
+                            __s('Valid to %s'),
                             Infocom::getWarrantyExpir(
                                 $con->fields['begin_date'],
                                 $con->fields['duration'],
@@ -107,7 +107,7 @@ class PluginPdfContract_Item extends PluginPdfCommon
                         str_replace('<br>', ' ', $con->getSuppliersNames()),
                         Html::convDate($con->fields['begin_date']),
                         sprintf(
-                            __('%1$s - %2$s'),
+                            __s('%1$s - %2$s'),
                             sprintf(
                                 _n('%d month', '%d months', $con->fields['duration']),
                                 $con->fields['duration'],
@@ -205,19 +205,19 @@ class PluginPdfContract_Item extends PluginPdfCommon
         $title = '<b>' . _n('Item', 'Items', $number) . '</b>';
 
         if ($number === 0) {
-            $pdf->displayTitle(sprintf(__('%1$s: %2$s'), $title, __('No item to display')));
+            $pdf->displayTitle(sprintf(__s('%1$s: %2$s'), $title, __s('No item to display')));
         } else {
-            $title = sprintf(__('%1$s: %2$s'), $title, $number);
+            $title = sprintf(__s('%1$s: %2$s'), $title, $number);
             $pdf->displayTitle($title);
 
             $pdf->setColumnsSize(15, 18, 29, 15, 15, 8);
             $pdf->displayTitle(
-                '<b><i>' . __('Type') . '</i></b>',
-                '<b><i>' . __('Name') . '</i></b>',
-                '<b><i>' . __('Entity') . '</i></b>',
-                '<b><i>' . __('Serial number') . '</i></b>',
-                '<b><i>' . __('Inventory number') . '</i></b>',
-                '<b><i>' . __('Status') . '</i></b>',
+                '<b><i>' . __s('Type') . '</i></b>',
+                '<b><i>' . __s('Name') . '</i></b>',
+                '<b><i>' . __s('Entity') . '</i></b>',
+                '<b><i>' . __s('Serial number') . '</i></b>',
+                '<b><i>' . __s('Inventory number') . '</i></b>',
+                '<b><i>' . __s('Status') . '</i></b>',
             );
 
             $totalnb = 0;
@@ -235,13 +235,13 @@ class PluginPdfContract_Item extends PluginPdfCommon
                         }
                         $name = $item instanceof Item_Devices ? $objdata['name_device'] : $objdata['name'];
                         if (empty($data['name'])) {
-                            $name = sprintf(__('%1$s (%2$s)'), $name, $objdata['id']);
+                            $name = sprintf(__s('%1$s (%2$s)'), $name, $objdata['id']);
                         }
 
                         if ($prem) {
                             $typename = $item->getTypeName($nb);
                             $pdf->displayLine(
-                                Toolbox::stripTags(sprintf(__('%1$s: %2$s'), $typename, $nb)),
+                                Toolbox::stripTags(sprintf(__s('%1$s: %2$s'), $typename, $nb)),
                                 Toolbox::stripTags($name),
                                 Dropdown::getDropdownName('glpi_entities', $objdata['entity']),
                                 Toolbox::stripTags((isset($objdata['serial'])

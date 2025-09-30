@@ -53,7 +53,7 @@ class PluginPdfTicket extends PluginPdfCommon
         $pdf->setColumnsSize(100);
 
         $pdf->displayTitle('<b>' .
-                 (empty($job->fields['name']) ? __('Without title') : $name = $job->fields['name']) . '</b>');
+                 (empty($job->fields['name']) ? __s('Without title') : $name = $job->fields['name']) . '</b>');
 
         if (count($_SESSION['glpiactiveentities']) > 1) {
             $entity = ' (' . Dropdown::getDropdownName(
@@ -73,29 +73,29 @@ class PluginPdfTicket extends PluginPdfCommon
         }
         $pdf->displayLine(
             '<b><i>' . sprintf(
-                __('%1$s: %2$s'),
-                __('Opening date') . '</i></b>',
+                __s('%1$s: %2$s'),
+                __s('Opening date') . '</i></b>',
                 Html::convDateTime($job->fields['date']),
             ),
-            '<b><i>' . sprintf(__('%1$s: %2$s'), __('By') . '</i></b>', $recipient_name),
+            '<b><i>' . sprintf(__s('%1$s: %2$s'), __s('By') . '</i></b>', $recipient_name),
         );
 
         $ttr = '<b><i>' . sprintf(
-            __('%1$s: %2$s'),
-            __('Time to resolve') . '</b></i>',
+            __s('%1$s: %2$s'),
+            __s('Time to resolve') . '</b></i>',
             Html::convDateTime($job->fields['time_to_resolve']),
         );
 
         $tto = '<b><i>' . sprintf(
-            __('%1$s: %2$s'),
-            __('Internal time to own') . '</b></i>',
+            __s('%1$s: %2$s'),
+            __s('Internal time to own') . '</b></i>',
             Html::convDateTime($job->fields['internal_time_to_own']),
         );
 
         if ($job->fields['olas_id_tto'] > 0) {
             $tto .= '<b><i>' . sprintf(
-                __('%1$s: %2$s'),
-                __('OLA') . '</b></i>',
+                __s('%1$s: %2$s'),
+                __s('OLA') . '</b></i>',
                 Toolbox::stripTags(Dropdown::getDropdownName(
                     'glpi_olas',
                     $job->fields['olas_id_tto'],
@@ -106,15 +106,15 @@ class PluginPdfTicket extends PluginPdfCommon
             $nextaction = new OlaLevel_Ticket();
             if ($nextaction->getFromDBForTicket($job->fields['id'], SLM::TTO)) {
                 $tto .= '<br /><b><i>' . sprintf(
-                    __('%1$s: %2$s'),
-                    sprintf(__('Next escalation: %s') . '</b></i>', ''),
+                    __s('%1$s: %2$s'),
+                    sprintf(__s('Next escalation: %s') . '</b></i>', ''),
                     Html::convDateTime($nextaction->fields['date']),
                 );
 
                 if ($olalevel->getFromDB($nextaction->fields['olalevels_id'])) {
                     $tto .= ' <b><i>' . sprintf(
-                        __('%1$s: %2$s'),
-                        __('Escalation level') . '</b></i>',
+                        __s('%1$s: %2$s'),
+                        __s('Escalation level') . '</b></i>',
                         $olalevel->getName(),
                     );
                 }
@@ -123,8 +123,8 @@ class PluginPdfTicket extends PluginPdfCommon
 
         if ($job->fields['slas_id_ttr'] > 0) {
             $ttr .= '<b><i>' . sprintf(
-                __('%1$s: %2$s'),
-                __('SLA') . '</b></i>',
+                __s('%1$s: %2$s'),
+                __s('SLA') . '</b></i>',
                 Toolbox::stripTags(Dropdown::getDropdownName(
                     'glpi_slas',
                     $job->fields['slas_id_ttr'],
@@ -135,15 +135,15 @@ class PluginPdfTicket extends PluginPdfCommon
             $nextaction = new SlaLevel_Ticket();
             if ($nextaction->getFromDBForTicket($job->fields['id'], SLM::TTR)) {
                 $ttr .= '<br /><b><i>' . sprintf(
-                    __('%1$s: %2$s'),
-                    sprintf(__('Next escalation: %s') . '</b></i>', ''),
+                    __s('%1$s: %2$s'),
+                    sprintf(__s('Next escalation: %s') . '</b></i>', ''),
                     Html::convDateTime($nextaction->fields['date']),
                 );
 
                 if ($slalevel->getFromDB($nextaction->fields['slalevels_id'])) {
                     $ttr .= ' <b><i>' . sprintf(
-                        __('%1$s: %2$s'),
-                        __('Escalation level') . '</b></i>',
+                        __s('%1$s: %2$s'),
+                        __s('Escalation level') . '</b></i>',
                         $slalevel->getName(),
                     );
                 }
@@ -154,20 +154,20 @@ class PluginPdfTicket extends PluginPdfCommon
         $lastupdate = Html::convDateTime($job->fields['date_mod']);
         if ($job->fields['users_id_lastupdater'] > 0) {
             $lastupdate = sprintf(
-                __('%1$s by %2$s'),
+                __s('%1$s by %2$s'),
                 $lastupdate,
                 $dbu->getUserName($job->fields['users_id_lastupdater']),
             );
         }
 
         $pdf->displayLine(
-            '<b><i>' . sprintf(__('%1$s: %2$s'), __('Last update') . '</i></b>', $lastupdate),
+            '<b><i>' . sprintf(__s('%1$s: %2$s'), __s('Last update') . '</i></b>', $lastupdate),
         );
 
         $pdf->displayLine(
             '<b><i>' . sprintf(
-                __('%1$s: %2$s'),
-                __('Time to own') . '</b></i>',
+                __s('%1$s: %2$s'),
+                __s('Time to own') . '</b></i>',
                 Html::convDateTime($job->fields['time_to_own']),
             ),
             $ttr,
@@ -176,21 +176,21 @@ class PluginPdfTicket extends PluginPdfCommon
         $pdf->displayLine(
             $tto,
             '<b><i>' . sprintf(
-                __('%1$s: %2$s'),
-                __('Internal time to resolve') . '</b></i>',
+                __s('%1$s: %2$s'),
+                __s('Internal time to resolve') . '</b></i>',
                 Html::convDateTime($job->fields['internal_time_to_resolve']),
             ),
         );
 
         $pdf->displayLine(
             '<b><i>' . sprintf(
-                __('%1$s: %2$s'),
-                __('Type') . '</i></b>',
+                __s('%1$s: %2$s'),
+                __s('Type') . '</i></b>',
                 Toolbox::stripTags(Ticket::getTicketTypeName($job->fields['type'])),
             ),
             '<b><i>' . sprintf(
-                __('%1$s: %2$s'),
-                __('Category') . '</i></b>',
+                __s('%1$s: %2$s'),
+                __s('Category') . '</i></b>',
                 Dropdown::getDropdownName(
                     'glpi_itilcategories',
                     $job->fields['itilcategories_id'],
@@ -201,15 +201,15 @@ class PluginPdfTicket extends PluginPdfCommon
         $status = '';
         if (in_array($job->fields['status'], $job->getSolvedStatusArray())
             || in_array($job->fields['status'], $job->getClosedStatusArray())) {
-            $status = sprintf(__('%1$s %2$s'), '-', Html::convDateTime($job->fields['solvedate']));
+            $status = sprintf(__s('%1$s %2$s'), '-', Html::convDateTime($job->fields['solvedate']));
         }
         if (in_array($job->fields['status'], $job->getClosedStatusArray())) {
-            $status = sprintf(__('%1$s %2$s'), '-', Html::convDateTime($job->fields['closedate']));
+            $status = sprintf(__s('%1$s %2$s'), '-', Html::convDateTime($job->fields['closedate']));
         }
 
         if ($job->fields['status'] == Ticket::WAITING) {
             $status = sprintf(
-                __('%1$s %2$s'),
+                __s('%1$s %2$s'),
                 '-',
                 Html::convDateTime($job->fields['begin_waiting_date']),
             );
@@ -217,13 +217,13 @@ class PluginPdfTicket extends PluginPdfCommon
 
         $pdf->displayLine(
             '<b><i>' . sprintf(
-                __('%1$s: %2$s'),
-                __('Status') . '</i></b>',
+                __s('%1$s: %2$s'),
+                __s('Status') . '</i></b>',
                 Toolbox::stripTags($job->getStatus($job->fields['status'])) . $status,
             ),
             '<b><i>' . sprintf(
-                __('%1$s: %2$s'),
-                __('Request source') . '</i></b>',
+                __s('%1$s: %2$s'),
+                __s('Request source') . '</i></b>',
                 Toolbox::stripTags(Dropdown::getDropdownName(
                     'glpi_requesttypes',
                     $job->fields['requesttypes_id'],
@@ -233,26 +233,26 @@ class PluginPdfTicket extends PluginPdfCommon
 
         $pdf->displayLine(
             '<b><i>' . sprintf(
-                __('%1$s: %2$s'),
-                __('Urgency') . '</i></b>',
+                __s('%1$s: %2$s'),
+                __s('Urgency') . '</i></b>',
                 Toolbox::stripTags($job->getUrgencyName($job->fields['urgency'])),
             ),
             '<b><i>' . sprintf(
-                __('%1$s: %2$s'),
-                __('Approval') . '</i></b>',
+                __s('%1$s: %2$s'),
+                __s('Approval') . '</i></b>',
                 TicketValidation::getStatus($job->fields['global_validation']),
             ),
         );
 
         $pdf->displayLine(
             '<b><i>' . sprintf(
-                __('%1$s: %2$s'),
-                __('Impact') . '</i></b>',
+                __s('%1$s: %2$s'),
+                __s('Impact') . '</i></b>',
                 Toolbox::stripTags($job->getImpactName($job->fields['impact'])),
             ),
             '<b><i>' . sprintf(
-                __('%1$s: %2$s'),
-                __('Location') . '</i></b>',
+                __s('%1$s: %2$s'),
+                __s('Location') . '</i></b>',
                 Dropdown::getDropdownName(
                     'glpi_locations',
                     $job->fields['locations_id'],
@@ -262,8 +262,8 @@ class PluginPdfTicket extends PluginPdfCommon
 
         $pdf->displayLine(
             '<b><i>' . sprintf(
-                __('%1$s: %2$s'),
-                __('Priority') . '</i></b>',
+                __s('%1$s: %2$s'),
+                __s('Priority') . '</i></b>',
                 Toolbox::stripTags($job->getPriorityName($job->fields['priority'])),
             ),
         );
@@ -273,7 +273,7 @@ class PluginPdfTicket extends PluginPdfCommon
         // Requester
         $users     = [];
         $listusers = '';
-        $requester = '<b><i>' . sprintf(__('%1$s: %2$s') . '</i></b>', __('Requester'), $listusers);
+        $requester = '<b><i>' . sprintf(__s('%1$s: %2$s') . '</i></b>', __s('Requester'), $listusers);
         foreach ($job->getUsers(CommonITILActor::REQUESTER) as $d) {
             if ($d['users_id']) {
                 $tmp = '<i>' . Toolbox::stripTags($dbu->getUserName($d['users_id'])) . '</i>';
@@ -290,14 +290,14 @@ class PluginPdfTicket extends PluginPdfCommon
                 $tmp .= ' (';
                 $first = true;
                 if ($user->fields['phone']) {
-                    $tmp .= sprintf(__('%1$s: %2$s'), __('Phone'), $user->fields['phone']);
+                    $tmp .= sprintf(__s('%1$s: %2$s'), __s('Phone'), $user->fields['phone']);
                     $first = false;
                 }
                 if ($user->fields['mobile']) {
                     if (!$first) {
                         $tmp .= ' - ';
                     }
-                    $tmp .= sprintf(__('%1$s: %2$s'), __('Mobile phone'), $user->fields['mobile']);
+                    $tmp .= sprintf(__s('%1$s: %2$s'), __s('Mobile phone'), $user->fields['mobile']);
                     $first = false;
                 }
                 if ($user->fields['usercategories_id']) {
@@ -305,8 +305,8 @@ class PluginPdfTicket extends PluginPdfCommon
                         $tmp .= ' - ';
                     }
                     $tmp .= sprintf(
-                        __('%1$s: %2$s'),
-                        __('Category'),
+                        __s('%1$s: %2$s'),
+                        __s('Category'),
                         Dropdown::getDropdownName(
                             'glpi_usercategories',
                             $user->fields['usercategories_id'],
@@ -319,8 +319,8 @@ class PluginPdfTicket extends PluginPdfCommon
                         $tmp .= ' - ';
                     }
                     $tmp .= sprintf(
-                        __('%1$s: %2$s'),
-                        __('Location'),
+                        __s('%1$s: %2$s'),
+                        __s('Location'),
                         Dropdown::getDropdownName(
                             'glpi_locations',
                             $user->fields['locations_id'],
@@ -339,8 +339,8 @@ class PluginPdfTicket extends PluginPdfCommon
         $groups         = [];
         $listgroups     = '';
         $requestergroup = '<b><i>' . sprintf(
-            __('%1$s: %2$s') . '</i></b>',
-            __('Requester group'),
+            __s('%1$s: %2$s') . '</i></b>',
+            __s('Requester group'),
             $listgroups,
         );
         foreach ($job->getGroups(CommonITILActor::REQUESTER) as $d) {
@@ -355,7 +355,7 @@ class PluginPdfTicket extends PluginPdfCommon
         // Observer
         $users     = [];
         $listusers = '';
-        $watcher   = '<b><i>' . sprintf(__('%1$s: %2$s') . '</i></b>', __('Watcher'), $listusers);
+        $watcher   = '<b><i>' . sprintf(__s('%1$s: %2$s') . '</i></b>', __s('Watcher'), $listusers);
         foreach ($job->getUsers(CommonITILActor::OBSERVER) as $d) {
             if ($d['users_id']) {
                 $tmp = Toolbox::stripTags($dbu->getUserName($d['users_id']));
@@ -375,8 +375,8 @@ class PluginPdfTicket extends PluginPdfCommon
         $groups       = [];
         $listgroups   = '';
         $watchergroup = '<b><i>' . sprintf(
-            __('%1$s: %2$s') . '</i></b>',
-            __('Watcher group'),
+            __s('%1$s: %2$s') . '</i></b>',
+            __s('Watcher group'),
             $listgroups,
         );
         foreach ($job->getGroups(CommonITILActor::OBSERVER) as $d) {
@@ -392,8 +392,8 @@ class PluginPdfTicket extends PluginPdfCommon
         $users     = [];
         $listusers = '';
         $assign    = '<b><i>' . sprintf(
-            __('%1$s: %2$s') . '</i></b>',
-            __('Assigned to technicians'),
+            __s('%1$s: %2$s') . '</i></b>',
+            __s('Assigned to technicians'),
             $listusers,
         );
         foreach ($job->getUsers(CommonITILActor::ASSIGN) as $d) {
@@ -415,8 +415,8 @@ class PluginPdfTicket extends PluginPdfCommon
         $groups      = [];
         $listgroups  = '';
         $assigngroup = '<b><i>' . sprintf(
-            __('%1$s: %2$s') . '</i></b>',
-            __('Assigned to groups'),
+            __s('%1$s: %2$s') . '</i></b>',
+            __s('Assigned to groups'),
             $listgroups,
         );
         foreach ($job->getGroups(CommonITILActor::ASSIGN) as $d) {
@@ -432,8 +432,8 @@ class PluginPdfTicket extends PluginPdfCommon
         $suppliers      = [];
         $listsuppliers  = '';
         $assignsupplier = '<b><i>' . sprintf(
-            __('%1$s: %2$s') . '</i></b>',
-            __('Assigned to a supplier'),
+            __s('%1$s: %2$s') . '</i></b>',
+            __s('Assigned to a supplier'),
             $listsuppliers,
         );
         foreach ($job->getSuppliers(CommonITILActor::ASSIGN) as $d) {
@@ -449,7 +449,7 @@ class PluginPdfTicket extends PluginPdfCommon
 
         $pdf->setColumnsSize(100);
         $pdf->displayLine(
-            '<b><i>' . sprintf(__('%1$s: %2$s'), __('Title') . '</i></b>', $job->fields['name']),
+            '<b><i>' . sprintf(__s('%1$s: %2$s'), __s('Title') . '</i></b>', $job->fields['name']),
         );
 
         $content = $job->fields['content'];
@@ -467,7 +467,7 @@ class PluginPdfTicket extends PluginPdfCommon
         }
 
         $pdf->displayText(
-            '<b><i>' . sprintf(__('%1$s: %2$s') . '</i></b>', __('Description'), ''),
+            '<b><i>' . sprintf(__s('%1$s: %2$s') . '</i></b>', __s('Description'), ''),
             $content,
             1,
         );
@@ -477,18 +477,18 @@ class PluginPdfTicket extends PluginPdfCommon
         if (count($tickets)) {
             $ticket = new Ticket();
             $pdf->displayLine('<b><i>' . sprintf(
-                __('%1$s: %2$s') . '</i></b>',
+                __s('%1$s: %2$s') . '</i></b>',
                 _n('Linked ticket', 'Linked tickets', 2),
                 '',
             ));
             foreach ($tickets as $linkID => $data) {
                 $tmp = sprintf(
-                    __('%1$s %2$s'),
+                    __s('%1$s %2$s'),
                     Ticket_Ticket::getLinkName($data['link']),
-                    sprintf(__('%1$s %2$s'), __('ID'), $data['tickets_id']),
+                    sprintf(__s('%1$s %2$s'), __s('ID'), $data['tickets_id']),
                 );
                 if ($ticket->getFromDB($data['tickets_id'])) {
-                    $tmp = sprintf(__('%1$s: %2$s'), $tmp, $ticket->getName());
+                    $tmp = sprintf(__s('%1$s: %2$s'), $tmp, $ticket->getName());
                 }
                 $pdf->displayText('', $tmp, 1);
             }
@@ -512,41 +512,41 @@ class PluginPdfTicket extends PluginPdfCommon
         $pdf->setColumnsSize(50, 50);
         $pdf->setColumnsAlign('right', 'left');
 
-        $pdf->displayLine(Html::convDateTime($job->fields['date']), __('Opening date'));
+        $pdf->displayLine(Html::convDateTime($job->fields['date']), __s('Opening date'));
 
         if (!empty($job->fields['internal_time_to_own'])) {
             $pdf->displayLine(
                 Html::convDateTime($job->fields['internal_time_to_own']),
-                __('Internal time to own'),
+                __s('Internal time to own'),
             );
         }
         if (!empty($job->fields['takeintoaccount_delay_stat'])) {
             $pdf->displayLine(
                 Html::convDateTime(date('Y-m-d H:i:s', $date_takeintoaccount)),
-                __('Take into account'),
+                __s('Take into account'),
             );
         }
         if (!empty($job->fields['time_to_own'])) {
-            $pdf->displayLine(Html::convDateTime($job->fields['time_to_own']), __('Time to own'));
+            $pdf->displayLine(Html::convDateTime($job->fields['time_to_own']), __s('Time to own'));
         }
         if (!empty($job->fields['internal_time_to_resolve'])) {
             $pdf->displayLine(
                 Html::convDateTime($job->fields['internal_time_to_resolve']),
-                __('Internal time to resolve'),
+                __s('Internal time to resolve'),
             );
         }
         if (!empty($job->fields['time_to_resolve'])) {
             $pdf->displayLine(
                 Html::convDateTime($job->fields['time_to_resolve']),
-                __('Time to resolve'),
+                __s('Time to resolve'),
             );
         }
         if (in_array($job->fields['status'], $job->getSolvedStatusArray())
             || in_array($job->fields['status'], $job->getClosedStatusArray())) {
-            $pdf->displayLine(Html::convDateTime($job->fields['solvedate']), __('Resolution date'));
+            $pdf->displayLine(Html::convDateTime($job->fields['solvedate']), __s('Resolution date'));
         }
         if (in_array($job->fields['status'], $job->getClosedStatusArray())) {
-            $pdf->displayLine(Html::convDateTime($job->fields['closedate']), __('Closing date'));
+            $pdf->displayLine(Html::convDateTime($job->fields['closedate']), __s('Closing date'));
         }
 
         $pdf->setColumnsSize(100);
@@ -555,26 +555,26 @@ class PluginPdfTicket extends PluginPdfCommon
         $pdf->setColumnsSize(50, 50);
         if ($job->fields['takeintoaccount_delay_stat'] > 0) {
             $pdf->displayLine(
-                __('Take into account'),
+                __s('Take into account'),
                 Toolbox::stripTags(Html::timestampToString($job->fields['takeintoaccount_delay_stat'], false)),
             );
         }
 
         if ((in_array($job->fields['status'], $job->getSolvedStatusArray()) || in_array($job->fields['status'], $job->getClosedStatusArray())) && $job->fields['solve_delay_stat'] > 0) {
             $pdf->displayLine(
-                __('Solution'),
+                __s('Solution'),
                 Toolbox::stripTags(Html::timestampToString($job->fields['solve_delay_stat'], false)),
             );
         }
         if (in_array($job->fields['status'], $job->getClosedStatusArray()) && $job->fields['close_delay_stat'] > 0) {
             $pdf->displayLine(
-                __('Closing'),
+                __s('Closing'),
                 Toolbox::stripTags(Html::timestampToString($job->fields['close_delay_stat'], true)),
             );
         }
         if ($job->fields['waiting_duration'] > 0) {
             $pdf->displayLine(
-                __('Pending'),
+                __s('Pending'),
                 Toolbox::stripTags(Html::timestampToString($job->fields['waiting_duration'], false)),
             );
         }
@@ -591,11 +591,11 @@ class PluginPdfTicket extends PluginPdfCommon
         if (Session::haveRight('ticket', Ticket::READALL) // for technician
             || Session::haveRight('followup', ITILFollowup::SEEPRIVATE)
             || Session::haveRight('task', TicketTask::SEEPRIVATE)) {
-            $onglets['_private_'] = __('Private');
+            $onglets['_private_'] = __s('Private');
         }
 
         if (Session::haveRight('user', READ)) {
-            $onglets['_inforequester_'] = __('Requester information', 'pdf');
+            $onglets['_inforequester_'] = __s('Requester information', 'pdf');
         }
 
         return $onglets;

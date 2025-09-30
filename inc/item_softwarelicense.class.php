@@ -82,15 +82,15 @@ class PluginPdfItem_SoftwareLicense extends PluginPdfCommon
         $pdf->setColumnsSize(65, 35);
         $pdf->setColumnsAlign('left', 'right');
         $pdf->displayTitle(
-            '<b><i>' . __('Entity') . '</i></b>',
-            '<b><i>' . __('Number of affected computers') . '</i></b>',
+            '<b><i>' . __s('Entity') . '</i></b>',
+            '<b><i>' . __s('Number of affected computers') . '</i></b>',
         );
 
         $tot = 0;
         if (in_array(0, $_SESSION['glpiactiveentities'])) {
             $nb = Item_SoftwareLicense::countForLicense($ID, 0);
             if ($nb > 0) {
-                $pdf->displayLine(__('Root entity'), $nb);
+                $pdf->displayLine(__s('Root entity'), $nb);
                 $tot += $nb;
             }
         }
@@ -108,11 +108,11 @@ class PluginPdfItem_SoftwareLicense extends PluginPdfCommon
         }
 
         if ($tot > 0) {
-            $pdf->displayLine(__('Total'), $tot);
+            $pdf->displayLine(__s('Total'), $tot);
         } else {
             $pdf->setColumnsSize(100);
             $pdf->setColumnsAlign('center');
-            $pdf->displayLine(__('No item to display'));
+            $pdf->displayLine(__s('No item to display'));
         }
         $pdf->displaySpace();
     }
@@ -142,12 +142,12 @@ class PluginPdfItem_SoftwareLicense extends PluginPdfCommon
 
         $pdf->setColumnsSize(100);
         $pdf->setColumnsAlign('center');
-        $title = '<b>' . __('Affected computers') . '</b>';
+        $title = '<b>' . __s('Affected computers') . '</b>';
 
         if ($number === 0) {
-            $pdf->displayTitle(sprintf(__('%1$s: %2$s'), $title, __('No item to display')));
+            $pdf->displayTitle(sprintf(__s('%1$s: %2$s'), $title, __s('No item to display')));
         } else {
-            $title = sprintf(__('%1$s: %2$s'), $title, $number);
+            $title = sprintf(__s('%1$s: %2$s'), $title, $number);
             $pdf->displayTitle($title);
 
             $query_params = [
@@ -238,35 +238,35 @@ class PluginPdfItem_SoftwareLicense extends PluginPdfCommon
             if ($showEntity) {
                 $pdf->setColumnsSize(12, 12, 12, 12, 18, 10, 12, 12);
                 $pdf->displayTitle(
-                    '<b><i>' . __('Entity'),
-                    __('Name'),
-                    __('Serial number'),
-                    __('Inventory number'),
-                    __('Location'),
-                    __('Status'),
-                    __('Group'),
-                    __('User') .
+                    '<b><i>' . __s('Entity'),
+                    __s('Name'),
+                    __s('Serial number'),
+                    __s('Inventory number'),
+                    __s('Location'),
+                    __s('Status'),
+                    __s('Group'),
+                    __s('User') .
                                '</i></b>',
                 );
             } else {
                 $pdf->setColumnsSize(14, 14, 14, 18, 14, 13, 13);
                 $pdf->displayTitle(
-                    '<b><i>' . __('Name'),
-                    __('Serial number'),
-                    __('Inventory number'),
-                    __('Location'),
-                    __('Status'),
-                    __('Group'),
-                    __('User') .
+                    '<b><i>' . __s('Name'),
+                    __s('Serial number'),
+                    __s('Inventory number'),
+                    __s('Location'),
+                    __s('Status'),
+                    __s('Group'),
+                    __s('User') .
                                '</i></b>',
                 );
             }
             foreach ($result as $data) {
                 $compname = $data['compname'];
                 if (empty($compname)) {
-                    $compname = sprintf(__('%1$s (%2$s)'), $compname, $data['cID']);
+                    $compname = sprintf(__s('%1$s (%2$s)'), $compname, $data['cID']);
                 }
-                $entname = (empty($data['entity']) ? __('Root entity') : $data['entity']);
+                $entname = (empty($data['entity']) ? __s('Root entity') : $data['entity']);
 
                 if ($showEntity) {
                     $pdf->displayLine(

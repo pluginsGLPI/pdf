@@ -73,24 +73,24 @@ class PluginPdfItilFollowup extends PluginPdfCommon
         $title = '<b>' . ITILFollowup::getTypeName(2) . '</b>';
 
         if ($number === 0) {
-            $pdf->displayTitle(sprintf(__('%1$s: %2$s'), $title, __('No item to display')));
+            $pdf->displayTitle(sprintf(__s('%1$s: %2$s'), $title, __s('No item to display')));
         } else {
             if ($number > $_SESSION['glpilist_limit']) {
-                $title = sprintf(__('%1$s (%2$s)'), $title, $_SESSION['glpilist_limit'] . '/' . $number);
+                $title = sprintf(__s('%1$s (%2$s)'), $title, $_SESSION['glpilist_limit'] . '/' . $number);
             } else {
-                $title = sprintf(__('%1$s: %2$s'), $title, $number);
+                $title = sprintf(__s('%1$s: %2$s'), $title, $number);
             }
             $pdf->displayTitle($title);
 
             $pdf->setColumnsSize(44, 14, 42);
-            $pdf->displayTitle('<b><i>' . __('Source of followup', 'pdf') . '</i></b>', // Source
-                '<b><i>' . __('Date') . '</i></b>', // Date
-                '<b><i>' . __('Requester') . '</i></b>'); // Author
+            $pdf->displayTitle('<b><i>' . __s('Source of followup', 'pdf') . '</i></b>', // Source
+                '<b><i>' . __s('Date') . '</i></b>', // Date
+                '<b><i>' . __s('Requester') . '</i></b>'); // Author
 
             foreach ($result as $data) {
                 $lib = $data['requesttypes_id'] ? Dropdown::getDropdownName('glpi_requesttypes', $data['requesttypes_id']) : '';
                 if ($data['is_private']) {
-                    $lib = sprintf(__('%1$s (%2$s)'), $lib, __('Private'));
+                    $lib = sprintf(__s('%1$s (%2$s)'), $lib, __s('Private'));
                 }
                 $pdf->displayLine(
                     Toolbox::stripTags($lib),
@@ -113,7 +113,7 @@ class PluginPdfItilFollowup extends PluginPdfCommon
                 }
 
                 $pdf->displayText(
-                    '<b><i>' . sprintf(__('%1$s: %2$s') . '</i></b>', __('Description'), ''),
+                    '<b><i>' . sprintf(__s('%1$s: %2$s') . '</i></b>', __s('Description'), ''),
                     $content,
                     1,
                 );

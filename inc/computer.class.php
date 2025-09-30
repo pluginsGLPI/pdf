@@ -71,13 +71,13 @@ class PluginPdfComputer extends PluginPdfCommon
 
         $pdf->displayLine(
             '<b><i>' . sprintf(
-                __('%1$s: %2$s'),
-                __('User') . '</i></b>',
+                __s('%1$s: %2$s'),
+                __s('User') . '</i></b>',
                 $dbu->getUserName($computer->fields['users_id']),
             ),
             '<b><i>' . sprintf(
-                __('%1$s: %2$s'),
-                __('Network') . '</i></b>',
+                __s('%1$s: %2$s'),
+                __s('Network') . '</i></b>',
                 Toolbox::stripTags(Dropdown::getDropdownName(
                     'glpi_networks',
                     $computer->fields['networks_id'],
@@ -87,20 +87,20 @@ class PluginPdfComputer extends PluginPdfCommon
 
         $pdf->displayLine(
             '<b><i>' . sprintf(
-                __('%1$s: %2$s'),
-                __('Group') . '</i></b>',
+                __s('%1$s: %2$s'),
+                __s('Group') . '</i></b>',
                 Dropdown::getDropdownName(
                     'glpi_groups',
                     $computer->fields['groups_id'],
                 ),
             ),
-            '<b><i>' . sprintf(__('%1$s: %2$s'), __('UUID') . '</i></b>', $computer->fields['uuid']),
+            '<b><i>' . sprintf(__s('%1$s: %2$s'), __s('UUID') . '</i></b>', $computer->fields['uuid']),
         );
 
         $pdf->displayLine(
             '<b><i>' . sprintf(
-                __('%1$s: %2$s'),
-                __('Update Source') . '</i></b>',
+                __s('%1$s: %2$s'),
+                __s('Update Source') . '</i></b>',
                 Dropdown::getDropdownName(
                     'glpi_autoupdatesystems',
                     $computer->fields['autoupdatesystems_id'],
@@ -127,16 +127,16 @@ class PluginPdfComputer extends PluginPdfCommon
 
         $pdf->displayLine(
             '<b><i>' . sprintf(
-                __('%1$s: %2$s'),
-                __('Name') . '</i></b>',
+                __s('%1$s: %2$s'),
+                __s('Name') . '</i></b>',
                 Toolbox::stripTags(Dropdown::getDropdownName(
                     'glpi_operatingsystems',
                     $computer->fields['operatingsystems_id'],
                 )),
             ),
             '<b><i>' . sprintf(
-                __('%1$s: %2$s'),
-                __('Version') . '</i></b>',
+                __s('%1$s: %2$s'),
+                __s('Version') . '</i></b>',
                 Toolbox::stripTags(Dropdown::getDropdownName(
                     'glpi_operatingsystemversions',
                     $computer->fields['operatingsystemversions_id'],
@@ -145,16 +145,16 @@ class PluginPdfComputer extends PluginPdfCommon
         );
         $pdf->displayLine(
             '<b><i>' . sprintf(
-                __('%1$s: %2$s'),
-                __('Architecture') . '</i></b>',
+                __s('%1$s: %2$s'),
+                __s('Architecture') . '</i></b>',
                 Toolbox::stripTags(Dropdown::getDropdownName(
                     'glpi_operatingsystemarchitectures',
                     $computer->fields['operatingsystemarchitectures_id'],
                 )),
             ),
             '<b><i>' . sprintf(
-                __('%1$s: %2$s'),
-                __('Service pack') . '</i></b>',
+                __s('%1$s: %2$s'),
+                __s('Service pack') . '</i></b>',
                 Toolbox::stripTags(Dropdown::getDropdownName(
                     'glpi_operatingsystemservicepacks',
                     $computer->fields['operatingsystemservicepacks_id'],
@@ -164,21 +164,21 @@ class PluginPdfComputer extends PluginPdfCommon
 
         $pdf->displayLine(
             '<b><i>' . sprintf(
-                __('%1$s: %2$s'),
-                __('Kernel version') . '</i></b>',
+                __s('%1$s: %2$s'),
+                __s('Kernel version') . '</i></b>',
                 $computer->fields['os_kernel_version'],
             ),
             '<b><i>' . sprintf(
-                __('%1$s: %2$s'),
-                __('Product ID') . '</i></b>',
+                __s('%1$s: %2$s'),
+                __s('Product ID') . '</i></b>',
                 $computer->fields['os_licenseid'],
             ),
         );
 
         $pdf->displayLine(
             '<b><i>' . sprintf(
-                __('%1$s: %2$s'),
-                __('Serial number') . '</i></b>',
+                __s('%1$s: %2$s'),
+                __s('Serial number') . '</i></b>',
                 $computer->fields['os_license_number'],
             ),
         );

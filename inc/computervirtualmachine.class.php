@@ -51,30 +51,30 @@ class PluginPdfComputerVirtualMachine extends PluginPdfCommon
             ['computers_id' => $ID],
         );
         $pdf->setColumnsSize(100);
-        $title = '<b>' . __('List of virtualized environments') . '</b>';
+        $title = '<b>' . __s('List of virtualized environments') . '</b>';
 
         $number = count($virtualmachines);
 
         if ($number === 0) {
-            $pdf->displayTitle('<b>' . __('No virtualized environment associated with the computer') . '</b>');
+            $pdf->displayTitle('<b>' . __s('No virtualized environment associated with the computer') . '</b>');
         } else {
             if ($number > $_SESSION['glpilist_limit']) {
-                $title = sprintf(__('%1$s: %2$s'), $title, $_SESSION['glpilist_limit'] . ' / ' . $number);
+                $title = sprintf(__s('%1$s: %2$s'), $title, $_SESSION['glpilist_limit'] . ' / ' . $number);
             } else {
-                $title = sprintf(__('%1$s: %2$s'), $title, $number);
+                $title = sprintf(__s('%1$s: %2$s'), $title, $number);
             }
             $pdf->displayTitle($title);
 
             $pdf->setColumnsSize(19, 11, 11, 8, 20, 8, 8, 15);
             $pdf->displayTitle(
-                __('Name'),
-                __('Virtualization system'),
-                __('Virtualization model'),
-                __('State'),
-                __('UUID'),
+                __s('Name'),
+                __s('Virtualization system'),
+                __s('Virtualization model'),
+                __s('State'),
+                __s('UUID'),
                 _x('quantity', 'Processors number'),
-                sprintf(__('%1$s (%2$s)'), __('Memory'), __('Mio')),
-                __('Machine'),
+                sprintf(__s('%1$s (%2$s)'), __s('Memory'), __s('Mio')),
+                __s('Machine'),
             );
             $pdf->setColumnsAlign('left', 'center', 'center', 'center', 'left', 'right', 'right', 'left');
 
@@ -121,10 +121,10 @@ class PluginPdfComputerVirtualMachine extends PluginPdfCommon
 
             if (count($hosts)) {
                 $pdf->setColumnsSize(100);
-                $pdf->displayTitle('<b>' . __('List of virtualized environments') . '</b>');
+                $pdf->displayTitle('<b>' . __s('List of virtualized environments') . '</b>');
 
                 $pdf->setColumnsSize(26, 37, 37);
-                $pdf->displayTitle(__('Name'), __('Operating system'), __('Entity'));
+                $pdf->displayTitle(__s('Name'), __s('Operating system'), __s('Entity'));
 
                 $computer = new Computer();
                 foreach ($hosts as $host) {

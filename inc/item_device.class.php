@@ -126,7 +126,7 @@ class PluginPdfItem_Device extends PluginPdfCommon
                                         );
                                     }
                                     $col4 .= '<b><i>' . sprintf(
-                                        __('%1$s: %2$s'),
+                                        __s('%1$s: %2$s'),
                                         $label['label'] . '</i></b>',
                                         Toolbox::stripTags($value) . ' ',
                                     );
@@ -135,23 +135,23 @@ class PluginPdfItem_Device extends PluginPdfCommon
                                         $value = $device->fields[$label['name']];
                                     }
                                     if ($label['type'] == 'bool') {
-                                        $value = $value == 1 ? __('Yes') : __('No');
+                                        $value = $value == 1 ? __s('Yes') : __s('No');
                                     }
                                     if (isset($label['unit'])) {
                                         $labelname = '<b><i>' . sprintf(
-                                            __('%1$s (%2$s)'),
+                                            __s('%1$s (%2$s)'),
                                             $label['label'],
                                             $label['unit'],
                                         ) . '</i></b>';
                                     } else {
                                         $labelname = $label['label'];
                                     }
-                                    $col4 .= '<b><i>' . sprintf(__('%1$s: %2$s'), $labelname . '</i></b>', $value . ' ');
+                                    $col4 .= '<b><i>' . sprintf(__s('%1$s: %2$s'), $labelname . '</i></b>', $value . ' ');
                                 }
                             } elseif (isset($device->fields[$label['name'] . '_default'])
                                        && !empty($device->fields[$label['name'] . '_default'])) {
                                 $col4 .= '<b><i>' . sprintf(
-                                    __('%1$s: %2$s'),
+                                    __s('%1$s: %2$s'),
                                     $label['label'] . '</i></b>',
                                     $device->fields[$label['name'] . '_default'] . ' ',
                                 );
@@ -166,7 +166,7 @@ class PluginPdfItem_Device extends PluginPdfCommon
         if ($vide) {
             $pdf->setColumnsSize(100);
             $pdf->setColumnsAlign('center');
-            $pdf->displayLine(__('No item to display'));
+            $pdf->displayLine(__s('No item to display'));
         }
 
         $pdf->displaySpace();

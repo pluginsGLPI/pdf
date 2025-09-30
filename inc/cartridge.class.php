@@ -108,36 +108,36 @@ class PluginPdfCartridge extends PluginPdfCommon
         $pages  = $p->fields['init_pages_counter'];
 
         $pdf->setColumnsSize(100);
-        $title = '<b>' . ($old ? __('Worn cartridges') : __('Used cartridges')) . '</b>';
+        $title = '<b>' . ($old ? __s('Worn cartridges') : __s('Used cartridges')) . '</b>';
 
         if ($number === 0) {
-            $pdf->displayTitle(sprintf(__('%1$s: %2$s'), $title, __('No item to display')));
+            $pdf->displayTitle(sprintf(__s('%1$s: %2$s'), $title, __s('No item to display')));
         } else {
-            $title = sprintf(__('%1$s: %2$s'), $title, $number);
+            $title = sprintf(__s('%1$s: %2$s'), $title, $number);
 
             $pdf->displayTitle($title);
 
             if (!$old) {
                 $pdf->setColumnsSize(5, 35, 30, 15, 15);
                 $pdf->displayTitle(
-                    '<b><i>' . __('ID'),
-                    __('Cartridge model'),
-                    __('Cartridge type'),
-                    __('Add date'),
-                    __('Use date') .
+                    '<b><i>' . __s('ID'),
+                    __s('Cartridge model'),
+                    __s('Cartridge type'),
+                    __s('Add date'),
+                    __s('Use date') .
                                '</b></i>',
                 );
             } else {
                 $pdf->setColumnsSize(4, 20, 20, 10, 10, 10, 13, 13);
                 $pdf->displayTitle(
-                    '<b><i>' . __('ID'),
-                    __('Cartridge model'),
-                    __('Cartridge type'),
-                    __('Add date'),
-                    __('Use date'),
-                    __('End date'),
-                    __('Printer counter'),
-                    __('Printed pages') .
+                    '<b><i>' . __s('ID'),
+                    __s('Cartridge model'),
+                    __s('Cartridge type'),
+                    __s('Add date'),
+                    __s('Use date'),
+                    __s('End date'),
+                    __s('Printer counter'),
+                    __s('Printed pages') .
                                '</b></i>',
                 );
             }
@@ -152,7 +152,7 @@ class PluginPdfCartridge extends PluginPdfCommon
                 $date_out = Html::convDate($data['date_out']);
 
                 $col1 = $data['id'];
-                $col2 = sprintf(__('%1$s - %2$s'), $data['type'], $data['ref']);
+                $col2 = sprintf(__s('%1$s - %2$s'), $data['type'], $data['ref']);
                 $col6 = $data['pages'];
                 $col7 = '';
 
@@ -175,9 +175,9 @@ class PluginPdfCartridge extends PluginPdfCommon
                         $pages_printed += $data['pages'] - $pages;
                         $nb_pages_printed++;
                         $col7 = sprintf(
-                            __('%1$s (%2$s)'),
+                            __s('%1$s (%2$s)'),
                             $col6,
-                            __('%d printed pages'),
+                            __s('%d printed pages'),
                             ($data['pages'] - $pages),
                         );
                         $pages = $data['pages'];
@@ -211,18 +211,18 @@ class PluginPdfCartridge extends PluginPdfCommon
                 $pdf->setColumnsSize(33, 33, 34);
                 $pdf->displayTitle(
                     '<b><i>' . sprintf(
-                        __('%1$s: %2$s'),
-                        __('Average time in stock') . '</i></b>',
+                        __s('%1$s: %2$s'),
+                        __s('Average time in stock') . '</i></b>',
                         sprintf(_n('%d month', '%d months', (int) $time_stock), $time_stock),
                     ),
                     '<b><i>' . sprintf(
-                        __('%1$s: %2$s'),
-                        __('Average time in use') . '</i></b>',
+                        __s('%1$s: %2$s'),
+                        __s('Average time in use') . '</i></b>',
                         sprintf(_n('%d month', '%d months', (int) $time_use), $time_use),
                     ),
                     '<b><i>' . sprintf(
-                        __('%1$s: %2$s'),
-                        __('Average number of printed pages') . '</i></b>',
+                        __s('%1$s: %2$s'),
+                        __s('Average number of printed pages') . '</i></b>',
                         round($pages_printed / $nb_pages_printed),
                     ),
                 );
@@ -292,55 +292,55 @@ class PluginPdfCartridge extends PluginPdfCommon
             if ($state == 'new') {
                 $pdf->setColumnsSize(25, 25, 25, 25);
                 $pdf->displayTitle(
-                    '<b><i>' . __('Total') . '</i></b>',
+                    '<b><i>' . __s('Total') . '</i></b>',
                     '<b><i>' . Cartridge::getTotalNumber($tID) . '</i></b>',
                     '<b><i>' . sprintf(
-                        __('%1$s %2$s'),
+                        __s('%1$s %2$s'),
                         _n('Cartridge', 'Cartridges', $number),
                         _nx('cartridge', 'New', 'New', $number),
                     ) . '</i></b>',
                     '<b><i>' . Cartridge::getUnusedNumber($tID) . '</i></b>',
                 );
                 $pdf->displayTitle(
-                    '<b><i>' . __('Used cartridges') . '</i></b>',
+                    '<b><i>' . __s('Used cartridges') . '</i></b>',
                     '<b><i>' . Cartridge::getUsedNumber($tID),
-                    '<b><i>' . __('Worn cartridges') . '</i></b>',
+                    '<b><i>' . __s('Worn cartridges') . '</i></b>',
                     '<b><i>' . Cartridge::getOldNumber($tID),
                 );
 
                 $pdf->setColumnsSize(100);
                 $pdf->displayTitle('<b>' . sprintf(
-                    __('%1$s %2$s'),
+                    __s('%1$s %2$s'),
                     _n('Cartridge', 'Cartridges', $number),
                     _nx('cartridge', 'New', 'New', $number),
                 ) . '</b>');
             } elseif ($state == 'used') {
                 $pdf->setColumnsSize(100);
-                $pdf->displayTitle('<b>' . __('Used cartridges') . '</b>');
+                $pdf->displayTitle('<b>' . __s('Used cartridges') . '</b>');
             } else { // Old
                 $pdf->setColumnsSize(100);
-                $pdf->displayTitle('<b>' . __('Worn cartridges') . '</b>');
+                $pdf->displayTitle('<b>' . __s('Worn cartridges') . '</b>');
             }
 
             if ($state != 'old') {
                 $pdf->setColumnsSize(5, 20, 20, 20, 35);
                 $pdf->displayLine(
-                    '<b>' . __('ID') . '</b>',
+                    '<b>' . __s('ID') . '</b>',
                     '<b>' . _x('item', 'State') . '</b>',
-                    '<b>' . __('Add date') . '</b>',
-                    '<b>' . __('Use date') . '</b>',
-                    '<b>' . __('Used on') . '</b>',
+                    '<b>' . __s('Add date') . '</b>',
+                    '<b>' . __s('Use date') . '</b>',
+                    '<b>' . __s('Used on') . '</b>',
                 );
             } else {
                 $pdf->setColumnsSize(5, 20, 15, 15, 15, 15, 15);
                 $pdf->displayLine(
-                    '<b>' . __('ID') . '</b>',
+                    '<b>' . __s('ID') . '</b>',
                     '<b>' . _x('item', 'State') . '</b>',
-                    '<b>' . __('Add date') . '</b>',
-                    '<b>' . __('Use date') . '</b>',
-                    '<b>' . __('Used on') . '</b>',
-                    '<b>' . __('End date') . '</b>',
-                    '<b>' . __('Printer counter') . '</b>',
+                    '<b>' . __s('Add date') . '</b>',
+                    '<b>' . __s('Use date') . '</b>',
+                    '<b>' . __s('Used on') . '</b>',
+                    '<b>' . __s('End date') . '</b>',
+                    '<b>' . __s('Printer counter') . '</b>',
                 );
             }
 
@@ -376,7 +376,7 @@ class PluginPdfCartridge extends PluginPdfCommon
                         $pdfpages        = sprintf(_n('%d printed page', '%d printed pages', $pp), $pp);
                         $pages[$printer] = $data['pages'];
                     } elseif ($data['pages'] != 0) {
-                        $pdfpages = __('Counter error');
+                        $pdfpages = __s('Counter error');
                     }
                 }
                 $pdf->displayLine(
@@ -396,14 +396,14 @@ class PluginPdfCartridge extends PluginPdfCommon
                 }
                 $pdf->setColumnsSize(33, 33, 34);
                 $pdf->displayLine(
-                    '<b>' . __('Average time in stock') . '</b>',
-                    '<b>' . __('Average time in use') . '</b>',
-                    '<b>' . __('Average number of printed pages') . '</b>',
+                    '<b>' . __s('Average time in stock') . '</b>',
+                    '<b>' . __s('Average time in use') . '</b>',
+                    '<b>' . __s('Average number of printed pages') . '</b>',
                 );
 
                 $pdf->displayLine(
-                    round($stock_time / $number / 60 / 60 / 24 / 30.5, 1) . ' ' . __('month'),
-                    round($use_time / $number / 60 / 60 / 24 / 30.5, 1) . ' ' . __('month'),
+                    round($stock_time / $number / 60 / 60 / 24 / 30.5, 1) . ' ' . __s('month'),
+                    round($use_time / $number / 60 / 60 / 24 / 30.5, 1) . ' ' . __s('month'),
                     round($pages_printed / $nb_pages_printed),
                 );
             }

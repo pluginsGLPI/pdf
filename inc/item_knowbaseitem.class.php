@@ -61,22 +61,22 @@ class PluginPdfItem_Knowbaseitem extends PluginPdfCommon
         $pdf->setColumnsSize(100);
 
         if ($number === 0) {
-            $pdf->displayTitle('<b>' . __('No knowledge base entries linked') . '</b>');
+            $pdf->displayTitle('<b>' . __s('No knowledge base entries linked') . '</b>');
         } else {
-            $title = '<b>' . __('Link a knowledge base entry') . '</b>';
+            $title = '<b>' . __s('Link a knowledge base entry') . '</b>';
             if ($number > $_SESSION['glpilist_limit']) {
-                $title = sprintf(__('%1$s: %2$s'), $title, $_SESSION['glpilist_limit'] . ' / ' . $number);
+                $title = sprintf(__s('%1$s: %2$s'), $title, $_SESSION['glpilist_limit'] . ' / ' . $number);
             } else {
-                $title = sprintf(__('%1$s: %2$s'), $title, $number);
+                $title = sprintf(__s('%1$s: %2$s'), $title, $number);
             }
             $pdf->displayTitle($title);
 
             $pdf->setColumnsSize(40, 40, 10, 10);
-            $pdf->displayTitle(__('Type'), __('Item'), __('Creation date'), __('Update date'));
+            $pdf->displayTitle(__s('Type'), __s('Item'), __s('Creation date'), __s('Update date'));
 
             foreach ($result as $data) {
                 $pdf->displayLine(
-                    __('Knowledge base'),
+                    __s('Knowledge base'),
                     $data['name'],
                     Html::convDateTime($data['date_creation']),
                     Html::convDateTime($data['date_mod']),

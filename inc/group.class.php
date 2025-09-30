@@ -45,74 +45,74 @@ class PluginPdfGroup extends PluginPdfCommon
 
         $pdf->setColumnsSize(50, 50);
         $pdf->displayTitle(
-            '<b>' . sprintf(__('%1$s %2$s'), __('ID'), $item->fields['id']) . '</b>',
+            '<b>' . sprintf(__s('%1$s %2$s'), __s('ID'), $item->fields['id']) . '</b>',
             sprintf(
-                __('%1$s: %2$s'),
-                __('Last update'),
+                __s('%1$s: %2$s'),
+                __s('Last update'),
                 Html::convDateTime($item->fields['date_mod']),
             ),
         );
 
         $pdf->setColumnsSize(100);
         $pdf->displayLine('<b><i>' . sprintf(
-            __('%1$s: %2$s'),
-            __('Complete name') . '</i></b>',
+            __s('%1$s: %2$s'),
+            __s('Complete name') . '</i></b>',
             $item->fields['completename'],
         ));
 
         $pdf->setColumnsAlign('center');
-        $pdf->displayLine('<b><i>' . sprintf(__('%1$s: %2$s'), __('Visible in a ticket'), '' . '</i></b>'));
+        $pdf->displayLine('<b><i>' . sprintf(__s('%1$s: %2$s'), __s('Visible in a ticket'), '' . '</i></b>'));
         $pdf->setColumnsSize(20, 20, 20, 20, 20);
         $pdf->displayLine(
             '<b><i>' . sprintf(
-                __('%1$s - %2$s'),
-                __('Requester') . '</i></b>',
+                __s('%1$s - %2$s'),
+                __s('Requester') . '</i></b>',
                 Dropdown::getYesNo($item->fields['is_requester']),
             ),
             '<b><i>' . sprintf(
-                __('%1$s - %2$s'),
-                __('Watcher') . '</i></b>',
+                __s('%1$s - %2$s'),
+                __s('Watcher') . '</i></b>',
                 Dropdown::getYesNo($item->fields['is_watcher']),
             ),
             '<b><i>' . sprintf(
-                __('%1$s - %2$s'),
-                __('Assigned to') . '</i></b>',
+                __s('%1$s - %2$s'),
+                __s('Assigned to') . '</i></b>',
                 Dropdown::getYesNo($item->fields['is_assign']),
             ),
             '<b><i>' . sprintf(
-                __('%1$s - %2$s'),
-                __('Task') . '</i></b>',
+                __s('%1$s - %2$s'),
+                __s('Task') . '</i></b>',
                 Dropdown::getYesNo($item->fields['is_task']),
             ),
             '<b><i>' . sprintf(
-                __('%1$s - %2$s'),
-                __('Can be notified') . '</i></b>',
+                __s('%1$s - %2$s'),
+                __s('Can be notified') . '</i></b>',
                 Dropdown::getYesNo($item->fields['is_notify']),
             ),
         );
 
         $pdf->setColumnsSize(100);
         $pdf->setColumnsAlign('center');
-        $pdf->displayLine('<b><i>' . sprintf(__('%1$s: %2$s'), __('Visible in a project'), ''));
+        $pdf->displayLine('<b><i>' . sprintf(__s('%1$s: %2$s'), __s('Visible in a project'), ''));
         $pdf->setColumnsAlign('left');
         $pdf->displayLine('<b><i>' . sprintf(
-            __('%1$s - %2$s'),
-            __('Can be manager') . '</i></b>',
+            __s('%1$s - %2$s'),
+            __s('Can be manager') . '</i></b>',
             Dropdown::getYesNo($item->fields['is_manager']),
         ));
 
         $pdf->setColumnsSize(100);
         $pdf->setColumnsAlign('center');
-        $pdf->displayLine('<b><i>' . sprintf(__('%1$s: %2$s'), __('Can contain'), ''));
+        $pdf->displayLine('<b><i>' . sprintf(__s('%1$s: %2$s'), __s('Can contain'), ''));
         $pdf->setColumnsSize(50, 50);
         $pdf->displayLine(
             '<b><i>' . sprintf(
-                __('%1$s - %2$s'),
+                __s('%1$s - %2$s'),
                 _n('Item', 'Items', 2) . '</i></b>',
                 Dropdown::getYesNo($item->fields['is_itemgroup']),
             ),
             '<b><i>' . sprintf(
-                __('%1$s - %2$s'),
+                __s('%1$s - %2$s'),
                 _n('User', 'Users', 2) . '</i></b>',
                 Dropdown::getYesNo($item->fields['is_usergroup']),
             ),
@@ -128,22 +128,22 @@ class PluginPdfGroup extends PluginPdfCommon
     {
         if (Session::haveRight('config', READ) && AuthLDAP::useAuthLdap()) {
             $pdf->setColumnsSize(100);
-            $pdf->displayTitle('<b>' . __('LDAP directory link') . '</b>');
+            $pdf->displayTitle('<b>' . __s('LDAP directory link') . '</b>');
 
             $pdf->displayText(
                 '<b>' . sprintf(
-                    __('%1$s: %2$s'),
-                    __('User attribute containing its groups') . '</b>',
+                    __s('%1$s: %2$s'),
+                    __s('User attribute containing its groups') . '</b>',
                     '',
                 ),
                 $item->getField('ldap_field'),
             );
             $pdf->displayText(
-                '<b>' . sprintf(__('%1$s: %2$s'), __('Attribute value') . '</b>', ''),
+                '<b>' . sprintf(__s('%1$s: %2$s'), __s('Attribute value') . '</b>', ''),
                 $item->getField('ldap_value'),
             );
             $pdf->displayText(
-                '<b>' . sprintf(__('%1$s: %2$s'), __('Group DN') . '</b>', ''),
+                '<b>' . sprintf(__s('%1$s: %2$s'), __s('Group DN') . '</b>', ''),
                 $item->getField('ldap_group_dn'),
             );
 
@@ -161,17 +161,17 @@ class PluginPdfGroup extends PluginPdfCommon
 
         if ($tech) {
             $field = 'groups_id_tech';
-            $title = __('Managed items');
+            $title = __s('Managed items');
         } else {
             $field = 'groups_id';
-            $title = __('Used items');
+            $title = __s('Used items');
         }
 
         $datas = [];
         $max   = $group->getDataItems($tech, $tree, $user, 0, $datas);
         $nb    = count($datas);
 
-        $title = $nb < $max ? sprintf(__('%1$s (%2$s)'), $title, $nb . '/' . $max) : sprintf(__('%1$s (%2$s)'), $title, $nb);
+        $title = $nb < $max ? sprintf(__s('%1$s (%2$s)'), $title, $nb . '/' . $max) : sprintf(__s('%1$s (%2$s)'), $title, $nb);
         $pdf->setColumnsSize(100);
         $pdf->displayTitle('<b>' . $title . '</b>');
 
@@ -179,17 +179,17 @@ class PluginPdfGroup extends PluginPdfCommon
             if ($tree || $user) {
                 $pdf->setColumnsSize(16, 20, 34, 30);
                 $pdf->displayTitle(
-                    __('Type'),
-                    __('Name'),
-                    __('Entity'),
+                    __s('Type'),
+                    __s('Name'),
+                    __s('Entity'),
                     Group::getTypeName(1) . ' / ' . User::getTypeName(1),
                 );
             } else {
                 $pdf->setColumnsSize(20, 25, 55);
-                $pdf->displayTitle(__('Type'), __('Name'), __('Entity'));
+                $pdf->displayTitle(__s('Type'), __s('Name'), __s('Entity'));
             }
         } else {
-            $pdf->displayLine(__('No item found'));
+            $pdf->displayLine(__s('No item found'));
         }
 
         $tmpgrp = new Group();
@@ -236,7 +236,7 @@ class PluginPdfGroup extends PluginPdfCommon
         global $DB;
 
         $item->getID();
-        $fields        = $item->getAdditionalFields();
+        $item->getAdditionalFields();
         $entity_assign = $item->isEntityAssign();
 
         $fk   = $item->getForeignKeyField();
@@ -250,7 +250,7 @@ class PluginPdfGroup extends PluginPdfCommon
 
         if ($item->haveChildren()) {
             $pdf->setColumnsSize(100);
-            $pdf->displayTitle(sprintf(__('Sons of %s'), '<b>' . $item->getNameID() . '</b>'));
+            $pdf->displayTitle(sprintf(__s('Sons of %s'), '<b>' . $item->getNameID() . '</b>'));
 
             if ($entity_assign) {
                 if ($fk == 'entities_id') {
@@ -260,10 +260,10 @@ class PluginPdfGroup extends PluginPdfCommon
                 }
 
                 $pdf->setColumnsSize(30, 30, 40);
-                $pdf->displayTitle(__('Name'), __('Entity'), __('Comments'));
+                $pdf->displayTitle(__s('Name'), __s('Entity'), __s('Comments'));
             } else {
                 $pdf->setColumnsSize(45, 55);
-                $pdf->displayTitle(__('Name'), __('Comments'));
+                $pdf->displayTitle(__s('Name'), __s('Comments'));
             }
 
             foreach ($DB->request($crit) as $data) {
@@ -279,7 +279,7 @@ class PluginPdfGroup extends PluginPdfCommon
             }
         } else {
             $pdf->setColumnsSize(100);
-            $pdf->displayTitle('<b>' . sprintf(__('No sons of %s', 'behaviors'), $item->getNameID() . '</b>'));
+            $pdf->displayTitle('<b>' . sprintf(__s('No sons of %s', 'behaviors'), $item->getNameID() . '</b>'));
         }
 
         $pdf->displaySpace();

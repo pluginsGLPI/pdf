@@ -68,13 +68,13 @@ class PluginPdfNetworkEquipment extends PluginPdfCommon
 
         $pdf->displayLine(
             '<b><i>' . sprintf(
-                __('%1$s: %2$s'),
-                __('User') . '</i></b>',
+                __s('%1$s: %2$s'),
+                __s('User') . '</i></b>',
                 $dbu->getUserName($item->fields['users_id']),
             ),
             '<b><i>' . sprintf(
-                __('%1$s: %2$s'),
-                __('Network') . '</i></b>',
+                __s('%1$s: %2$s'),
+                __s('Network') . '</i></b>',
                 Toolbox::stripTags(Dropdown::getDropdownName(
                     'glpi_networks',
                     $item->fields['networks_id'],
@@ -84,14 +84,14 @@ class PluginPdfNetworkEquipment extends PluginPdfCommon
 
         $pdf->displayLine(
             '<b><i>' . sprintf(
-                __('%1$s: %2$s'),
-                __('Group') . '</i></b>',
+                __s('%1$s: %2$s'),
+                __s('Group') . '</i></b>',
                 Dropdown::getDropdownName('glpi_groups', $item->fields['groups_id']),
             ),
-            '<b><i>' . __('The MAC address and the IP of the equipment are included in an aggregated network port'),
+            '<b><i>' . __s('The MAC address and the IP of the equipment are included in an aggregated network port'),
             '<b><i>' . sprintf(
-                __('%1$s: %2$s'),
-                sprintf(__('%1$s (%2$s)'), __('Memory'), __('Mio')) . '</i></b>',
+                __s('%1$s: %2$s'),
+                sprintf(__s('%1$s (%2$s)'), __s('Memory'), __s('Mio')) . '</i></b>',
                 $item->fields['ram'],
             ),
         );

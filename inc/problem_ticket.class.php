@@ -67,7 +67,7 @@ class PluginPdfProblem_Ticket extends PluginPdfCommon
         $pdf->setColumnsSize(100);
         $title = '<b>' . _n('Problem', 'Problems', $number) . '</b>';
         if ($number === 0) {
-            $pdf->displayTitle(sprintf(__('%1$s: %2$s'), $title, __('No item to display')));
+            $pdf->displayTitle(sprintf(__s('%1$s: %2$s'), $title, __s('No item to display')));
         } else {
             $pdf->displayTitle('<b>' . sprintf(
                 _n('Last %d problem', 'Last %d problems', $number) . '</b>',
@@ -82,17 +82,17 @@ class PluginPdfProblem_Ticket extends PluginPdfCommon
                 $pdf->setColumnsAlign('center');
                 $col = '<b><i>ID ' . $job->fields['id'] . '</i></b>, ' .
                         sprintf(
-                            __('%1$s: %2$s'),
-                            __('Status'),
+                            __s('%1$s: %2$s'),
+                            __s('Status'),
                             Problem::getStatus($job->fields['status']),
                         );
 
                 if (count($_SESSION['glpiactiveentities']) > 1) {
                     if ($job->fields['entities_id'] == 0) {
-                        $col = sprintf(__('%1$s (%2$s)'), $col, __('Root entity'));
+                        $col = sprintf(__s('%1$s (%2$s)'), $col, __s('Root entity'));
                     } else {
                         $col = sprintf(
-                            __('%1$s (%2$s)'),
+                            __s('%1$s (%2$s)'),
                             $col,
                             Dropdown::getDropdownName(
                                 'glpi_entities',
@@ -106,15 +106,15 @@ class PluginPdfProblem_Ticket extends PluginPdfCommon
                 $pdf->setColumnsAlign('left');
 
                 $col = '<b><i>' . sprintf(
-                    __('Opened on %s') . '</i></b>',
+                    __s('Opened on %s') . '</i></b>',
                     Html::convDateTime($job->fields['date']),
                 );
                 if ($job->fields['begin_waiting_date']) {
                     $col = sprintf(
-                        __('%1$s, %2$s'),
+                        __s('%1$s, %2$s'),
                         $col,
                         '<b><i>' . sprintf(
-                            __('Put on hold on %s') . '</i></b>',
+                            __s('Put on hold on %s') . '</i></b>',
                             Html::convDateTime($job->fields['begin_waiting_date']),
                         ),
                     );
@@ -122,31 +122,31 @@ class PluginPdfProblem_Ticket extends PluginPdfCommon
                 if (in_array($job->fields['status'], $job->getSolvedStatusArray())
                     || in_array($job->fields['status'], $job->getClosedStatusArray())) {
                     $col = sprintf(
-                        __('%1$s, %2$s'),
+                        __s('%1$s, %2$s'),
                         $col,
                         '<b><i>' . sprintf(
-                            __('Solved on %s') . '</i></b>',
+                            __s('Solved on %s') . '</i></b>',
                             Html::convDateTime($job->fields['solvedate']),
                         ),
                     );
                 }
                 if (in_array($job->fields['status'], $job->getClosedStatusArray())) {
                     $col = sprintf(
-                        __('%1$s, %2$s'),
+                        __s('%1$s, %2$s'),
                         $col,
                         '<b><i>' . sprintf(
-                            __('Closed on %s') . '</i></b>',
+                            __s('Closed on %s') . '</i></b>',
                             Html::convDateTime($job->fields['closedate']),
                         ),
                     );
                 }
                 if ($job->fields['time_to_resolve']) {
                     $col = sprintf(
-                        __('%1$s, %2$s'),
+                        __s('%1$s, %2$s'),
                         $col,
                         '<b><i>' . sprintf(
-                            __('%1$s: %2$s') . '</i></b>',
-                            __('Time to resolve'),
+                            __s('%1$s: %2$s') . '</i></b>',
+                            __s('Time to resolve'),
                             Html::convDateTime($job->fields['time_to_resolve']),
                         ),
                     );
@@ -156,29 +156,29 @@ class PluginPdfProblem_Ticket extends PluginPdfCommon
                 $lastupdate = Html::convDateTime($job->fields['date_mod']);
                 if ($job->fields['users_id_lastupdater'] > 0) {
                     $lastupdate = sprintf(
-                        __('%1$s by %2$s'),
+                        __s('%1$s by %2$s'),
                         $lastupdate,
                         $dbu->getUserName($job->fields['users_id_lastupdater']),
                     );
                 }
 
                 $pdf->displayLine('<b><i>' . sprintf(
-                    __('%1$s: %2$s'),
-                    __('Last update') . '</i></b>',
+                    __s('%1$s: %2$s'),
+                    __s('Last update') . '</i></b>',
                     $lastupdate,
                 ));
 
                 $pdf->displayLine('<b><i>' . sprintf(
-                    __('%1$s: %2$s'),
-                    __('Priority') . '</i></b>',
+                    __s('%1$s: %2$s'),
+                    __s('Priority') . '</i></b>',
                     Ticket::getPriorityName($job->fields['priority']),
                 ));
 
                 if ($job->fields['itilcategories_id']) {
                     $pdf->displayLine(
                         '<b><i>' . sprintf(
-                            __('%1$s: %2$s'),
-                            __('Category') . '</i></b>',
+                            __s('%1$s: %2$s'),
+                            __s('Category') . '</i></b>',
                             Dropdown::getDropdownName(
                                 'glpi_itilcategories',
                                 $job->fields['itilcategories_id'],
@@ -194,28 +194,28 @@ class PluginPdfProblem_Ticket extends PluginPdfCommon
                         if (empty($col)) {
                             $col = $dbu->getUserName($d['users_id']);
                         } else {
-                            $col = sprintf(__('%1$s, %2$s'), $col, $dbu->getUserName($d['users_id']));
+                            $col = sprintf(__s('%1$s, %2$s'), $col, $dbu->getUserName($d['users_id']));
                         }
                     }
                 }
                 $grps = $job->getGroups(CommonITILActor::REQUESTER);
                 if (count($grps)) {
                     if (empty($col)) {
-                        $col = sprintf(__('%1$s %2$s'), $col, _n('Group', 'Groups', 2) . ' </i></b>');
+                        $col = sprintf(__s('%1$s %2$s'), $col, _n('Group', 'Groups', 2) . ' </i></b>');
                     } else {
-                        $col = sprintf(__('%1$s - %2$s'), $col, _n('Group', 'Groups', 2) . ' </i></b>');
+                        $col = sprintf(__s('%1$s - %2$s'), $col, _n('Group', 'Groups', 2) . ' </i></b>');
                     }
                     $first = true;
                     foreach ($grps as $d) {
                         if ($first) {
                             $col = sprintf(
-                                __('%1$s  %2$s'),
+                                __s('%1$s  %2$s'),
                                 $col,
                                 Dropdown::getDropdownName('glpi_groups', $d['groups_id']),
                             );
                         } else {
                             $col = sprintf(
-                                __('%1$s, %2$s'),
+                                __s('%1$s, %2$s'),
                                 $col,
                                 Dropdown::getDropdownName('glpi_groups', $d['groups_id']),
                             );
@@ -224,7 +224,7 @@ class PluginPdfProblem_Ticket extends PluginPdfCommon
                     }
                 }
                 if ($col) {
-                    $texte = '<b><i>' . sprintf(__('%1$s: %2$s'), __('Requester') . '</i></b>', '');
+                    $texte = '<b><i>' . sprintf(__s('%1$s: %2$s'), __s('Requester') . '</i></b>', '');
                     $pdf->displayText($texte, $col, 1);
                 }
 
@@ -235,28 +235,28 @@ class PluginPdfProblem_Ticket extends PluginPdfCommon
                         if (empty($col)) {
                             $col = $dbu->getUserName($d['users_id']);
                         } else {
-                            $col = sprintf(__('%1$s, %2$s'), $col, $dbu->getUserName($d['users_id']));
+                            $col = sprintf(__s('%1$s, %2$s'), $col, $dbu->getUserName($d['users_id']));
                         }
                     }
                 }
                 $grps = $job->getGroups(CommonITILActor::ASSIGN);
                 if (count($grps)) {
                     if (empty($col)) {
-                        $col = sprintf(__('%1$s %2$s'), $col, _n('Group', 'Groups', 2) . ' </i></b>');
+                        $col = sprintf(__s('%1$s %2$s'), $col, _n('Group', 'Groups', 2) . ' </i></b>');
                     } else {
-                        $col = sprintf(__('%1$s - %2$s'), $col, _n('Group', 'Groups', 2) . ' </i></b>');
+                        $col = sprintf(__s('%1$s - %2$s'), $col, _n('Group', 'Groups', 2) . ' </i></b>');
                     }
                     $first = true;
                     foreach ($grps as $d) {
                         if ($first) {
                             $col = sprintf(
-                                __('%1$s  %2$s'),
+                                __s('%1$s  %2$s'),
                                 $col,
                                 Dropdown::getDropdownName('glpi_groups', $d['groups_id']),
                             );
                         } else {
                             $col = sprintf(
-                                __('%1$s, %2$s'),
+                                __s('%1$s, %2$s'),
                                 $col,
                                 Dropdown::getDropdownName('glpi_groups', $d['groups_id']),
                             );
@@ -265,11 +265,11 @@ class PluginPdfProblem_Ticket extends PluginPdfCommon
                     }
                 }
                 if ($col) {
-                    $texte = '<b><i>' . sprintf(__('%1$s: %2$s') . '</i></b>', ('Assigned to'), '');
+                    $texte = '<b><i>' . sprintf(__s('%1$s: %2$s') . '</i></b>', ('Assigned to'), '');
                     $pdf->displayText($texte, $col, 1);
                 }
 
-                $texte = '<b><i>' . sprintf(__('%1$s: %2$s') . '</i></b>', ('Title'), '');
+                $texte = '<b><i>' . sprintf(__s('%1$s: %2$s') . '</i></b>', ('Title'), '');
                 $pdf->displayText($texte, $job->fields['name'], 1);
             }
         }
@@ -303,7 +303,7 @@ class PluginPdfProblem_Ticket extends PluginPdfCommon
         $pdf->setColumnsSize(100);
         $title = '<b>' . _n('Ticket', 'Tickets', 2) . '</b>';
         if ($number === 0) {
-            $pdf->displayTitle(sprintf(__('%1$s: %2$s'), $title, __('No item to display')));
+            $pdf->displayTitle(sprintf(__s('%1$s: %2$s'), $title, __s('No item to display')));
         } else {
             $pdf->displayTitle('<b>' . sprintf(
                 _n('Last %d ticket', 'Last %d tickets', $number) . '</b>',
@@ -318,17 +318,17 @@ class PluginPdfProblem_Ticket extends PluginPdfCommon
                 $pdf->setColumnsAlign('center');
                 $col = '<b><i>ID ' . $job->fields['id'] . '</i></b>, ' .
                         sprintf(
-                            __('%1$s: %2$s'),
-                            __('Status'),
+                            __s('%1$s: %2$s'),
+                            __s('Status'),
                             Problem::getStatus($job->fields['status']),
                         );
 
                 if (count($_SESSION['glpiactiveentities']) > 1) {
                     if ($job->fields['entities_id'] == 0) {
-                        $col = sprintf(__('%1$s (%2$s)'), $col, __('Root entity'));
+                        $col = sprintf(__s('%1$s (%2$s)'), $col, __s('Root entity'));
                     } else {
                         $col = sprintf(
-                            __('%1$s (%2$s)'),
+                            __s('%1$s (%2$s)'),
                             $col,
                             Dropdown::getDropdownName(
                                 'glpi_entities',
@@ -342,37 +342,37 @@ class PluginPdfProblem_Ticket extends PluginPdfCommon
                 $pdf->setColumnsAlign('left');
 
                 $col = '<b><i>' . sprintf(
-                    __('Opened on %s') . '</i></b>',
+                    __s('Opened on %s') . '</i></b>',
                     Html::convDateTime($job->fields['date']),
                 );
                 if (in_array($job->fields['status'], $job->getSolvedStatusArray())
                     || in_array($job->fields['status'], $job->getClosedStatusArray())) {
                     $col = sprintf(
-                        __('%1$s, %2$s'),
+                        __s('%1$s, %2$s'),
                         $col,
                         '<b><i>' . sprintf(
-                            __('Solved on %s') . '</i></b>',
+                            __s('Solved on %s') . '</i></b>',
                             Html::convDateTime($job->fields['solvedate']),
                         ),
                     );
                 }
                 if (in_array($job->fields['status'], $job->getClosedStatusArray())) {
                     $col = sprintf(
-                        __('%1$s, %2$s'),
+                        __s('%1$s, %2$s'),
                         $col,
                         '<b><i>' . sprintf(
-                            __('Closed on %s') . '</i></b>',
+                            __s('Closed on %s') . '</i></b>',
                             Html::convDateTime($job->fields['closedate']),
                         ),
                     );
                 }
                 if ($job->fields['time_to_resolve']) {
                     $col = sprintf(
-                        __('%1$s, %2$s'),
+                        __s('%1$s, %2$s'),
                         $col,
                         '<b><i>' . sprintf(
-                            __('%1$s: %2$s') . '</i></b>',
-                            __('Time to resolve'),
+                            __s('%1$s: %2$s') . '</i></b>',
+                            __s('Time to resolve'),
                             Html::convDateTime($job->fields['time_to_resolve']),
                         ),
                     );
@@ -382,28 +382,28 @@ class PluginPdfProblem_Ticket extends PluginPdfCommon
                 $lastupdate = Html::convDateTime($job->fields['date_mod']);
                 if ($job->fields['users_id_lastupdater'] > 0) {
                     $lastupdate = sprintf(
-                        __('%1$s by %2$s'),
+                        __s('%1$s by %2$s'),
                         $lastupdate,
                         $dbu->getUserName($job->fields['users_id_lastupdater']),
                     );
                 }
 
                 $pdf->displayLine('<b><i>' . sprintf(
-                    __('%1$s: %2$s'),
-                    __('Last update') . '</i></b>',
+                    __s('%1$s: %2$s'),
+                    __s('Last update') . '</i></b>',
                     $lastupdate,
                 ));
 
                 $pdf->displayLine('<b><i>' . sprintf(
-                    __('%1$s: %2$s'),
-                    __('Priority') . '</i></b>',
+                    __s('%1$s: %2$s'),
+                    __s('Priority') . '</i></b>',
                     Ticket::getPriorityName($job->fields['priority']),
                 ));
                 if ($job->fields['itilcategories_id']) {
                     $pdf->displayLine(
                         '<b><i>' . sprintf(
-                            __('%1$s: %2$s'),
-                            __('Category') . '</i></b>',
+                            __s('%1$s: %2$s'),
+                            __s('Category') . '</i></b>',
                             Dropdown::getDropdownName(
                                 'glpi_itilcategories',
                                 $job->fields['itilcategories_id'],
@@ -419,28 +419,28 @@ class PluginPdfProblem_Ticket extends PluginPdfCommon
                         if (empty($col)) {
                             $col = $dbu->getUserName($d['users_id']);
                         } else {
-                            $col = sprintf(__('%1$s, %2$s'), $col, $dbu->getUserName($d['users_id']));
+                            $col = sprintf(__s('%1$s, %2$s'), $col, $dbu->getUserName($d['users_id']));
                         }
                     }
                 }
                 $grps = $job->getGroups(CommonITILActor::REQUESTER);
                 if (count($grps)) {
                     if (empty($col)) {
-                        $col = sprintf(__('%1$s %2$s'), $col, _n('Group', 'Groups', 2) . ' </i></b>');
+                        $col = sprintf(__s('%1$s %2$s'), $col, _n('Group', 'Groups', 2) . ' </i></b>');
                     } else {
-                        $col = sprintf(__('%1$s - %2$s'), $col, _n('Group', 'Groups', 2) . ' </i></b>');
+                        $col = sprintf(__s('%1$s - %2$s'), $col, _n('Group', 'Groups', 2) . ' </i></b>');
                     }
                     $first = true;
                     foreach ($grps as $d) {
                         if ($first) {
                             $col = sprintf(
-                                __('%1$s  %2$s'),
+                                __s('%1$s  %2$s'),
                                 $col,
                                 Dropdown::getDropdownName('glpi_groups', $d['groups_id']),
                             );
                         } else {
                             $col = sprintf(
-                                __('%1$s, %2$s'),
+                                __s('%1$s, %2$s'),
                                 $col,
                                 Dropdown::getDropdownName('glpi_groups', $d['groups_id']),
                             );
@@ -449,7 +449,7 @@ class PluginPdfProblem_Ticket extends PluginPdfCommon
                     }
                 }
                 if ($col) {
-                    $texte = '<b><i>' . sprintf(__('%1$s: %2$s'), __('Requester') . '</i></b>', '');
+                    $texte = '<b><i>' . sprintf(__s('%1$s: %2$s'), __s('Requester') . '</i></b>', '');
                     $pdf->displayText($texte, $col, 1);
                 }
 
@@ -460,28 +460,28 @@ class PluginPdfProblem_Ticket extends PluginPdfCommon
                         if (empty($col)) {
                             $col = $dbu->getUserName($d['users_id']);
                         } else {
-                            $col = sprintf(__('%1$s, %2$s'), $col, $dbu->getUserName($d['users_id']));
+                            $col = sprintf(__s('%1$s, %2$s'), $col, $dbu->getUserName($d['users_id']));
                         }
                     }
                 }
                 $grps = $job->getGroups(CommonITILActor::ASSIGN);
                 if (count($grps)) {
                     if (empty($col)) {
-                        $col = sprintf(__('%1$s %2$s'), $col, _n('Group', 'Groups', 2) . ' </i></b>');
+                        $col = sprintf(__s('%1$s %2$s'), $col, _n('Group', 'Groups', 2) . ' </i></b>');
                     } else {
-                        $col = sprintf(__('%1$s - %2$s'), $col, _n('Group', 'Groups', 2) . ' </i></b>');
+                        $col = sprintf(__s('%1$s - %2$s'), $col, _n('Group', 'Groups', 2) . ' </i></b>');
                     }
                     $first = true;
                     foreach ($grps as $d) {
                         if ($first) {
                             $col = sprintf(
-                                __('%1$s  %2$s'),
+                                __s('%1$s  %2$s'),
                                 $col,
                                 Dropdown::getDropdownName('glpi_groups', $d['groups_id']),
                             );
                         } else {
                             $col = sprintf(
-                                __('%1$s, %2$s'),
+                                __s('%1$s, %2$s'),
                                 $col,
                                 Dropdown::getDropdownName('glpi_groups', $d['groups_id']),
                             );
@@ -490,27 +490,25 @@ class PluginPdfProblem_Ticket extends PluginPdfCommon
                     }
                 }
                 if ($col) {
-                    $texte = '<b><i>' . sprintf(__('%1$s: %2$s') . '</i></b>', __('Assigned to'), '');
+                    $texte = '<b><i>' . sprintf(__s('%1$s: %2$s') . '</i></b>', __s('Assigned to'), '');
                     $pdf->displayText($texte, $col, 1);
                 }
 
-                $texte = '<b><i>' . sprintf(__('%1$s: %2$s') . '</i></b>', ('Title'), '');
+                $texte = '<b><i>' . sprintf(__s('%1$s: %2$s') . '</i></b>', ('Title'), '');
                 $pdf->displayText($texte, $job->fields['name'], 1);
 
                 $item_col    = '';
                 $item_ticket = new Item_Ticket();
                 $data        = $item_ticket->find(['tickets_id' => $job->fields['id']]);
                 foreach ($data as $val) {
-                    if (!empty($val['itemtype']) && $val['items_id'] > 0 && $object = $dbu->getItemForItemtype($val['itemtype'])) {
-                        if ($object->getFromDB($val['items_id'])) {
-                            $item_col .= $object->getTypeName();
-                            $item_col .= ' - ' . $object->getNameID() . '<br />';
-                        }
+                    if (!empty($val['itemtype']) && $val['items_id'] > 0 && ($object = $dbu->getItemForItemtype($val['itemtype'])) && $object->getFromDB($val['items_id'])) {
+                        $item_col .= $object->getTypeName();
+                        $item_col .= ' - ' . $object->getNameID() . '<br />';
                     }
                 }
                 $texte = '<b><i>' . sprintf(
-                    __('%1$s: %2$s') . '</i></b>',
-                    __('Items of the ticket', 'behaviors'),
+                    __s('%1$s: %2$s') . '</i></b>',
+                    __s('Items of the ticket', 'behaviors'),
                     '',
                 );
                 $pdf->displayText($texte, $item_col, 1);

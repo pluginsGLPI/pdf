@@ -61,12 +61,12 @@ class PluginPdfLink extends PluginPdfCommon
         $pdf->setColumnsSize(100);
         $title = '<b>' . _n('External link', 'External links', $number) . '</b>';
         if ($number === 0) {
-            $pdf->displayTitle(sprintf(__('%1$s: %2$s'), $title, __('No item to display')));
+            $pdf->displayTitle(sprintf(__s('%1$s: %2$s'), $title, __s('No item to display')));
         } else {
             if ($number > $_SESSION['glpilist_limit']) {
-                $title = sprintf(__('%1$s: %2$s'), $title, $_SESSION['glpilist_limit'] . ' / ' . $number);
+                $title = sprintf(__s('%1$s: %2$s'), $title, $_SESSION['glpilist_limit'] . ' / ' . $number);
             } else {
-                $title = sprintf(__('%1$s: %2$s'), $title, $number);
+                $title = sprintf(__s('%1$s: %2$s'), $title, $number);
             }
             $pdf->displayTitle($title);
 
@@ -83,7 +83,7 @@ class PluginPdfLink extends PluginPdfCommon
                     $i     = 1;
                     foreach ($links as $key => $link) {
                         $url = $link;
-                        $pdf->displayLine(sprintf(__('%1$s: %2$s'), "<b>$name #$i</b>", $link));
+                        $pdf->displayLine(sprintf(__s('%1$s: %2$s'), "<b>$name #$i</b>", $link));
                         $i++;
                         $i++;
                     }
@@ -100,7 +100,7 @@ class PluginPdfLink extends PluginPdfCommon
                             $file = reset($files);
                         }
                         $pdf->displayText(
-                            sprintf(__('%1$s: %2$s'), "<b>$name #$i - $file</b>", ''),
+                            sprintf(__s('%1$s: %2$s'), "<b>$name #$i - $file</b>", ''),
                             trim($data),
                             1,
                             10,

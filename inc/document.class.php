@@ -68,25 +68,25 @@ class PluginPdfDocument extends PluginPdfCommon
         $pdf->setColumnsSize(100);
         $title = '<b>' . _n('Document', 'Documents', $number) . '</b>';
         if ($number === 0) {
-            $pdf->displayTitle(sprintf(__('%1$s: %2$s'), $title, __('No item to display')));
+            $pdf->displayTitle(sprintf(__s('%1$s: %2$s'), $title, __s('No item to display')));
         } else {
             if ($number > $_SESSION['glpilist_limit']) {
-                $title = sprintf(__('%1$s: %2$s'), $title, $_SESSION['glpilist_limit'] . ' / ' . $number);
+                $title = sprintf(__s('%1$s: %2$s'), $title, $_SESSION['glpilist_limit'] . ' / ' . $number);
             } else {
-                $title = sprintf(__('%1$s: %2$s'), $title, $number);
+                $title = sprintf(__s('%1$s: %2$s'), $title, $number);
             }
             $pdf->displayTitle($title);
 
             $pdf->setColumnsSize(20, 15, 10, 10, 10, 8, 20, 7);
             $pdf->displayTitle(
-                __('Name'),
-                __('Entity'),
-                __('File'),
-                __('Web link'),
-                __('Heading'),
-                __('MIME type'),
-                __('Tag'),
-                __('Date'),
+                __s('Name'),
+                __s('Entity'),
+                __s('File'),
+                __s('Web link'),
+                __s('Heading'),
+                __s('MIME type'),
+                __s('Tag'),
+                __s('Date'),
             );
             foreach ($result as $data) {
                 if (empty($data['link'])) {

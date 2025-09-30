@@ -200,13 +200,13 @@ class PluginPdfComputer_SoftwareVersion extends PluginPdfCommon
         if (($number = count($result)) > 0) {
             if ($number == $total) {
                 $pdf->displayTitle('<b>' . sprintf(
-                    __('%1$s: %2$s'),
+                    __s('%1$s: %2$s'),
                     _n('Installation', 'Installations', 2),
                     $number,
                 ) . '</b>');
             } else {
                 $pdf->displayTitle('<b>' . sprintf(
-                    __('%1$s: %2$s'),
+                    __s('%1$s: %2$s'),
                     _n('Installation', 'Installations', 2),
                     $number . ' / ' . $total,
                 ) . '</b>');
@@ -214,21 +214,21 @@ class PluginPdfComputer_SoftwareVersion extends PluginPdfCommon
             $pdf->setColumnsSize(8, 12, 10, 10, 12, 8, 10, 5, 17, 8);
             $pdf->displayTitle(
                 '<b><i>' . _n('Version', 'Versions', 2),
-                __('Name'),
-                __('Serial number'),
-                __('Inventory number'),
-                __('Location'),
-                __('Status'),
-                __('Group'),
-                __('User'),
+                __s('Name'),
+                __s('Serial number'),
+                __s('Inventory number'),
+                __s('Location'),
+                __s('Status'),
+                __s('Group'),
+                __s('User'),
                 _n('License', 'Licenses', 2),
-                __('Installation date') . '</i></b>',
+                __s('Installation date') . '</i></b>',
             );
 
             foreach ($result as $data) {
                 $compname = $data['compname'];
                 if (empty($compname)) {
-                    $compname = sprintf(__('%1$s (%2$s)'), $compname, $data['cID']);
+                    $compname = sprintf(__s('%1$s (%2$s)'), $compname, $data['cID']);
                 }
                 $lics = Item_SoftwareLicense::GetLicenseForInstallation(
                     'Computer',
@@ -241,7 +241,7 @@ class PluginPdfComputer_SoftwareVersion extends PluginPdfCommon
                     foreach ($lics as $lic) {
                         $licname = $lic['name'];
                         if (!empty($lic['type'])) {
-                            $licname = sprintf(__('%1$s (%2$s)'), $licname, $lic['type']);
+                            $licname = sprintf(__s('%1$s (%2$s)'), $licname, $lic['type']);
                         }
                         $tmp[] = $licname;
                     }
@@ -268,7 +268,7 @@ class PluginPdfComputer_SoftwareVersion extends PluginPdfCommon
             }
         } else {
             $pdf->displayTitle('<b>' . _n('Installation', 'Installations', 2) . '</b>');
-            $pdf->displayLine(__('No item found'));
+            $pdf->displayLine(__s('No item found'));
         }
         $pdf->displaySpace();
     }
@@ -284,7 +284,7 @@ class PluginPdfComputer_SoftwareVersion extends PluginPdfCommon
 
         $pdf->setColumnsSize(100);
         $pdf->displayTitle('<b>' . sprintf(
-            __('%1$s: %2$s'),
+            __s('%1$s: %2$s'),
             Dropdown::getDropdownName(
                 'glpi_softwares',
                 $version->getField('softwares_id'),
@@ -294,13 +294,13 @@ class PluginPdfComputer_SoftwareVersion extends PluginPdfCommon
         $pdf->setColumnsSize(75, 25);
         $pdf->setColumnsAlign('left', 'right');
 
-        $pdf->displayTitle('<b>' . __('Entity'), _n('Installation', 'Installations', 2) . '</b>');
+        $pdf->displayTitle('<b>' . __s('Entity'), _n('Installation', 'Installations', 2) . '</b>');
 
         $lig = $tot = 0;
         if (in_array(0, $_SESSION['glpiactiveentities'])) {
             $nb = Item_SoftwareVersion::countForVersion($softwareversions_id, '0');
             if ($nb > 0) {
-                $pdf->displayLine(__('Root entity'), $nb);
+                $pdf->displayLine(__s('Root entity'), $nb);
                 $tot += $nb;
                 $lig++;
             }
@@ -321,12 +321,12 @@ class PluginPdfComputer_SoftwareVersion extends PluginPdfCommon
 
         if ($tot > 0) {
             if ($lig > 1) {
-                $pdf->displayLine(__('Total'), $tot);
+                $pdf->displayLine(__s('Total'), $tot);
             }
         } else {
             $pdf->setColumnsSize(100);
             $pdf->setColumnsAlign('center');
-            $pdf->displayLine(__('No item to display'));
+            $pdf->displayLine(__s('No item to display'));
         }
         $pdf->displaySpace();
     }
@@ -390,31 +390,31 @@ class PluginPdfComputer_SoftwareVersion extends PluginPdfCommon
 
         $installed = [];
         $pdf->setColumnsSize(100);
-        $title = '<b>' . __('Installed software') . '</b>';
+        $title = '<b>' . __s('Installed software') . '</b>';
 
         if (!count($output)) {
-            $pdf->displayTitle(sprintf(__('%1$s: %2$s'), $title, __('No item to display')));
+            $pdf->displayTitle(sprintf(__s('%1$s: %2$s'), $title, __s('No item to display')));
         } else {
-            $title = sprintf(__('%1$s: %2$s'), $title, count($output));
+            $title = sprintf(__s('%1$s: %2$s'), $title, count($output));
             $pdf->displayTitle($title);
 
             $cat = -1;
             foreach ($output as $soft) {
                 if ($soft['softwarecategories_id'] != $cat) {
                     $cat = $soft['softwarecategories_id'];
-                    $catname = $cat && $software_category->getFromDB($cat) ? $software_category->getName() : __('Uncategorized software');
+                    $catname = $cat && $software_category->getFromDB($cat) ? $software_category->getName() : __s('Uncategorized software');
 
                     $pdf->setColumnsSize(100);
                     $pdf->displayTitle('<b>' . $catname . '</b>');
 
                     $pdf->setColumnsSize(39, 9, 11, 19, 14, 8);
                     $pdf->displayTitle(
-                        '<b>' . __('Name'),
-                        __('Status'),
-                        __('Version'),
-                        __('License'),
-                        __('Installation date'),
-                        __('Valid license') . '</b>',
+                        '<b>' . __s('Name'),
+                        __s('Status'),
+                        __s('Version'),
+                        __s('License'),
+                        __s('Installation date'),
+                        __s('Valid license') . '</b>',
                     );
                 }
 
@@ -461,7 +461,7 @@ class PluginPdfComputer_SoftwareVersion extends PluginPdfCommon
                     $installed[] = $licdata['id'];
                     $lic .= (empty($lic) ? '' : ', ') . '<b>' . $licdata['name'] . '</b> ' . $licdata['serial'];
                     if (!empty($licdata['type'])) {
-                        $lic = sprintf(__('%1$s (%2$s)'), $lic, $licdata['type']);
+                        $lic = sprintf(__s('%1$s (%2$s)'), $lic, $licdata['type']);
                     }
                 }
 
@@ -540,17 +540,17 @@ class PluginPdfComputer_SoftwareVersion extends PluginPdfCommon
         $req = $DB->request($query_affected_params);
         if ($req->numrows()) {
             $pdf->setColumnsSize(100);
-            $pdf->displayTitle('<b>' . __('Affected licenses of not installed software', 'pdf') . '</b>');
+            $pdf->displayTitle('<b>' . __s('Affected licenses of not installed software', 'pdf') . '</b>');
 
             $pdf->setColumnsSize(50, 13, 13, 24);
-            $pdf->displayTitle('<b>' . __('Name'), __('Status'), __('Version'), __('License') . '</b>');
+            $pdf->displayTitle('<b>' . __s('Name'), __s('Status'), __s('Version'), __s('License') . '</b>');
 
             $lic = '';
             foreach ($req as $data) {
                 $lic .= '<b>' . $data['name'] . '</b> ' . $data['serial'];
                 if (!empty($data['softwarelicensetypes_id'])) {
                     $lic = sprintf(
-                        __('%1$s (%2$s)'),
+                        __s('%1$s (%2$s)'),
                         $lic,
                         Toolbox::stripTags(Dropdown::getDropdownName(
                             'glpi_softwarelicensetypes',

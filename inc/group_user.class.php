@@ -54,12 +54,12 @@ class PluginPdfGroup_User extends PluginPdfCommon
         $title = '<b>' . _n('User', 'Users', 2) . '</b>';
 
         if ($number === 0) {
-            $pdf->displayTitle(sprintf(__('%1$s: %2$s'), $title, __('No item to display')));
+            $pdf->displayTitle(sprintf(__s('%1$s: %2$s'), $title, __s('No item to display')));
         } else {
             if ($number > $_SESSION['glpilist_limit']) {
-                $title = sprintf(__('%1$s (%2$s)'), $title, $_SESSION['glpilist_limit'] . '/' . $number);
+                $title = sprintf(__s('%1$s (%2$s)'), $title, $_SESSION['glpilist_limit'] . '/' . $number);
             } else {
-                $title = sprintf(__('%1$s: %2$s'), $title, $number);
+                $title = sprintf(__s('%1$s: %2$s'), $title, $number);
             }
             $pdf->displayTitle($title);
 
@@ -71,19 +71,19 @@ class PluginPdfGroup_User extends PluginPdfCommon
                 $pdf->displayTitle(
                     User::getTypeName(1),
                     Group::getTypeName(1),
-                    __('Dynamic'),
-                    __('Manager'),
-                    __('Delegatee'),
-                    __('Active'),
+                    __s('Dynamic'),
+                    __s('Manager'),
+                    __s('Delegatee'),
+                    __s('Active'),
                 );
             } else {
                 $pdf->setColumnsSize(40, 15, 15, 15, 15);
                 $pdf->displayTitle(
                     User::getTypeName(1),
-                    __('Dynamic'),
-                    __('Manager'),
-                    __('Delegatee'),
-                    __('Active'),
+                    __s('Dynamic'),
+                    __s('Manager'),
+                    __s('Delegatee'),
+                    __s('Active'),
                 );
             }
 

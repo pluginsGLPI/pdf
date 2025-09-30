@@ -65,19 +65,19 @@ class PluginPdfTicket_Contract extends PluginPdfCommon
         $pdf->setColumnsSize(100);
         $title = '<b>' . _n('Associated contract', 'Associated contracts', $number) . '</b>';
         if ($number === 0) {
-            $pdf->displayTitle(sprintf(__('%1$s: %2$s'), $title, __('No item to display')));
+            $pdf->displayTitle(sprintf(__s('%1$s: %2$s'), $title, __s('No item to display')));
         } else {
-            $pdf->displayTitle(sprintf(__('%1$s: %2$s'), $title, $number));
+            $pdf->displayTitle(sprintf(__s('%1$s: %2$s'), $title, $number));
 
             $pdf->setColumnsSize(19, 19, 15, 10, 16, 11, 10);
             $pdf->displayTitle(
-                __('Name'),
-                __('Entity'),
+                __s('Name'),
+                __s('Entity'),
                 _x('phone', 'Number'),
-                __('Contract type'),
-                __('Supplier'),
-                __('Start date'),
-                __('Initial contract period'),
+                __s('Contract type'),
+                __s('Supplier'),
+                __s('Start date'),
+                __s('Initial contract period'),
             );
 
             foreach ($result as $row) {
@@ -88,7 +88,7 @@ class PluginPdfTicket_Contract extends PluginPdfCommon
                     $textduration = '';
                     if ($con->fields['duration'] > 0) {
                         $textduration = sprintf(
-                            __('Valid to %s'),
+                            __s('Valid to %s'),
                             Infocom::getWarrantyExpir(
                                 $con->fields['begin_date'],
                                 $con->fields['duration'],
@@ -106,7 +106,7 @@ class PluginPdfTicket_Contract extends PluginPdfCommon
                         str_replace('<br>', ' ', $con->getSuppliersNames()),
                         Html::convDate($con->fields['begin_date']),
                         sprintf(
-                            __('%1$s - %2$s'),
+                            __s('%1$s - %2$s'),
                             sprintf(
                                 _n('%d month', '%d months', $con->fields['duration']),
                                 $con->fields['duration'],

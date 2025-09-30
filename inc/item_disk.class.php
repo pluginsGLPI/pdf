@@ -62,24 +62,24 @@ class PluginPdfItem_Disk extends PluginPdfCommon
         $title = '<b>' . _n('Volume', 'Volumes', $number) . '</b>';
 
         if ($number === 0) {
-            $pdf->displayTitle(sprintf(__('%1$s: %2$s'), $title, __('No item to display')));
+            $pdf->displayTitle(sprintf(__s('%1$s: %2$s'), $title, __s('No item to display')));
         } else {
             if ($number > $_SESSION['glpilist_limit']) {
-                $title = sprintf(__('%1$s: %2$s'), $title, $_SESSION['glpilist_limit'] . ' / ' . $number);
+                $title = sprintf(__s('%1$s: %2$s'), $title, $_SESSION['glpilist_limit'] . ' / ' . $number);
             } else {
-                $title = sprintf(__('%1$s: %2$s'), $title, $number);
+                $title = sprintf(__s('%1$s: %2$s'), $title, $number);
             }
             $pdf->displayTitle($title);
 
             $pdf->setColumnsSize(21, 21, 20, 9, 9, 9, 11);
             $pdf->displayTitle(
-                '<b>' . __('Name'),
-                __('Partition'),
-                __('Mount point'),
-                __('File system'),
-                __('Global size'),
-                __('Free size'),
-                __('Free percentage') . '</b>',
+                '<b>' . __s('Name'),
+                __s('Partition'),
+                __s('Mount point'),
+                __s('File system'),
+                __s('Global size'),
+                __s('Free size'),
+                __s('Free percentage') . '</b>',
             );
 
             $pdf->setColumnsAlign('left', 'left', 'left', 'left', 'center', 'right', 'right');
@@ -95,7 +95,7 @@ class PluginPdfItem_Disk extends PluginPdfCommon
                     $data['mountpoint'],
                     $data['name'],
                     sprintf(
-                        __('%s Mio'),
+                        __s('%s Mio'),
                         Toolbox::stripTags(Html::formatNumber(
                             $data['totalsize'],
                             false,
@@ -103,7 +103,7 @@ class PluginPdfItem_Disk extends PluginPdfCommon
                         )),
                     ),
                     sprintf(
-                        __('%s Mio'),
+                        __s('%s Mio'),
                         Toolbox::stripTags(Html::formatNumber(
                             $data['freesize'],
                             false,
@@ -111,7 +111,7 @@ class PluginPdfItem_Disk extends PluginPdfCommon
                         )),
                     ),
                     sprintf(
-                        __('%s %s'),
+                        __s('%s %s'),
                         Toolbox::stripTags(Html::formatNumber($percent, false, 0)),
                         '%',
                     ),

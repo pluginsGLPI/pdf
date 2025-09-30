@@ -63,25 +63,25 @@ class PluginPdfDomain_Item extends PluginPdfCommon
         $title = '<b>' . Domain::getTypeName($number) . '</b>';
 
         if ($number === 0) {
-            $pdf->displayTitle(sprintf(__('%1$s: %2$s'), $title, __('No item to display')));
+            $pdf->displayTitle(sprintf(__s('%1$s: %2$s'), $title, __s('No item to display')));
         } else {
             if ($number > $_SESSION['glpilist_limit']) {
-                $title = sprintf(__('%1$s: %2$s'), $title, $_SESSION['glpilist_limit'] . ' / ' . $number);
+                $title = sprintf(__s('%1$s: %2$s'), $title, $_SESSION['glpilist_limit'] . ' / ' . $number);
             } else {
-                $title = sprintf(__('%1$s: %2$s'), $title, $number);
+                $title = sprintf(__s('%1$s: %2$s'), $title, $number);
             }
             $pdf->displayTitle($title);
 
             $pdf->setColumnsSize(17, 15, 10, 10, 8, 8, 16, 16);
             $pdf->displayTitle(
-                __('Name'),
-                __('Entity'),
-                __('Group in charge'),
-                __('Technician in charge'),
-                __('Type'),
-                __('Domain relation'),
-                __('Creation date'),
-                __('Expiration date'),
+                __s('Name'),
+                __s('Entity'),
+                __s('Group in charge'),
+                __s('Technician in charge'),
+                __s('Type'),
+                __s('Domain relation'),
+                __s('Creation date'),
+                __s('Expiration date'),
             );
 
             foreach ($result as $data) {

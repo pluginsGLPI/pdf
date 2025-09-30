@@ -55,11 +55,11 @@ class PluginPdfITILSolution extends PluginPdfCommon
 
         $number = count($soluce);
 
-        $title = '<b>' . __('Solution') . '</b>';
+        $title = '<b>' . __s('Solution') . '</b>';
         if ($number === 0) {
-            $pdf->displayTitle(sprintf(__('%1$s: %2$s'), $title, __('No item to display')));
+            $pdf->displayTitle(sprintf(__s('%1$s: %2$s'), $title, __s('No item to display')));
         } else {
-            $title = sprintf(__('%1$s: %2$s'), $title, $number);
+            $title = sprintf(__s('%1$s: %2$s'), $title, $number);
             $pdf->displayTitle($title);
             foreach ($soluce as $row) {
                 if ($row['solutiontypes_id']) {
@@ -68,7 +68,7 @@ class PluginPdfITILSolution extends PluginPdfCommon
                         $row['solutiontypes_id'],
                     ));
                 } else {
-                    $title = __('Solution');
+                    $title = __s('Solution');
                 }
                 $sol = $row['content'];
                 $sol = preg_replace('#data:image/[^;]+;base64,#', '@', $sol);
@@ -85,25 +85,25 @@ class PluginPdfITILSolution extends PluginPdfCommon
 
                 $text = $textapprove = '';
                 if ($row['status'] == 3) {
-                    $text = __('Soluce approved on ', 'pdf');
+                    $text = __s('Soluce approved on ', 'pdf');
                 } elseif ($row['status'] == 4) {
-                    $text = __('Soluce refused on ', 'pdf');
+                    $text = __s('Soluce refused on ', 'pdf');
                 }
                 if (isset($row['date_approval']) || !empty($row['users_id_approval'])) {
                     $textapprove = '<br /><br /><br /><i>' .
                                     sprintf(
-                                        __('%1$s %2$s'),
+                                        __s('%1$s %2$s'),
                                         $text,
                                         Html::convDateTime($row['date_approval']),
                                     ) . '&nbsp;' .
                                     sprintf(
-                                        __('%1$s %2$s'),
-                                        __('By'),
+                                        __s('%1$s %2$s'),
+                                        __s('By'),
                                         Toolbox::stripTags($dbu->getUserName($row['users_id_approval'])),
                                     )
                                     . '</i>';
                 }
-                $pdf->displayText('<b><i>' . sprintf(__('%1$s: %2$s'), $title . '</i></b>', ''), $sol . $textapprove);
+                $pdf->displayText('<b><i>' . sprintf(__s('%1$s: %2$s'), $title . '</i></b>', ''), $sol . $textapprove);
             }
         }
 

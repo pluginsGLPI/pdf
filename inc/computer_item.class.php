@@ -58,7 +58,7 @@ class PluginPdfComputer_Item extends PluginPdfCommon
         $info = new Infocom();
 
         $pdf->setColumnsSize(100);
-        $pdf->displayTitle('<b>' . __('Direct connections') . '</b>');
+        $pdf->displayTitle('<b>' . __s('Direct connections') . '</b>');
 
         foreach (array_keys($items) as $type) {
             if (!($item = $dbu->getItemForItemtype($type))) {
@@ -110,18 +110,18 @@ class PluginPdfComputer_Item extends PluginPdfCommon
                     $line1 = $item->getName();
                     if ($item->getField('serial') != null) {
                         $line1 = sprintf(
-                            __('%1$s - %2$s'),
+                            __s('%1$s - %2$s'),
                             $line1,
                             sprintf(
-                                __('%1$s: %2$s'),
-                                __('Serial number'),
+                                __s('%1$s: %2$s'),
+                                __s('Serial number'),
                                 $item->getField('serial'),
                             ),
                         );
                     }
 
                     $line1 = sprintf(
-                        __('%1$s - %2$s'),
+                        __s('%1$s - %2$s'),
                         $line1,
                         Toolbox::stripTags(Dropdown::getDropdownName(
                             'glpi_states',
@@ -132,31 +132,31 @@ class PluginPdfComputer_Item extends PluginPdfCommon
                     $line2 = '';
                     if ($item->getField('otherserial') != null) {
                         $line2 = sprintf(
-                            __('%1$s: %2$s'),
-                            __('Inventory number'),
+                            __s('%1$s: %2$s'),
+                            __s('Inventory number'),
                             $item->getField('otherserial'),
                         );
                     }
                     if ($info->fields['immo_number']) {
                         $line2 = sprintf(
-                            __('%1$s - %2$s'),
+                            __s('%1$s - %2$s'),
                             $line2,
                             sprintf(
-                                __('%1$s: %2$s'),
-                                __('Immobilization number'),
+                                __s('%1$s: %2$s'),
+                                __s('Immobilization number'),
                                 $info->fields['immo_number'],
                             ),
                         );
                     }
                     if ($line2 !== '' && $line2 !== '0') {
                         $pdf->displayText(
-                            '<b>' . sprintf(__('%1$s: %2$s'), $item->getTypeName() . '</b>', ''),
+                            '<b>' . sprintf(__s('%1$s: %2$s'), $item->getTypeName() . '</b>', ''),
                             $line1 . "\n" . $line2,
                             2,
                         );
                     } else {
                         $pdf->displayText(
-                            '<b>' . sprintf(__('%1$s: %2$s'), $item->getTypeName() . '</b>', ''),
+                            '<b>' . sprintf(__s('%1$s: %2$s'), $item->getTypeName() . '</b>', ''),
                             $line1,
                             1,
                         );
@@ -165,19 +165,19 @@ class PluginPdfComputer_Item extends PluginPdfCommon
             } else { // No row
                 switch ($type) {
                     case 'Printer':
-                        $pdf->displayLine(__('No printer', 'pdf'));
+                        $pdf->displayLine(__s('No printer', 'pdf'));
                         break;
 
                     case 'Monitor':
-                        $pdf->displayLine(__('No monitor', 'pdf'));
+                        $pdf->displayLine(__s('No monitor', 'pdf'));
                         break;
 
                     case 'Peripheral':
-                        $pdf->displayLine(__('No peripheral', 'pdf'));
+                        $pdf->displayLine(__s('No peripheral', 'pdf'));
                         break;
 
                     case 'Phone':
-                        $pdf->displayLine(__('No phone', 'pdf'));
+                        $pdf->displayLine(__s('No phone', 'pdf'));
                         break;
                 }
             } // No row
@@ -197,7 +197,7 @@ class PluginPdfComputer_Item extends PluginPdfCommon
         $comp = new Computer();
 
         $pdf->setColumnsSize(100);
-        $title = '<b>' . __('Direct connections') . '</b>';
+        $title = '<b>' . __s('Direct connections') . '</b>';
 
         $result = $DB->request(
             ['FROM' => 'glpi_assets_assets_peripheralassets'] + ['items_id'    => $ID,
@@ -206,7 +206,7 @@ class PluginPdfComputer_Item extends PluginPdfCommon
         $resultnum = count($result);
 
         if ($resultnum === 0) {
-            $pdf->displayTitle(sprintf(__('%1$s: %2$s'), $title, __('No item to display')));
+            $pdf->displayTitle(sprintf(__s('%1$s: %2$s'), $title, __s('No item to display')));
         } else {
             $pdf->displayTitle($title);
 
@@ -221,11 +221,11 @@ class PluginPdfComputer_Item extends PluginPdfCommon
                 $line1 = ($comp->fields['name'] ?? '(' . $comp->fields['id'] . ')');
                 if (isset($comp->fields['states_id'])) {
                     $line1 = sprintf(
-                        __('%1$s - %2$s'),
+                        __s('%1$s - %2$s'),
                         $line1,
                         sprintf(
-                            __('%1$s: %2$s'),
-                            '<b>' . __('Status') . '</b>',
+                            __s('%1$s: %2$s'),
+                            '<b>' . __s('Status') . '</b>',
                             Toolbox::stripTags(Dropdown::getDropdownName(
                                 'glpi_states',
                                 $comp->fields['states_id'],
@@ -235,11 +235,11 @@ class PluginPdfComputer_Item extends PluginPdfCommon
                 }
                 if (isset($comp->fields['serial'])) {
                     $line1 = sprintf(
-                        __('%1$s - %2$s'),
+                        __s('%1$s - %2$s'),
                         $line1,
                         sprintf(
-                            __('%1$s: %2$s'),
-                            '<b>' . __('Serial number') . '</b>',
+                            __s('%1$s: %2$s'),
+                            '<b>' . __s('Serial number') . '</b>',
                             $comp->fields['serial'],
                         ),
                     );
@@ -248,11 +248,11 @@ class PluginPdfComputer_Item extends PluginPdfCommon
 
                 if (isset($comp->fields['otherserial'])) {
                     $line1 = sprintf(
-                        __('%1$s - %2$s'),
+                        __s('%1$s - %2$s'),
                         $line1,
                         sprintf(
-                            __('%1$s: %2$s'),
-                            '<b>' . __('Inventory number') . '</b>',
+                            __s('%1$s: %2$s'),
+                            '<b>' . __s('Inventory number') . '</b>',
                             $item->getField('otherserial'),
                         ),
                     );
@@ -260,24 +260,24 @@ class PluginPdfComputer_Item extends PluginPdfCommon
                 $line2 = '';
                 if ($info->fields['immo_number']) {
                     $line2 = sprintf(
-                        __('%1$s - %2$s'),
+                        __s('%1$s - %2$s'),
                         $line2,
                         sprintf(
-                            __('%1$s: %2$s'),
-                            '<b>' . __('Immobilization number') . '</b>',
+                            __s('%1$s: %2$s'),
+                            '<b>' . __s('Immobilization number') . '</b>',
                             $info->fields['immo_number'],
                         ),
                     );
                 }
                 if ($line2 !== '' && $line2 !== '0') {
                     $pdf->displayText(
-                        '<b>' . sprintf(__('%1$s: %2$s'), __('Computer') . '</b>', ''),
+                        '<b>' . sprintf(__s('%1$s: %2$s'), __s('Computer') . '</b>', ''),
                         $line1 . "\n" . $line2,
                         2,
                     );
                 } else {
                     $pdf->displayText(
-                        '<b>' . sprintf(__('%1$s: %2$s'), __('Computer') . '</b>', ''),
+                        '<b>' . sprintf(__s('%1$s: %2$s'), __s('Computer') . '</b>', ''),
                         $line1,
                         1,
                     );
