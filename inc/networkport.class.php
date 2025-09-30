@@ -38,7 +38,7 @@ class PluginPdfNetworkPort extends PluginPdfCommon
 
     public function __construct(?CommonGLPI $obj = null)
     {
-        $this->obj = ($obj ? $obj : new NetworkPort());
+        $this->obj = ($obj ?: new NetworkPort());
     }
 
     public static function pdfForItem(PluginPdfSimplePDF $pdf, CommonDBTM $item)
@@ -60,7 +60,7 @@ class PluginPdfNetworkPort extends PluginPdfCommon
         $nb_connect = count($result);
 
         $title = '<b>' . _n('Network port', 'Network ports', $nb_connect) . '</b>';
-        if (!$nb_connect) {
+        if ($nb_connect === 0) {
             $pdf->displayTitle('<b>' . __('No network port found') . '</b>');
         } else {
             if ($nb_connect > $_SESSION['glpilist_limit']) {
@@ -93,13 +93,10 @@ class PluginPdfNetworkPort extends PluginPdfCommon
                 $netport2 = new NetworkPort();
 
                 $add = __('Not connected.');
-                if ($cid = $contact->getContact($netport->fields['id'])) {
-                    if ($netport2->getFromDB($cid)
-                        && ($device2 = $dbu->getItemForItemtype($netport2->fields['itemtype']))) {
-                        if ($device2->getFromDB($netport2->fields['items_id'])) {
-                            $add = $netport2->getName() . ' ' . __('on') . ' ' .
-                                   $device2->getName() . ' (' . $device2->getTypeName() . ')';
-                        }
+                if (($cid = $contact->getContact($netport->fields['id'])) && ($netport2->getFromDB($cid) && $device2 = $dbu->getItemForItemtype($netport2->fields['itemtype']))) {
+                    if ($device2->getFromDB($netport2->fields['items_id'])) {
+                        $add = $netport2->getName() . ' ' . __('on') . ' ' .
+                               $device2->getName() . ' (' . $device2->getTypeName() . ')';
                     }
                 }
 

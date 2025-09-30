@@ -36,7 +36,7 @@ class PluginPdfChange_Problem extends PluginPdfCommon
 
     public function __construct(?CommonGLPI $obj = null)
     {
-        $this->obj = ($obj ? $obj : new Change_Problem());
+        $this->obj = ($obj ?: new Change_Problem());
     }
 
     public static function pdfForChange(PluginPdfSimplePDF $pdf, Change $change)
@@ -65,13 +65,10 @@ class PluginPdfChange_Problem extends PluginPdfCommon
         ]);
         $number = count($result);
 
-        $problems = [];
-        $used     = [];
-
         $pdf->setColumnsSize(100);
         $title = '<b>' . Problem::getTypeName($number) . '</b>';
 
-        if (!$number) {
+        if ($number === 0) {
             $pdf->displayTitle(sprintf(__('%1$s: %2$s'), $title, __('No item to display')));
         } else {
             $pdf->displayTitle('<b>' . sprintf(
@@ -307,12 +304,9 @@ class PluginPdfChange_Problem extends PluginPdfCommon
         ]);
         $number = count($result);
 
-        $problems = [];
-        $used     = [];
-
         $pdf->setColumnsSize(100);
         $title = '<b>' . Change::getTypeName($number) . '</b>';
-        if (!$number) {
+        if ($number === 0) {
             $pdf->displayTitle(sprintf(__('%1$s: %2$s'), $title, __('No item to display')));
         } else {
             $pdf->displayTitle('<b>' . sprintf(

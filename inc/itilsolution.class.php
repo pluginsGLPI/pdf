@@ -36,7 +36,7 @@ class PluginPdfITILSolution extends PluginPdfCommon
 
     public function __construct(?CommonGLPI $obj = null)
     {
-        $this->obj = ($obj ? $obj : new ITILSolution());
+        $this->obj = ($obj ?: new ITILSolution());
     }
 
     public static function pdfForItem(PluginPdfSimplePDF $pdf, CommonDBTM $item)
@@ -56,7 +56,7 @@ class PluginPdfITILSolution extends PluginPdfCommon
         $number = count($soluce);
 
         $title = '<b>' . __('Solution') . '</b>';
-        if (!$number) {
+        if ($number === 0) {
             $pdf->displayTitle(sprintf(__('%1$s: %2$s'), $title, __('No item to display')));
         } else {
             $title = sprintf(__('%1$s: %2$s'), $title, $number);

@@ -36,7 +36,7 @@ class PluginPdfLink extends PluginPdfCommon
 
     public function __construct(?CommonGLPI $obj = null)
     {
-        $this->obj = ($obj ? $obj : new Link());
+        $this->obj = ($obj ?: new Link());
     }
 
     public static function pdfForItem(PluginPdfSimplePDF $pdf, CommonDBTM $item)
@@ -44,7 +44,7 @@ class PluginPdfLink extends PluginPdfCommon
         /** @var DBmysql $DB */
         global $DB;
 
-        $ID   = $item->getField('id');
+        $item->getField('id');
         $type = get_class($item);
 
         $query = ['SELECT' => ['glpi_links.id', 'link', 'name', 'data'],
@@ -60,7 +60,7 @@ class PluginPdfLink extends PluginPdfCommon
 
         $pdf->setColumnsSize(100);
         $title = '<b>' . _n('External link', 'External links', $number) . '</b>';
-        if (!$number) {
+        if ($number === 0) {
             $pdf->displayTitle(sprintf(__('%1$s: %2$s'), $title, __('No item to display')));
         } else {
             if ($number > $_SESSION['glpilist_limit']) {

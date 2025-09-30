@@ -36,7 +36,7 @@ class PluginPdfItem_Knowbaseitem extends PluginPdfCommon
 
     public function __construct(?CommonGLPI $obj = null)
     {
-        $this->obj = ($obj ? $obj : new Item_Disk());
+        $this->obj = ($obj ?: new Item_Disk());
     }
 
     public static function pdfForItem(PluginPdfSimplePDF $pdf, CommonDBTM $item)
@@ -60,7 +60,7 @@ class PluginPdfItem_Knowbaseitem extends PluginPdfCommon
 
         $pdf->setColumnsSize(100);
 
-        if (!$number) {
+        if ($number === 0) {
             $pdf->displayTitle('<b>' . __('No knowledge base entries linked') . '</b>');
         } else {
             $title = '<b>' . __('Link a knowledge base entry') . '</b>';

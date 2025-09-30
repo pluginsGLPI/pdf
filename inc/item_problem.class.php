@@ -30,13 +30,44 @@
  *  --------------------------------------------------------------------------
  */
 
+use Glpi\DBAL\QueryExpression;
+
+/**
+ *  -------------------------------------------------------------------------
+ *  LICENSE
+ *
+ *  This file is part of PDF plugin for GLPI.
+ *
+ *  PDF is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Affero General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  PDF is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *  GNU Affero General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Affero General Public License
+ *  along with Reports. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @author    Nelly Mahu-Lasson, Remi Collet, Teclib
+ * @copyright Copyright (c) 2009-2022 PDF plugin team
+ * @license   AGPL License 3.0 or (at your option) any later version
+ * @link      https://github.com/pluginsGLPI/pdf/
+ * @link      http://www.glpi-project.org/
+ * @package   pdf
+ * @since     2009
+ *             http://www.gnu.org/licenses/agpl-3.0-standalone.html
+ *  --------------------------------------------------------------------------
+ */
 class PluginPdfItem_Problem extends PluginPdfCommon
 {
     public static $rightname = 'plugin_pdf';
 
     public function __construct(?CommonGLPI $obj = null)
     {
-        $this->obj = ($obj ? $obj : new Item_Problem());
+        $this->obj = ($obj ?: new Item_Problem());
     }
 
     public static function pdfForProblem(PluginPdfSimplePDF $pdf, Problem $problem)
@@ -64,7 +95,7 @@ class PluginPdfItem_Problem extends PluginPdfCommon
 
         $pdf->setColumnsSize(100);
         $title = '<b>' . _n('Item', 'Items', 2) . '</b>';
-        if (!$number) {
+        if ($number === 0) {
             $pdf->displayTitle(sprintf(__('%1$s: %2$s'), $title, __('No item to display')));
         } else {
             $title = sprintf(__('%1$s: %2$s'), $title, $number);
@@ -133,7 +164,7 @@ class PluginPdfItem_Problem extends PluginPdfCommon
                     );
 
                     if (!empty($entity_restrict)) {
-                        $query_params['WHERE'][] = new \Glpi\DBAL\QueryExpression($entity_restrict);
+                        $query_params['WHERE'][] = new QueryExpression($entity_restrict);
                     }
 
                     $result_linked = $DB->request($query_params);
@@ -265,15 +296,15 @@ class PluginPdfItem_Problem extends PluginPdfCommon
 
         $where_conditions = [];
 
-        if (strpos($restrict, 'IN (') !== false || strpos($restrict, 'AND') !== false || strpos($restrict, 'OR') !== false) {
-            $where_conditions[] = new \Glpi\DBAL\QueryExpression($restrict);
+        if (str_contains($restrict, 'IN (') || str_contains($restrict, 'AND') || str_contains($restrict, 'OR')) {
+            $where_conditions[] = new QueryExpression($restrict);
         } else {
-            $where_conditions[] = new \Glpi\DBAL\QueryExpression($restrict);
+            $where_conditions[] = new QueryExpression($restrict);
         }
 
         $entity_restrict = $dbu->getEntitiesRestrictRequest('', 'glpi_problems');
         if (!empty($entity_restrict)) {
-            $where_conditions[] = new \Glpi\DBAL\QueryExpression($entity_restrict);
+            $where_conditions[] = new QueryExpression($entity_restrict);
         }
 
         $query_params = [
@@ -291,7 +322,7 @@ class PluginPdfItem_Problem extends PluginPdfCommon
 
         $pdf->setColumnsSize(100);
         $title = '<b>' . Problem::getTypeName($number) . '</b>';
-        if (!$number) {
+        if ($number === 0) {
             $pdf->displayTitle(sprintf(__('%1$s: %2$s'), $title, __('No item to display')));
         } else {
             $pdf->displayTitle('<b>' . sprintf(

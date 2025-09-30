@@ -36,7 +36,7 @@ class PluginPdfPeripheral extends PluginPdfCommon
 
     public function __construct(?CommonGLPI $obj = null)
     {
-        $this->obj = ($obj ? $obj : new Peripheral());
+        $this->obj = ($obj ?: new Peripheral());
     }
 
     public function defineAllTabsPDF($options = [])

@@ -36,7 +36,7 @@ class PluginPdfUser extends PluginPdfCommon
 
     public function __construct(?CommonGLPI $obj = null)
     {
-        $this->obj = ($obj ? $obj : new User());
+        $this->obj = ($obj ?: new User());
     }
 
     public static function pdfMain(PluginPdfSimplePDF $pdf, User $item)
@@ -44,7 +44,7 @@ class PluginPdfUser extends PluginPdfCommon
         /** @var DBmysql $DB */
         global $DB;
 
-        $ID = $item->getField('id');
+        $item->getField('id');
 
         $pdf->setColumnsSize(50, 50);
         $pdf->displayTitle(
@@ -92,11 +92,7 @@ class PluginPdfUser extends PluginPdfCommon
 
         $emails = [];
         foreach ($DB->request(['FROM' => 'glpi_useremails', 'WHERE' => ['users_id' => $item->getField('id')]]) as $key => $email) {
-            if ($email['is_default'] == 1) {
-                $emails[] = $email['email'] . ' (' . __('Default email') . ')';
-            } else {
-                $emails[] = $email['email'];
-            }
+            $emails[] = $email['is_default'] == 1 ? $email['email'] . ' (' . __('Default email') . ')' : $email['email'];
         }
         $pdf->setColumnsSize(100);
         $pdf->displayLine(
@@ -247,7 +243,7 @@ class PluginPdfUser extends PluginPdfCommon
 
                 $type_name = $item->getTypeName();
 
-                if (count($result)) {
+                if (count($result) > 0) {
                     foreach ($result as $data) {
                         $name = $data['name'];
                         if (empty($name)) {
@@ -261,8 +257,8 @@ class PluginPdfUser extends PluginPdfCommon
                             $item->getTypeName(1),
                             Dropdown::getDropdownName('glpi_entities', $data['entities_id']),
                             $name,
-                            isset($data['serial']) ? $data['serial'] : '',
-                            isset($data['otherserial']) ? $data['otherserial'] : '',
+                            $data['serial'] ?? '',
+                            $data['otherserial'] ?? '',
                             isset($data['states_id'])
                              ? Dropdown::getDropdownName('glpi_states', $data['states_id'])
                              : '',
@@ -334,7 +330,7 @@ class PluginPdfUser extends PluginPdfCommon
 
                     $type_name = $item->getTypeName();
 
-                    if (count($result)) {
+                    if (count($result) > 0) {
                         foreach ($result as $data) {
                             $name = $data['name'];
                             if (empty($name)) {
@@ -405,9 +401,6 @@ class PluginPdfUser extends PluginPdfCommon
 
     public static function displayTabContentForPDF(PluginPdfSimplePDF $pdf, CommonGLPI $item, $tab)
     {
-        $tree = isset($_REQUEST['item']['_tree']);
-        $user = isset($_REQUEST['item']['_user']);
-
         if ($item instanceof User) {
             switch ($tab) {
                 case 'User$1':

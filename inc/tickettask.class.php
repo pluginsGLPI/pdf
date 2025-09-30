@@ -36,7 +36,7 @@ class PluginPdfTicketTask extends PluginPdfCommon
 
     public function __construct(?CommonGLPI $obj = null)
     {
-        $this->obj = ($obj ? $obj : new TicketTask());
+        $this->obj = ($obj ?: new TicketTask());
     }
 
     public static function pdfForTicket(PluginPdfSimplePDF $pdf, Ticket $job, $private)
@@ -71,7 +71,7 @@ class PluginPdfTicketTask extends PluginPdfCommon
         $pdf->setColumnsSize(100);
         $title = '<b>' . TicketTask::getTypeName($number) . '</b>';
 
-        if (!$number) {
+        if ($number === 0) {
             $pdf->displayTitle(sprintf(__('%1$s: %2$s'), $title, __('No item to display')));
         } else {
             if ($number > $_SESSION['glpilist_limit']) {
@@ -130,11 +130,7 @@ class PluginPdfTicketTask extends PluginPdfCommon
                         ),
                     );
                 }
-                if ($data['taskcategories_id']) {
-                    $lib = Dropdown::getDropdownName('glpi_taskcategories', $data['taskcategories_id']);
-                } else {
-                    $lib = '';
-                }
+                $lib = $data['taskcategories_id'] ? Dropdown::getDropdownName('glpi_taskcategories', $data['taskcategories_id']) : '';
                 if ($data['is_private']) {
                     $lib = sprintf(__('%1$s (%2$s)'), $lib, __('Private'));
                 }

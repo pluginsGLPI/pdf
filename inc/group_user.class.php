@@ -36,7 +36,7 @@ class PluginPdfGroup_User extends PluginPdfCommon
 
     public function __construct(?CommonGLPI $obj = null)
     {
-        $this->obj = ($obj ? $obj : new Group_User());
+        $this->obj = ($obj ?: new Group_User());
     }
 
     public static function pdfForGroup(PluginPdfSimplePDF $pdf, Group $group, $tree)
@@ -46,14 +46,14 @@ class PluginPdfGroup_User extends PluginPdfCommon
         $ids  = [];
 
         // Retrieve member list
-        $entityrestrict = Group_User::getDataForGroup($group, $used, $ids, '', $tree);
+        Group_User::getDataForGroup($group, $used, $ids, '', $tree);
 
         $number = count($used);
 
         $pdf->setColumnsSize(100);
         $title = '<b>' . _n('User', 'Users', 2) . '</b>';
 
-        if (!$number) {
+        if ($number === 0) {
             $pdf->displayTitle(sprintf(__('%1$s: %2$s'), $title, __('No item to display')));
         } else {
             if ($number > $_SESSION['glpilist_limit']) {

@@ -36,7 +36,7 @@ class PluginPdfCommonItilCost extends PluginPdfCommon
 
     public function __construct(?CommonGLPI $obj = null)
     {
-        $this->obj = ($obj ? $obj : new TicketCost());
+        $this->obj = ($obj ?: new TicketCost());
     }
 
     public static function pdfForItem(PluginPdfSimplePDF $pdf, CommonDBTM $job)
@@ -57,7 +57,7 @@ class PluginPdfCommonItilCost extends PluginPdfCommon
 
         $number = count($result);
 
-        if (!$number) {
+        if ($number === 0) {
             $pdf->setColumnsSize(100);
             $pdf->displayTitle(sprintf(
                 __('%1$s: %2$s'),

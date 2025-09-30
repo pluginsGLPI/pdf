@@ -36,7 +36,7 @@ class PluginPdfKnowbaseItem extends PluginPdfCommon
 
     public function __construct(?CommonGLPI $obj = null)
     {
-        $this->obj = ($obj ? $obj : new KnowbaseItem());
+        $this->obj = ($obj ?: new KnowbaseItem());
     }
 
     public function defineAllTabsPDF($options = [])
@@ -54,7 +54,7 @@ class PluginPdfKnowbaseItem extends PluginPdfCommon
     {
         $dbu = new DbUtils();
 
-        $ID = $item->getField('id');
+        $item->getField('id');
 
         if (!Session::haveRightsOr(
             'knowbase',

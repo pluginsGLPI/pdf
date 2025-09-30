@@ -36,7 +36,7 @@ class PluginPdfProblemTask extends PluginPdfCommon
 
     public function __construct(?CommonGLPI $obj = null)
     {
-        $this->obj = ($obj ? $obj : new ProblemTask());
+        $this->obj = ($obj ?: new ProblemTask());
     }
 
     public static function pdfForProblem(PluginPdfSimplePDF $pdf, Problem $job)
@@ -61,7 +61,7 @@ class PluginPdfProblemTask extends PluginPdfCommon
         $pdf->setColumnsSize(100);
         $title = '<b>' . ProblemTask::getTypeName($number) . '</b>';
 
-        if (!$number) {
+        if ($number === 0) {
             $pdf->displayTitle(sprintf(__('%1$s: %2$s'), $title, __('No item to display')));
         } else {
             if ($number > $_SESSION['glpilist_limit']) {
@@ -113,11 +113,7 @@ class PluginPdfProblemTask extends PluginPdfCommon
                 }
 
 
-                if ($data['taskcategories_id']) {
-                    $lib = Dropdown::getDropdownName('glpi_taskcategories', $data['taskcategories_id']);
-                } else {
-                    $lib = '';
-                }
+                $lib = $data['taskcategories_id'] ? Dropdown::getDropdownName('glpi_taskcategories', $data['taskcategories_id']) : '';
                 $pdf->displayLine(
                     '</b>' . Toolbox::stripTags($lib),
                     Html::convDateTime($data['date']),

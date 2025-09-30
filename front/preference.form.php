@@ -30,11 +30,11 @@
  *  --------------------------------------------------------------------------
  */
 
-include_once('../../../inc/includes.php');
+include_once(__DIR__ . '/../../../inc/includes.php');
 
 Session::checkLoginUser();
 
-/** @var \DBmysql $DB */
+/** @var DBmysql $DB */
 global $DB;
 
 //Save user preferences

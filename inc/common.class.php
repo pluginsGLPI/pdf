@@ -42,7 +42,7 @@ abstract class PluginPdfCommon extends CommonGLPI
     **/
     public function __construct(?CommonGLPI $obj = null)
     {
-        if ($obj) {
+        if ($obj instanceof CommonGLPI) {
             $this->obj = $obj;
         }
     }
@@ -65,19 +65,14 @@ abstract class PluginPdfCommon extends CommonGLPI
             $withtemplate = $options['withtemplate'];
         }
 
-        if (!is_numeric($itemtype)
-            && ($obj = $dbu->getItemForItemtype($itemtype))) {
-            if (method_exists($itemtype, 'displayTabContentForPDF')
-                && !($obj instanceof PluginPdfCommon)) {
-                $titles = $obj->getTabNameForItem($this->obj, $withtemplate);
-                if (!is_array($titles)) {
-                    $titles = [1 => $titles];
-                }
-
-                foreach ($titles as $key => $val) {
-                    if (!empty($val)) {
-                        $ong[$itemtype . '$' . $key] = $val;
-                    }
+        if (!is_numeric($itemtype) && ($obj = $dbu->getItemForItemtype($itemtype)) && (method_exists($itemtype, 'displayTabContentForPDF') && !($obj instanceof PluginPdfCommon))) {
+            $titles = $obj->getTabNameForItem($this->obj, $withtemplate);
+            if (!is_array($titles)) {
+                $titles = [1 => $titles];
+            }
+            foreach ($titles as $key => $val) {
+                if (!empty($val)) {
+                    $ong[$itemtype . '$' . $key] = $val;
                 }
             }
         }
@@ -121,10 +116,8 @@ abstract class PluginPdfCommon extends CommonGLPI
     **/
     public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
     {
-        if (Session::haveRight('plugin_pdf', READ)) {
-            if (empty($withtemplate)) {
-                return self::createTabEntry(__('PDF export', 'pdf'), 0, $item::getType(), PluginPdfConfig::getIcon());
-            }
+        if (Session::haveRight('plugin_pdf', READ) && empty($withtemplate)) {
+            return self::createTabEntry(__('PDF export', 'pdf'), 0, $item::getType(), PluginPdfConfig::getIcon());
         }
         return '';
     }
@@ -339,7 +332,7 @@ abstract class PluginPdfCommon extends CommonGLPI
         $pdf->setColumnsSize(100);
         $title = '<b>' . _n('Note', 'Notes', $number) . '</b>';
 
-        if (!$number) {
+        if ($number === 0) {
             $pdf->displayTitle(sprintf(__('%1$s: %2$s'), $title, __('No item to display')));
         } else {
             if ($number > $_SESSION['glpilist_limit']) {
@@ -387,12 +380,12 @@ abstract class PluginPdfCommon extends CommonGLPI
             }
 
             foreach ($tabs as $tab) {
-                if (!$this->displayTabContentForPDF($this->pdf, $this->obj, $tab)
-                    && !$this->displayCommonTabForPDF($this->pdf, $this->obj, $tab)) {
+                if (!static::displayTabContentForPDF($this->pdf, $this->obj, $tab)
+                    && !static::displayCommonTabForPDF($this->pdf, $this->obj, $tab)) {
                     $data     = explode('$', $tab);
                     $itemtype = $data[0];
                     // Default set
-                    $tabnum = (isset($data[1]) ? $data[1] : 1);
+                    $tabnum = ($data[1] ?? 1);
 
                     if (!is_numeric($itemtype)
                         && ($itemtype != 'empty')) {

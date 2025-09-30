@@ -36,7 +36,7 @@ class PluginPdfChangeValidation extends PluginPdfCommon
 
     public function __construct(?CommonGLPI $obj = null)
     {
-        $this->obj = ($obj ? $obj : new ChangeValidation());
+        $this->obj = ($obj ?: new ChangeValidation());
     }
 
     public static function pdfForChange(PluginPdfSimplePDF $pdf, Change $change)
@@ -59,7 +59,7 @@ class PluginPdfChangeValidation extends PluginPdfCommon
         )) {
             return false;
         }
-        $ID = $change->getField('id');
+        $change->getField('id');
 
         $result = $DB->request([
             'FROM'      => 'glpi_changevalidations',
@@ -70,7 +70,7 @@ class PluginPdfChangeValidation extends PluginPdfCommon
 
         $pdf->setColumnsSize(100);
         $title = '<b>' . ChangeValidation::getTypeName(2) . '</b>';
-        if (!$number) {
+        if ($number === 0) {
             $pdf->displayTitle(sprintf(__('%1$s: %2$s'), $title, __('No item to display')));
         } else {
             $title = sprintf(__('%1$s: %2$s'), $title, $number);

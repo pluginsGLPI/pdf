@@ -36,7 +36,7 @@ class PluginPdfTicketSatisfaction extends PluginPdfCommon
 
     public function __construct(?CommonGLPI $obj = null)
     {
-        $this->obj = ($obj ? $obj : new TicketSatisfaction());
+        $this->obj = ($obj ?: new TicketSatisfaction());
     }
 
     public static function pdfForTicket(PluginPdfSimplePDF $pdf, Ticket $ticket)

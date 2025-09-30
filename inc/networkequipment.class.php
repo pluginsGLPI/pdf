@@ -36,7 +36,7 @@ class PluginPdfNetworkEquipment extends PluginPdfCommon
 
     public function __construct(?CommonGLPI $obj = null)
     {
-        $this->obj = ($obj ? $obj : new NetworkEquipment());
+        $this->obj = ($obj ?: new NetworkEquipment());
     }
 
     public function defineAllTabsPDF($options = [])

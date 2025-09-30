@@ -36,7 +36,7 @@ class PluginPdfComputerAntivirus extends PluginPdfCommon
 
     public function __construct(?CommonGLPI $obj = null)
     {
-        $this->obj = ($obj ? $obj : new ItemAntivirus());
+        $this->obj = ($obj ?: new ItemAntivirus());
     }
 
     public static function pdfForComputer(PluginPdfSimplePDF $pdf, Computer $item)
@@ -53,7 +53,7 @@ class PluginPdfComputerAntivirus extends PluginPdfCommon
         $pdf->setColumnsSize(100);
         $title = '<b>' . __('Antivirus') . '</b>';
 
-        if (!$number) {
+        if ($number === 0) {
             $pdf->displayTitle(sprintf(__('%1$s: %2$s'), $title, __('No item to display')));
         } else {
             if ($number > $_SESSION['glpilist_limit']) {

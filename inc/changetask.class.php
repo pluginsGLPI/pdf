@@ -36,7 +36,7 @@ class PluginPdfChangeTask extends PluginPdfCommon
 
     public function __construct(?CommonGLPI $obj = null)
     {
-        $this->obj = ($obj ? $obj : new ChangeTask());
+        $this->obj = ($obj ?: new ChangeTask());
     }
 
     public static function pdfForChange(PluginPdfSimplePDF $pdf, Change $job)
@@ -58,7 +58,7 @@ class PluginPdfChangeTask extends PluginPdfCommon
 
         $pdf->setColumnsSize(100);
         $title = '<b>' . ChangeTask::getTypeName(2) . '</b>';
-        if (!$number) {
+        if ($number === 0) {
             $pdf->displayTitle(sprintf(__('%1$s: %2$s'), $title, __('No item to display')));
         } else {
             $title = sprintf(__('%1$s: %2$s'), $title, $number);
@@ -105,11 +105,7 @@ class PluginPdfChangeTask extends PluginPdfCommon
                     );
                 }
 
-                if ($data['taskcategories_id']) {
-                    $lib = Dropdown::getDropdownName('glpi_taskcategories', $data['taskcategories_id']);
-                } else {
-                    $lib = '';
-                }
+                $lib = $data['taskcategories_id'] ? Dropdown::getDropdownName('glpi_taskcategories', $data['taskcategories_id']) : '';
 
                 $pdf->displayLine(
                     '</b>' . Toolbox::stripTags($lib),

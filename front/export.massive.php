@@ -41,13 +41,13 @@ $type = $_SESSION['plugin_pdf']['type'];
 $dbu = new DbUtils();
 $item = $dbu->getItemForItemtype($type);
 if (!$item) {
-    throw new \InvalidArgumentException('Invalid item type: ' . $type);
+    throw new InvalidArgumentException('Invalid item type: ' . $type);
 }
 
 $tab_id = unserialize($_SESSION['plugin_pdf']['tab_id']);
 unset($_SESSION['plugin_pdf']['tab_id']);
 
-/** @var \DBmysql $DB */
+/** @var DBmysql $DB */
 global $DB;
 
 $result = $DB->request([
@@ -68,18 +68,18 @@ foreach ($result as $data) {
         $tab[] = $data['tabref'];
     }
 }
-if (empty($tab)) {
+if ($tab === []) {
     $tab[] = $type . '$main';
 }
 
 if (isset($PLUGIN_HOOKS['plugin_pdf'][$type]) && class_exists($PLUGIN_HOOKS['plugin_pdf'][$type])) {
     $pdf_class = $PLUGIN_HOOKS['plugin_pdf'][$type];
     if (!is_a($pdf_class, PluginPdfCommon::class, true)) {
-        throw new \RuntimeException('Invalid PDF plugin class for type: ' . $type);
+        throw new RuntimeException('Invalid PDF plugin class for type: ' . $type);
     }
 
     $itempdf = new $pdf_class($item);
-    $itempdf->generatePDF($tab_id, $tab, (isset($pag) ? $pag : 0));
+    $itempdf->generatePDF($tab_id, $tab, ($pag ?? 0));
 } else {
-    throw new \RuntimeException('Missing PDF plugin hook for type: ' . $type);
+    throw new RuntimeException('Missing PDF plugin hook for type: ' . $type);
 }

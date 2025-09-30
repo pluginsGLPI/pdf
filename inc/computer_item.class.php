@@ -38,7 +38,7 @@ class PluginPdfComputer_Item extends PluginPdfCommon
 
     public function __construct(?CommonGLPI $obj = null)
     {
-        $this->obj = ($obj ? $obj : new Asset_PeripheralAsset());
+        $this->obj = ($obj ?: new Asset_PeripheralAsset());
     }
 
     public static function pdfForComputer(PluginPdfSimplePDF $pdf, Computer $comp)
@@ -60,7 +60,7 @@ class PluginPdfComputer_Item extends PluginPdfCommon
         $pdf->setColumnsSize(100);
         $pdf->displayTitle('<b>' . __('Direct connections') . '</b>');
 
-        foreach ($items as $type => $title) {
+        foreach (array_keys($items) as $type) {
             if (!($item = $dbu->getItemForItemtype($type))) {
                 continue;
             }
@@ -103,7 +103,9 @@ class PluginPdfComputer_Item extends PluginPdfCommon
                     $tID    = $row['items_id'];
                     $connID = $row['id'];
                     $item->getFromDB($tID);
-                    $info->getFromDBforDevice($type, $tID) || $info->getEmpty();
+                    if (!$info->getFromDBforDevice($type, $tID)) {
+                        $info->getEmpty();
+                    }
 
                     $line1 = $item->getName();
                     if ($item->getField('serial') != null) {
@@ -146,7 +148,7 @@ class PluginPdfComputer_Item extends PluginPdfCommon
                             ),
                         );
                     }
-                    if ($line2) {
+                    if ($line2 !== '' && $line2 !== '0') {
                         $pdf->displayText(
                             '<b>' . sprintf(__('%1$s: %2$s'), $item->getTypeName() . '</b>', ''),
                             $line1 . "\n" . $line2,
@@ -163,19 +165,19 @@ class PluginPdfComputer_Item extends PluginPdfCommon
             } else { // No row
                 switch ($type) {
                     case 'Printer':
-                        $pdf->displayLine(sprintf(__('No printer', 'pdf')));
+                        $pdf->displayLine(__('No printer', 'pdf'));
                         break;
 
                     case 'Monitor':
-                        $pdf->displayLine(sprintf(__('No monitor', 'pdf')));
+                        $pdf->displayLine(__('No monitor', 'pdf'));
                         break;
 
                     case 'Peripheral':
-                        $pdf->displayLine(sprintf(__('No peripheral', 'pdf')));
+                        $pdf->displayLine(__('No peripheral', 'pdf'));
                         break;
 
                     case 'Phone':
-                        $pdf->displayLine(sprintf(__('No phone', 'pdf')));
+                        $pdf->displayLine(__('No phone', 'pdf'));
                         break;
                 }
             } // No row
@@ -203,7 +205,7 @@ class PluginPdfComputer_Item extends PluginPdfCommon
         );
         $resultnum = count($result);
 
-        if (!$resultnum) {
+        if ($resultnum === 0) {
             $pdf->displayTitle(sprintf(__('%1$s: %2$s'), $title, __('No item to display')));
         } else {
             $pdf->displayTitle($title);
@@ -212,9 +214,11 @@ class PluginPdfComputer_Item extends PluginPdfCommon
                 $tID    = $row['computers_id'];
                 $connID = $row['id'];
                 $comp->getFromDB($tID);
-                $info->getFromDBforDevice('Computer', $tID) || $info->getEmpty();
+                if (!$info->getFromDBforDevice('Computer', $tID)) {
+                    $info->getEmpty();
+                }
 
-                $line1 = (isset($comp->fields['name']) ? $comp->fields['name'] : '(' . $comp->fields['id'] . ')');
+                $line1 = ($comp->fields['name'] ?? '(' . $comp->fields['id'] . ')');
                 if (isset($comp->fields['states_id'])) {
                     $line1 = sprintf(
                         __('%1$s - %2$s'),
@@ -265,7 +269,7 @@ class PluginPdfComputer_Item extends PluginPdfCommon
                         ),
                     );
                 }
-                if ($line2) {
+                if ($line2 !== '' && $line2 !== '0') {
                     $pdf->displayText(
                         '<b>' . sprintf(__('%1$s: %2$s'), __('Computer') . '</b>', ''),
                         $line1 . "\n" . $line2,

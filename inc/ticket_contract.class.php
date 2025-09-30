@@ -36,7 +36,7 @@ class PluginPdfTicket_Contract extends PluginPdfCommon
 
     public function __construct(?CommonGLPI $obj = null)
     {
-        $this->obj = ($obj ? $obj : new Ticket_Contract());
+        $this->obj = ($obj ?: new Ticket_Contract());
     }
 
     public static function pdfForTicket(PluginPdfSimplePDF $pdf, CommonDBTM $item)
@@ -46,7 +46,7 @@ class PluginPdfTicket_Contract extends PluginPdfCommon
 
         $type      = $item->getType();
         $ID        = $item->getField('id');
-        $itemtable = getTableForItemType($type);
+        getTableForItemType($type);
         $con       = new Contract();
         $dbu       = new DbUtils();
 
@@ -64,7 +64,7 @@ class PluginPdfTicket_Contract extends PluginPdfCommon
 
         $pdf->setColumnsSize(100);
         $title = '<b>' . _n('Associated contract', 'Associated contracts', $number) . '</b>';
-        if (!$number) {
+        if ($number === 0) {
             $pdf->displayTitle(sprintf(__('%1$s: %2$s'), $title, __('No item to display')));
         } else {
             $pdf->displayTitle(sprintf(__('%1$s: %2$s'), $title, $number));

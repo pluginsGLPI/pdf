@@ -396,12 +396,9 @@ class PluginPdfConfig extends CommonDBTM
         global $PDF_DEVICES;
 
         $config = self::getInstance();
-        $name   = '';
         foreach ($PDF_DEVICES as $option => $value) {
-            if ($config->getField('currency') == $option) {
-                if (isset($value[2])) {
-                    return $value[0];
-                }
+            if ($config->getField('currency') == $option && isset($value[2])) {
+                return $value[0];
             }
         }
     }

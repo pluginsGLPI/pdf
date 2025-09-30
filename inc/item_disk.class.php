@@ -36,7 +36,7 @@ class PluginPdfItem_Disk extends PluginPdfCommon
 
     public function __construct(?CommonGLPI $obj = null)
     {
-        $this->obj = ($obj ? $obj : new Item_Disk());
+        $this->obj = ($obj ?: new Item_Disk());
     }
 
     public static function pdfForItem(PluginPdfSimplePDF $pdf, CommonDBTM $item)
@@ -61,7 +61,7 @@ class PluginPdfItem_Disk extends PluginPdfCommon
         $pdf->setColumnsSize(100);
         $title = '<b>' . _n('Volume', 'Volumes', $number) . '</b>';
 
-        if (!$number) {
+        if ($number === 0) {
             $pdf->displayTitle(sprintf(__('%1$s: %2$s'), $title, __('No item to display')));
         } else {
             if ($number > $_SESSION['glpilist_limit']) {

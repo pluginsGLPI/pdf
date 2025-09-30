@@ -39,7 +39,7 @@ class PluginPdfAppliance extends PluginPdfCommon
      **/
     public function __construct(?CommonGLPI $obj = null)
     {
-        $this->obj = ($obj ? $obj : new Appliance());
+        $this->obj = ($obj ?: new Appliance());
     }
 
     /**
@@ -96,7 +96,7 @@ class PluginPdfAppliance extends PluginPdfCommon
 
     public static function pdfMain(PluginPdfSimplePDF $pdf, Appliance $item)
     {
-        $dbu = new DbUtils();
+        new DbUtils();
 
         PluginPdfCommon::mainTitle($pdf, $item);
 
@@ -246,7 +246,7 @@ class PluginPdfAppliance extends PluginPdfCommon
             );
         }
 
-        if (!$number) {
+        if ($number === 0) {
             $pdf->displayLine(__('No item found'));
         } else {
             $dbu = new DbUtils();
@@ -288,7 +288,7 @@ class PluginPdfAppliance extends PluginPdfCommon
                     $query['ORDER'] = ['glpi_entities.completename', $item->getTable() . '.' . $column];
 
                     $result_linked = $DB->request($query);
-                    if (count($result_linked)) {
+                    if (count($result_linked) > 0) {
                         foreach ($result_linked as $id => $data) {
                             if (!$item->getFromDB($data['id'])) {
                                 continue;
@@ -314,16 +314,16 @@ class PluginPdfAppliance extends PluginPdfCommon
                                         'glpi_entities',
                                         $data['entities_id'],
                                     ),
-                                    (isset($data['serial']) ? $data['serial'] : '-'),
-                                    (isset($data['otherserial']) ? $data['otherserial'] : '-'),
+                                    ($data['serial'] ?? '-'),
+                                    ($data['otherserial'] ?? '-'),
                                 );
                             } else {
                                 $pdf->setColumnsSize(25, 31, 22, 22);
                                 $pdf->displayTitle(
                                     $item->getTypeName(1),
                                     $name,
-                                    (isset($data['serial']) ? $data['serial'] : '-'),
-                                    (isset($data['otherserial']) ? $data['otherserial'] : '-'),
+                                    ($data['serial'] ?? '-'),
+                                    ($data['otherserial'] ?? '-'),
                                 );
                             }
 
@@ -403,7 +403,7 @@ class PluginPdfAppliance extends PluginPdfCommon
             'ORDER'                              => 'vvalues']);
         $number_champs = count($result_app_opt);
 
-        if (!$number_champs) {
+        if ($number_champs === 0) {
             return;
         }
 
@@ -436,7 +436,7 @@ class PluginPdfAppliance extends PluginPdfCommon
         /** @var DBmysql $DB */
         global $DB;
 
-        $dbu = new DbUtils();
+        new DbUtils();
 
         $ID       = $item->getField('id');
         $itemtype = get_class($item);
@@ -467,7 +467,7 @@ class PluginPdfAppliance extends PluginPdfCommon
         $result = $DB->request($query);
         $number = count($result);
 
-        if (!$number) {
+        if ($number === 0) {
             $pdf->displayLine(__('No item found'));
         } else {
             if (Session::isMultiEntitiesMode()) {

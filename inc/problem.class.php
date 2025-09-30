@@ -36,7 +36,7 @@ class PluginPdfProblem extends PluginPdfCommon
 
     public function __construct(?CommonGLPI $obj = null)
     {
-        $this->obj = ($obj ? $obj : new Problem());
+        $this->obj = ($obj ?: new Problem());
     }
 
     public static function pdfMain(PluginPdfSimplePDF $pdf, Problem $job)
@@ -66,8 +66,6 @@ class PluginPdfProblem extends PluginPdfCommon
             $recipient->getFromDB($job->fields['users_id_recipient']);
             $recipient_name = $recipient->getName();
         }
-
-        $sla = $due = $commentsla = '';
         if ($job->fields['time_to_resolve']) {
             $due = '<b><i>' . sprintf(
                 __('%1$s: %2$s'),
@@ -382,24 +380,19 @@ class PluginPdfProblem extends PluginPdfCommon
         $pdf->displayTitle('<b>' . _n('Time', 'Times', 2) . '</b>');
 
 
-        if (in_array($job->fields['status'], $job->getSolvedStatusArray())
-            || in_array($job->fields['status'], $job->getClosedStatusArray())) {
-            if ($job->fields['solve_delay_stat'] > 0) {
-                $pdf->displayLine(sprintf(
-                    __('%1$s: %2$s'),
-                    __('Solution'),
-                    Toolbox::stripTags(Html::timestampToString($job->fields['solve_delay_stat'], false)),
-                ));
-            }
+        if ((in_array($job->fields['status'], $job->getSolvedStatusArray()) || in_array($job->fields['status'], $job->getClosedStatusArray())) && $job->fields['solve_delay_stat'] > 0) {
+            $pdf->displayLine(sprintf(
+                __('%1$s: %2$s'),
+                __('Solution'),
+                Toolbox::stripTags(Html::timestampToString($job->fields['solve_delay_stat'], false)),
+            ));
         }
-        if (in_array($job->fields['status'], $job->getClosedStatusArray())) {
-            if ($job->fields['close_delay_stat'] > 0) {
-                $pdf->displayLine(sprintf(
-                    __('%1$s: %2$s'),
-                    __('Closing'),
-                    Toolbox::stripTags(Html::timestampToString($job->fields['close_delay_stat'], false)),
-                ));
-            }
+        if (in_array($job->fields['status'], $job->getClosedStatusArray()) && $job->fields['close_delay_stat'] > 0) {
+            $pdf->displayLine(sprintf(
+                __('%1$s: %2$s'),
+                __('Closing'),
+                Toolbox::stripTags(Html::timestampToString($job->fields['close_delay_stat'], false)),
+            ));
         }
         if ($job->fields['waiting_duration'] > 0) {
             $pdf->displayLine(sprintf(

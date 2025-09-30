@@ -36,7 +36,7 @@ class PluginPdfTicket extends PluginPdfCommon
 
     public function __construct(?CommonGLPI $obj = null)
     {
-        $this->obj = ($obj ? $obj : new Ticket());
+        $this->obj = ($obj ?: new Ticket());
     }
 
     public static function pdfMain(PluginPdfSimplePDF $pdf, Ticket $job)
@@ -71,8 +71,6 @@ class PluginPdfTicket extends PluginPdfCommon
             $recipient->getFromDB($job->fields['users_id_recipient']);
             $recipient_name = $recipient->getName();
         }
-
-        $due = $commenttto = $commentttr = $interntto = '';
         $pdf->displayLine(
             '<b><i>' . sprintf(
                 __('%1$s: %2$s'),
@@ -287,52 +285,49 @@ class PluginPdfTicket extends PluginPdfCommon
             }
 
             $user = new User();
-            if ($info = $user->getFromDB($d['users_id'])
-                && $infouser) {
-                if ($user->fields['phone'] || $user->fields['mobile']
-                                           || $user->fields['usercategories_id'] || $user->fields['locations_id']) {
-                    $tmp .= ' (';
-                    $first = true;
-                    if ($user->fields['phone']) {
-                        $tmp .= sprintf(__('%1$s: %2$s'), __('Phone'), $user->fields['phone']);
-                        $first = false;
-                    }
-                    if ($user->fields['mobile']) {
-                        if (!$first) {
-                            $tmp .= ' - ';
-                        }
-                        $tmp .= sprintf(__('%1$s: %2$s'), __('Mobile phone'), $user->fields['mobile']);
-                        $first = false;
-                    }
-                    if ($user->fields['usercategories_id']) {
-                        if (!$first) {
-                            $tmp .= ' - ';
-                        }
-                        $tmp .= sprintf(
-                            __('%1$s: %2$s'),
-                            __('Category'),
-                            Dropdown::getDropdownName(
-                                'glpi_usercategories',
-                                $user->fields['usercategories_id'],
-                            ),
-                        );
-                        $first = false;
-                    }
-                    if ($user->fields['locations_id']) {
-                        if (!$first) {
-                            $tmp .= ' - ';
-                        }
-                        $tmp .= sprintf(
-                            __('%1$s: %2$s'),
-                            __('Location'),
-                            Dropdown::getDropdownName(
-                                'glpi_locations',
-                                $user->fields['locations_id'],
-                            ),
-                        );
-                    }
-                    $tmp .= ')';
+            if (($info = $user->getFromDB($d['users_id'])
+                && $infouser) && ($user->fields['phone'] || $user->fields['mobile'] || $user->fields['usercategories_id'] || $user->fields['locations_id'])) {
+                $tmp .= ' (';
+                $first = true;
+                if ($user->fields['phone']) {
+                    $tmp .= sprintf(__('%1$s: %2$s'), __('Phone'), $user->fields['phone']);
+                    $first = false;
                 }
+                if ($user->fields['mobile']) {
+                    if (!$first) {
+                        $tmp .= ' - ';
+                    }
+                    $tmp .= sprintf(__('%1$s: %2$s'), __('Mobile phone'), $user->fields['mobile']);
+                    $first = false;
+                }
+                if ($user->fields['usercategories_id']) {
+                    if (!$first) {
+                        $tmp .= ' - ';
+                    }
+                    $tmp .= sprintf(
+                        __('%1$s: %2$s'),
+                        __('Category'),
+                        Dropdown::getDropdownName(
+                            'glpi_usercategories',
+                            $user->fields['usercategories_id'],
+                        ),
+                    );
+                    $first = false;
+                }
+                if ($user->fields['locations_id']) {
+                    if (!$first) {
+                        $tmp .= ' - ';
+                    }
+                    $tmp .= sprintf(
+                        __('%1$s: %2$s'),
+                        __('Location'),
+                        Dropdown::getDropdownName(
+                            'glpi_locations',
+                            $user->fields['locations_id'],
+                        ),
+                    );
+                }
+                $tmp .= ')';
             }
             $users[] = $tmp;
         }
@@ -504,7 +499,7 @@ class PluginPdfTicket extends PluginPdfCommon
 
     public static function pdfStat(PluginPdfSimplePDF $pdf, Ticket $job)
     {
-        $now                  = time();
+        time();
         $date_creation        = strtotime($job->fields['date']);
         $date_takeintoaccount = $date_creation + $job->fields['takeintoaccount_delay_stat'];
         if ($date_takeintoaccount == $date_creation) {
@@ -565,22 +560,17 @@ class PluginPdfTicket extends PluginPdfCommon
             );
         }
 
-        if (in_array($job->fields['status'], $job->getSolvedStatusArray())
-            || in_array($job->fields['status'], $job->getClosedStatusArray())) {
-            if ($job->fields['solve_delay_stat'] > 0) {
-                $pdf->displayLine(
-                    __('Solution'),
-                    Toolbox::stripTags(Html::timestampToString($job->fields['solve_delay_stat'], false)),
-                );
-            }
+        if ((in_array($job->fields['status'], $job->getSolvedStatusArray()) || in_array($job->fields['status'], $job->getClosedStatusArray())) && $job->fields['solve_delay_stat'] > 0) {
+            $pdf->displayLine(
+                __('Solution'),
+                Toolbox::stripTags(Html::timestampToString($job->fields['solve_delay_stat'], false)),
+            );
         }
-        if (in_array($job->fields['status'], $job->getClosedStatusArray())) {
-            if ($job->fields['close_delay_stat'] > 0) {
-                $pdf->displayLine(
-                    __('Closing'),
-                    Toolbox::stripTags(Html::timestampToString($job->fields['close_delay_stat'], true)),
-                );
-            }
+        if (in_array($job->fields['status'], $job->getClosedStatusArray()) && $job->fields['close_delay_stat'] > 0) {
+            $pdf->displayLine(
+                __('Closing'),
+                Toolbox::stripTags(Html::timestampToString($job->fields['close_delay_stat'], true)),
+            );
         }
         if ($job->fields['waiting_duration'] > 0) {
             $pdf->displayLine(

@@ -36,7 +36,7 @@ class PluginPdfPrinter extends PluginPdfCommon
 
     public function __construct(?CommonGLPI $obj = null)
     {
-        $this->obj = ($obj ? $obj : new Printer());
+        $this->obj = ($obj ?: new Printer());
     }
 
     public function defineAllTabsPDF($options = [])
@@ -136,7 +136,7 @@ class PluginPdfPrinter extends PluginPdfCommon
             'have_ethernet'    => __('Ethernet'),
             'have_wifi'        => __('Wifi')];
 
-        foreach ($opts as $key => $val) {
+        foreach (array_keys($opts) as $key) {
             if (!$printer->fields[$key]) {
                 unset($opts[$key]);
             }

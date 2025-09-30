@@ -36,7 +36,7 @@ class PluginPdfTicketValidation extends PluginPdfCommon
 
     public function __construct(?CommonGLPI $obj = null)
     {
-        $this->obj = ($obj ? $obj : new TicketValidation());
+        $this->obj = ($obj ?: new TicketValidation());
     }
 
     public static function pdfForTicket(PluginPdfSimplePDF $pdf, Ticket $ticket)
@@ -52,7 +52,7 @@ class PluginPdfTicketValidation extends PluginPdfCommon
         if (!Session::haveRightsOr('ticketvalidation', TicketValidation::getValidateRights())) {
             return false;
         }
-        $ID = $ticket->getField('id');
+        $ticket->getField('id');
 
         $result = $DB->request(
             ['FROM' => 'glpi_ticketvalidations'] + ['WHERE'    => ['tickets_id' => $ticket->getField('id')],
@@ -61,7 +61,7 @@ class PluginPdfTicketValidation extends PluginPdfCommon
 
         $number = count($result);
 
-        if ($number) {
+        if ($number !== 0) {
             $pdf->setColumnsSize(20, 19, 21, 19, 21);
             $pdf->displayTitle(
                 _x('item', 'State'),

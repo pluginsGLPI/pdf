@@ -36,7 +36,7 @@ class PluginPdfContract extends PluginPdfCommon
 
     public function __construct(?CommonGLPI $obj = null)
     {
-        $this->obj = ($obj ? $obj : new Contract());
+        $this->obj = ($obj ?: new Contract());
     }
 
     public function defineAllTabsPDF($options = [])
@@ -49,7 +49,7 @@ class PluginPdfContract extends PluginPdfCommon
 
     public static function pdfMain(PluginPdfSimplePDF $pdf, Contract $contract)
     {
-        $dbu = new DbUtils();
+        new DbUtils();
 
         PluginPdfCommon::mainTitle($pdf, $contract);
 
@@ -215,7 +215,7 @@ class PluginPdfContract extends PluginPdfCommon
 
         $number = count($result);
 
-        if (!$number) {
+        if ($number === 0) {
             $pdf->setColumnsSize(100);
             $pdf->displayTitle(sprintf(
                 __('%1$s: %2$s'),

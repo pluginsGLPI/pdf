@@ -46,7 +46,7 @@ class PluginPdfPreference extends CommonDBTM
         /** @var array $PLUGIN_HOOKS */
         global $PLUGIN_HOOKS;
 
-        $target = Toolbox::getItemTypeFormURL(__CLASS__);
+        $target = Toolbox::getItemTypeFormURL(self::class);
         $pref   = new self();
         $dbu    = new DbUtils();
 

@@ -36,7 +36,7 @@ class PluginPdfItilFollowup extends PluginPdfCommon
 
     public function __construct(?CommonGLPI $obj = null)
     {
-        $this->obj = ($obj ? $obj : new ITILFollowup());
+        $this->obj = ($obj ?: new ITILFollowup());
     }
 
     public static function pdfForItem(PluginPdfSimplePDF $pdf, CommonDBTM $item, $private)
@@ -72,7 +72,7 @@ class PluginPdfItilFollowup extends PluginPdfCommon
         $pdf->setColumnsSize(100);
         $title = '<b>' . ITILFollowup::getTypeName(2) . '</b>';
 
-        if (!$number) {
+        if ($number === 0) {
             $pdf->displayTitle(sprintf(__('%1$s: %2$s'), $title, __('No item to display')));
         } else {
             if ($number > $_SESSION['glpilist_limit']) {
@@ -88,11 +88,7 @@ class PluginPdfItilFollowup extends PluginPdfCommon
                 '<b><i>' . __('Requester') . '</i></b>'); // Author
 
             foreach ($result as $data) {
-                if ($data['requesttypes_id']) {
-                    $lib = Dropdown::getDropdownName('glpi_requesttypes', $data['requesttypes_id']);
-                } else {
-                    $lib = '';
-                }
+                $lib = $data['requesttypes_id'] ? Dropdown::getDropdownName('glpi_requesttypes', $data['requesttypes_id']) : '';
                 if ($data['is_private']) {
                     $lib = sprintf(__('%1$s (%2$s)'), $lib, __('Private'));
                 }

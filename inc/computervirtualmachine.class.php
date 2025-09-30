@@ -36,7 +36,7 @@ class PluginPdfComputerVirtualMachine extends PluginPdfCommon
 
     public function __construct(?CommonGLPI $obj = null)
     {
-        $this->obj = ($obj ? $obj : new ItemVirtualMachine());
+        $this->obj = ($obj ?: new ItemVirtualMachine());
     }
 
     public static function pdfForComputer(PluginPdfSimplePDF $pdf, Computer $item)
@@ -55,7 +55,7 @@ class PluginPdfComputerVirtualMachine extends PluginPdfCommon
 
         $number = count($virtualmachines);
 
-        if (!$number) {
+        if ($number === 0) {
             $pdf->displayTitle('<b>' . __('No virtualized environment associated with the computer') . '</b>');
         } else {
             if ($number > $_SESSION['glpilist_limit']) {

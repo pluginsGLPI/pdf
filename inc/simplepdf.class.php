@@ -30,6 +30,38 @@
  *  --------------------------------------------------------------------------
  */
 
+use Glpi\RichText\RichText;
+
+/**
+ *  -------------------------------------------------------------------------
+ *  LICENSE
+ *
+ *  This file is part of PDF plugin for GLPI.
+ *
+ *  PDF is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Affero General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  PDF is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *  GNU Affero General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Affero General Public License
+ *  along with Reports. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @author    Nelly Mahu-Lasson, Remi Collet, Teclib
+ * @copyright Copyright (c) 2009-2022 PDF plugin team
+ * @license   AGPL License 3.0 or (at your option) any later version
+ * @link      https://github.com/pluginsGLPI/pdf/
+ * @link      http://www.glpi-project.org/
+ * @package   pdf
+ * @since     2009
+ *             http://www.gnu.org/licenses/agpl-3.0-standalone.html
+ *  --------------------------------------------------------------------------
+ */
+
 //use TCPDF;
 
 define('K_PATH_IMAGES', '');
@@ -78,7 +110,6 @@ class PluginPdfSimplePDF
         $pdf->SetCreator('GLPI');
         $pdf->SetAuthor('GLPI');
         $font = 'helvetica';
-        $fonsize = 8;
         if (isset($_SESSION['glpipdffont']) && $_SESSION['glpipdffont']) {
             $font = $_SESSION['glpipdffont'];
         }
@@ -275,7 +306,7 @@ class PluginPdfSimplePDF
                     $ln = 1; // down
                 }
                 $this->pdf->SetX($this->colsx[$i]);
-                $align = (isset($this->align[$i]) ? $this->align[$i] : $defalign);
+                $align = ($this->align[$i] ?? $defalign);
                 $this->pdf->writeHTMLCell(
                     $this->colsw[$i], // $w (float) Cell width. If 0, the cell extends up to the right margin.
                     $max,             // $h (float) Cell minimum height. The cell extends automatically if needed.
@@ -345,18 +376,13 @@ class PluginPdfSimplePDF
 
         $this->setColumnsSize(100);
         $text    = $name . ' ' . $content;
-        $content = Glpi\RichText\RichText::getEnhancedHtml($text);
+        $content = RichText::getEnhancedHtml($text);
         if (!preg_match("/<br\s?\/?>/", $content) && !preg_match('/<p>/', $content)) {
             $content = nl2br($content);
         }
         $this->displayInternal(240, 0.5, self::LEFT, $minline * 5, [$content]);
         /* Restore */
-        list(
-            $this->cols,
-            $this->colsx,
-            $this->colsw,
-            $this->align,
-        ) = $save;
+        [$this->cols, $this->colsx, $this->colsw, $this->align, ] = $save;
     }
 
     /**

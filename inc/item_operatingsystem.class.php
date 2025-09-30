@@ -36,7 +36,7 @@ class PluginPdfItem_OperatingSystem extends PluginPdfCommon
 
     public function __construct(?CommonGLPI $obj = null)
     {
-        $this->obj = ($obj ? $obj : new Item_OperatingSystem());
+        $this->obj = ($obj ?: new Item_OperatingSystem());
     }
 
     public static function pdfForItem(PluginPdfSimplePDF $pdf, $item)
@@ -86,7 +86,7 @@ class PluginPdfItem_OperatingSystem extends PluginPdfCommon
 
         $pdf->setColumnsSize(100);
         $title = '<b>' . __('Operating system') . '</b>';
-        if (!$number) {
+        if ($number === 0) {
             $pdf->displayTitle(sprintf(__('%1$s: %2$s'), $title, __('No item to display')));
         } else {
             if ($number > $_SESSION['glpilist_limit']) {

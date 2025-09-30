@@ -36,7 +36,7 @@ class PluginPdfMonitor extends PluginPdfCommon
 
     public function __construct(?CommonGLPI $obj = null)
     {
-        $this->obj = ($obj ? $obj : new Monitor());
+        $this->obj = ($obj ?: new Monitor());
     }
 
     public function defineAllTabsPDF($options = [])
@@ -81,7 +81,7 @@ class PluginPdfMonitor extends PluginPdfCommon
             'have_pivot'       => __('Pivot'),
             'have_hdmi'        => __('HDMI'),
             'have_displayport' => __('DisplayPort')];
-        foreach ($opts as $key => $val) {
+        foreach (array_keys($opts) as $key) {
             if (!$item->fields[$key]) {
                 unset($opts[$key]);
             }

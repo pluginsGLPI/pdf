@@ -36,7 +36,7 @@ class PluginPdfProblem_Ticket extends PluginPdfCommon
 
     public function __construct(?CommonGLPI $obj = null)
     {
-        $this->obj = ($obj ? $obj : new Problem_Ticket());
+        $this->obj = ($obj ?: new Problem_Ticket());
     }
 
     public static function pdfForTicket(PluginPdfSimplePDF $pdf, Ticket $ticket)
@@ -64,12 +64,9 @@ class PluginPdfProblem_Ticket extends PluginPdfCommon
         $result = $DB->request($query);
         $number = count($result);
 
-        $problems = [];
-        $used     = [];
-
         $pdf->setColumnsSize(100);
         $title = '<b>' . _n('Problem', 'Problems', $number) . '</b>';
-        if (!$number) {
+        if ($number === 0) {
             $pdf->displayTitle(sprintf(__('%1$s: %2$s'), $title, __('No item to display')));
         } else {
             $pdf->displayTitle('<b>' . sprintf(
@@ -303,12 +300,9 @@ class PluginPdfProblem_Ticket extends PluginPdfCommon
         $result = $DB->request($query);
         $number = count($result);
 
-        $problems = [];
-        $used     = [];
-
         $pdf->setColumnsSize(100);
         $title = '<b>' . _n('Ticket', 'Tickets', 2) . '</b>';
-        if (!$number) {
+        if ($number === 0) {
             $pdf->displayTitle(sprintf(__('%1$s: %2$s'), $title, __('No item to display')));
         } else {
             $pdf->displayTitle('<b>' . sprintf(
@@ -507,12 +501,10 @@ class PluginPdfProblem_Ticket extends PluginPdfCommon
                 $item_ticket = new Item_Ticket();
                 $data        = $item_ticket->find(['tickets_id' => $job->fields['id']]);
                 foreach ($data as $val) {
-                    if (!empty($val['itemtype']) && ($val['items_id'] > 0)) {
-                        if ($object = $dbu->getItemForItemtype($val['itemtype'])) {
-                            if ($object->getFromDB($val['items_id'])) {
-                                $item_col .= $object->getTypeName();
-                                $item_col .= ' - ' . $object->getNameID() . '<br />';
-                            }
+                    if (!empty($val['itemtype']) && $val['items_id'] > 0 && $object = $dbu->getItemForItemtype($val['itemtype'])) {
+                        if ($object->getFromDB($val['items_id'])) {
+                            $item_col .= $object->getTypeName();
+                            $item_col .= ' - ' . $object->getNameID() . '<br />';
                         }
                     }
                 }

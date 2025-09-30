@@ -36,7 +36,7 @@ class PluginPdfReservation extends PluginPdfCommon
 
     public function __construct(?CommonGLPI $obj = null)
     {
-        $this->obj = ($obj ? $obj : new Reservation());
+        $this->obj = ($obj ?: new Reservation());
     }
 
     public static function pdfForItem(PluginPdfSimplePDF $pdf, CommonDBTM $item)
@@ -70,7 +70,7 @@ class PluginPdfReservation extends PluginPdfCommon
 
             $pdf->setColumnsSize(100);
 
-            if (!count($result)) {
+            if (count($result) === 0) {
                 $pdf->displayTitle('<b>' . __('No current and future reservations', 'pdf') . '</b>');
             } else {
                 $pdf->displayTitle('<b>' . __('Current and future reservations') . '</b>');
@@ -110,7 +110,7 @@ class PluginPdfReservation extends PluginPdfCommon
 
             $pdf->setColumnsSize(100);
 
-            if (!count($result)) {
+            if (count($result) === 0) {
                 $pdf->displayTitle('<b>' . __('No past reservations', 'pdf') . '</b>');
             } else {
                 $pdf->displayTitle('<b>' . __('Past reservations') . '</b>');
@@ -175,7 +175,7 @@ class PluginPdfReservation extends PluginPdfCommon
 
         $result = $DB->request($query);
 
-        if (!count($result)) {
+        if (count($result) === 0) {
             $pdf->displayTitle('<b>' . __('No current and future reservations', 'pdf') . '</b>');
         } else {
             $pdf->displayTitle('<b>' . __('Current and future reservations') . '</b>');
@@ -193,11 +193,9 @@ class PluginPdfReservation extends PluginPdfCommon
         $ri = new ReservationItem();
 
         foreach ($result as $data) {
-            if ($ri->getFromDB($data['reservationitems_id'])) {
-                if ($item = getItemForItemtype($ri->fields['itemtype'])) {
-                    if ($item->getFromDB($ri->fields['items_id'])) {
-                        $name = $item->fields['name'];
-                    }
+            if ($ri->getFromDB($data['reservationitems_id']) && $item = getItemForItemtype($ri->fields['itemtype'])) {
+                if ($item->getFromDB($ri->fields['items_id'])) {
+                    $name = $item->fields['name'];
                 }
             }
             $pdf->displayLine(
@@ -228,7 +226,7 @@ class PluginPdfReservation extends PluginPdfCommon
 
         $result = $DB->request($query);
 
-        if (!count($result)) {
+        if (count($result) === 0) {
             $pdf->displayTitle('<b>' . __('No past reservations', 'pdf') . '</b>');
         } else {
             $pdf->displayTitle('<b>' . __('Past reservations') . '</b>');
@@ -245,11 +243,9 @@ class PluginPdfReservation extends PluginPdfCommon
         }
 
         foreach ($result as $data) {
-            if ($ri->getFromDB($data['reservationitems_id'])) {
-                if ($item = getItemForItemtype($ri->fields['itemtype'])) {
-                    if ($item->getFromDB($ri->fields['items_id'])) {
-                        $name = $item->fields['name'];
-                    }
+            if ($ri->getFromDB($data['reservationitems_id']) && $item = getItemForItemtype($ri->fields['itemtype'])) {
+                if ($item->getFromDB($ri->fields['items_id'])) {
+                    $name = $item->fields['name'];
                 }
             }
             $pdf->displayLine(

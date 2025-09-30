@@ -36,7 +36,7 @@ class PluginPdfSoftware extends PluginPdfCommon
 
     public function __construct(?CommonGLPI $obj = null)
     {
-        $this->obj = ($obj ? $obj : new Software());
+        $this->obj = ($obj ?: new Software());
     }
 
     public static function pdfMain(PluginPdfSimplePDF $pdf, Software $software)

@@ -30,13 +30,45 @@
  *  --------------------------------------------------------------------------
  */
 
+use Glpi\DBAL\QueryExpression;
+use Glpi\DBAL\QueryUnion;
+
+/**
+ *  -------------------------------------------------------------------------
+ *  LICENSE
+ *
+ *  This file is part of PDF plugin for GLPI.
+ *
+ *  PDF is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Affero General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  PDF is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *  GNU Affero General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Affero General Public License
+ *  along with Reports. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @author    Nelly Mahu-Lasson, Remi Collet, Teclib
+ * @copyright Copyright (c) 2009-2022 PDF plugin team
+ * @license   AGPL License 3.0 or (at your option) any later version
+ * @link      https://github.com/pluginsGLPI/pdf/
+ * @link      http://www.glpi-project.org/
+ * @package   pdf
+ * @since     2009
+ *             http://www.gnu.org/licenses/agpl-3.0-standalone.html
+ *  --------------------------------------------------------------------------
+ */
 class PluginPdfItem_SoftwareVersion extends PluginPdfCommon
 {
     public static $rightname = 'plugin_pdf';
 
     public function __construct(?CommonGLPI $obj = null)
     {
-        $this->obj = ($obj ? $obj : new Item_SoftwareVersion());
+        $this->obj = ($obj ?: new Item_SoftwareVersion());
     }
 
     public static function pdfForSoftware(PluginPdfSimplePDF $pdf, CommonDBTM $item)
@@ -45,7 +77,7 @@ class PluginPdfItem_SoftwareVersion extends PluginPdfCommon
         /** @var DBmysql $DB */
         global $DB, $CFG_GLPI;
 
-        $dbu = new DbUtils();
+        new DbUtils();
 
         $ID   = $item->getField('id');
         $type = $item->getType();
@@ -70,7 +102,7 @@ class PluginPdfItem_SoftwareVersion extends PluginPdfCommon
                 'glpi_softwareversions.id AS vID',
                 "{$itemtable}.name AS itemname",
                 "{$itemtable}.id AS iID",
-                new \Glpi\DBAL\QueryExpression($DB->quoteValue($itemtype) . ' AS ' . $DB::quoteName('item_type')),
+                new QueryExpression($DB->quoteValue($itemtype) . ' AS ' . $DB::quoteName('item_type')),
             ],
                 'FROM'       => $item_version_table,
                 'INNER JOIN' => ['glpi_softwareversions'
@@ -91,13 +123,13 @@ class PluginPdfItem_SoftwareVersion extends PluginPdfCommon
             if ($DB->fieldExists($itemtable, 'serial')) {
                 $query['SELECT'][] = $itemtable . '.serial';
             } else {
-                $query['SELECT'][] = new \Glpi\DBAL\QueryExpression($DB->quoteValue('') . ' AS ' . $DB->quoteName($itemtable . '.serial'));
+                $query['SELECT'][] = new QueryExpression($DB->quoteValue('') . ' AS ' . $DB->quoteName($itemtable . '.serial'));
             }
 
             if ($DB->fieldExists($itemtable, 'otherserial')) {
                 $query['SELECT'][] = $itemtable . '.otherserial';
             } else {
-                $query['SELECT'][] = new \Glpi\DBAL\QueryExpression($DB->quoteValue('') . ' AS ' . $DB->quoteName($itemtable . '.otherserial'));
+                $query['SELECT'][] = new QueryExpression($DB->quoteValue('') . ' AS ' . $DB->quoteName($itemtable . '.otherserial'));
             }
 
             if ($DB->fieldExists($itemtable, 'users_id')) {
@@ -109,10 +141,10 @@ class PluginPdfItem_SoftwareVersion extends PluginPdfCommon
                     'glpi_users'                                           => 'id'],
                 ];
             } else {
-                $query['SELECT'][] = new \Glpi\DBAL\QueryExpression($DB->quoteValue('') . ' AS ' . $DB->quoteName($itemtable . '.username'));
-                $query['SELECT'][] = new \Glpi\DBAL\QueryExpression($DB->quoteValue('-1') . ' AS ' . $DB->quoteName($itemtable . '.userid'));
-                $query['SELECT'][] = new \Glpi\DBAL\QueryExpression($DB->quoteValue('') . ' AS ' . $DB->quoteName($itemtable . '.userrealname'));
-                $query['SELECT'][] = new \Glpi\DBAL\QueryExpression($DB->quoteValue('') . ' AS ' . $DB->quoteName($itemtable . '.userfirstname'));
+                $query['SELECT'][] = new QueryExpression($DB->quoteValue('') . ' AS ' . $DB->quoteName($itemtable . '.username'));
+                $query['SELECT'][] = new QueryExpression($DB->quoteValue('-1') . ' AS ' . $DB->quoteName($itemtable . '.userid'));
+                $query['SELECT'][] = new QueryExpression($DB->quoteValue('') . ' AS ' . $DB->quoteName($itemtable . '.userrealname'));
+                $query['SELECT'][] = new QueryExpression($DB->quoteValue('') . ' AS ' . $DB->quoteName($itemtable . '.userfirstname'));
             }
 
             if ($DB->fieldExists($itemtable, 'entities_id')) {
@@ -122,7 +154,7 @@ class PluginPdfItem_SoftwareVersion extends PluginPdfCommon
                 ];
                 $query['WHERE'] += getEntitiesRestrictCriteria($itemtable, '', '', true);
             } else {
-                $query['SELECT'][] = new \Glpi\DBAL\QueryExpression($DB->quoteValue('') . ' AS ' . $DB->quoteName('entity'));
+                $query['SELECT'][] = new QueryExpression($DB->quoteValue('') . ' AS ' . $DB->quoteName('entity'));
             }
 
             if ($DB->fieldExists($itemtable, 'locations_id')) {
@@ -131,7 +163,7 @@ class PluginPdfItem_SoftwareVersion extends PluginPdfCommon
                     'glpi_locations'                                           => 'id'],
                 ];
             } else {
-                $query['SELECT'][] = new \Glpi\DBAL\QueryExpression($DB->quoteValue('') . ' AS ' . $DB->quoteName('location'));
+                $query['SELECT'][] = new QueryExpression($DB->quoteValue('') . ' AS ' . $DB->quoteName('location'));
             }
             if ($DB->fieldExists($itemtable, 'states_id')) {
                 $query['SELECT'][]                 = 'glpi_states.name AS state';
@@ -139,7 +171,7 @@ class PluginPdfItem_SoftwareVersion extends PluginPdfCommon
                     'glpi_states'                                           => 'id'],
                 ];
             } else {
-                $query['SELECT'][] = new \Glpi\DBAL\QueryExpression($DB->quoteValue('') . ' AS ' . $DB->quoteName('state'));
+                $query['SELECT'][] = new QueryExpression($DB->quoteValue('') . ' AS ' . $DB->quoteName('state'));
             }
 
             if ($DB->fieldExists($itemtable, 'groups_id')) {
@@ -148,7 +180,7 @@ class PluginPdfItem_SoftwareVersion extends PluginPdfCommon
                     'glpi_groups'                                           => 'id'],
                 ];
             } else {
-                $query['SELECT'][] = new \Glpi\DBAL\QueryExpression($DB->quoteValue('') . ' AS ' . $DB->quoteName('groupe'));
+                $query['SELECT'][] = new QueryExpression($DB->quoteValue('') . ' AS ' . $DB->quoteName('groupe'));
             }
 
             if ($DB->fieldExists($itemtable, 'is_deleted')) {
@@ -162,7 +194,7 @@ class PluginPdfItem_SoftwareVersion extends PluginPdfCommon
             $queries[] = $query;
         }
 
-        $union    = new \Glpi\DBAL\QueryUnion($queries, true);
+        $union    = new QueryUnion($queries, true);
         $criteria = [
             'FROM'            => $union,
             'ORDER'           => "$sort ASC",
@@ -354,7 +386,7 @@ class PluginPdfItem_SoftwareVersion extends PluginPdfCommon
         $output = [];
 
         $software_category = new SoftwareCategory();
-        $software_version  = new SoftwareVersion();
+        new SoftwareVersion();
 
         foreach ($DB->request($query_params) as $softwareversion) {
             $output[] = $softwareversion;
@@ -374,11 +406,7 @@ class PluginPdfItem_SoftwareVersion extends PluginPdfCommon
             foreach ($output as $soft) {
                 if ($soft['softwarecategories_id'] != $cat) {
                     $cat = $soft['softwarecategories_id'];
-                    if ($cat && $software_category->getFromDB($cat)) {
-                        $catname = $software_category->getName();
-                    } else {
-                        $catname = __('Uncategorized software');
-                    }
+                    $catname = $cat && $software_category->getFromDB($cat) ? $software_category->getName() : __('Uncategorized software');
 
                     $pdf->setColumnsSize(100);
                     $pdf->displayTitle('<b>' . $catname . '</b>');
@@ -510,7 +538,7 @@ class PluginPdfItem_SoftwareVersion extends PluginPdfCommon
         ];
 
         if (count($installed)) {
-            $query_affected_params['WHERE'][] = new \Glpi\DBAL\QueryExpression(
+            $query_affected_params['WHERE'][] = new QueryExpression(
                 'glpi_softwarelicenses.id NOT IN (' . implode(',', $installed) . ')',
             );
         }

@@ -36,12 +36,12 @@ class PluginPdfGroup extends PluginPdfCommon
 
     public function __construct(?CommonGLPI $obj = null)
     {
-        $this->obj = ($obj ? $obj : new Group());
+        $this->obj = ($obj ?: new Group());
     }
 
     public static function pdfMain(PluginPdfSimplePDF $pdf, Group $item)
     {
-        $ID = $item->getField('id');
+        $item->getField('id');
 
         $pdf->setColumnsSize(50, 50);
         $pdf->displayTitle(
@@ -171,15 +171,11 @@ class PluginPdfGroup extends PluginPdfCommon
         $max   = $group->getDataItems($tech, $tree, $user, 0, $datas);
         $nb    = count($datas);
 
-        if ($nb < $max) {
-            $title = sprintf(__('%1$s (%2$s)'), $title, $nb . '/' . $max);
-        } else {
-            $title = sprintf(__('%1$s (%2$s)'), $title, $nb);
-        }
+        $title = $nb < $max ? sprintf(__('%1$s (%2$s)'), $title, $nb . '/' . $max) : sprintf(__('%1$s (%2$s)'), $title, $nb);
         $pdf->setColumnsSize(100);
         $pdf->displayTitle('<b>' . $title . '</b>');
 
-        if ($nb) {
+        if ($nb !== 0) {
             if ($tree || $user) {
                 $pdf->setColumnsSize(16, 20, 34, 30);
                 $pdf->displayTitle(
@@ -197,7 +193,7 @@ class PluginPdfGroup extends PluginPdfCommon
         }
 
         $tmpgrp = new Group();
-        $tmpusr = new User();
+        new User();
 
         foreach ($datas as $data) {
             if (!($item = $dbu->getItemForItemtype($data['itemtype']))) {
@@ -239,9 +235,8 @@ class PluginPdfGroup extends PluginPdfCommon
         /** @var DBmysql $DB */
         global $DB;
 
-        $ID            = $item->getID();
+        $item->getID();
         $fields        = $item->getAdditionalFields();
-        $nb            = count($fields);
         $entity_assign = $item->isEntityAssign();
 
         $fk   = $item->getForeignKeyField();

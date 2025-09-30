@@ -36,7 +36,7 @@ class PluginPdfSoftwareVersion extends PluginPdfCommon
 
     public function __construct(?CommonGLPI $obj = null)
     {
-        $this->obj = ($obj ? $obj : new SoftwareVersion());
+        $this->obj = ($obj ?: new SoftwareVersion());
     }
 
     public static function pdfMain(PluginPdfSimplePDF $pdf, SoftwareVersion $version)
@@ -110,7 +110,7 @@ class PluginPdfSoftwareVersion extends PluginPdfCommon
         $pdf->setColumnsSize(100);
         $title = '<b>' . SoftwareVersion::getTypeName($number) . '</b>';
 
-        if (!$number) {
+        if ($number === 0) {
             $pdf->displayTitle(sprintf(__('%1$s: %2$s'), $title, __('No item to display')));
         } else {
             if ($number > $_SESSION['glpilist_limit']) {

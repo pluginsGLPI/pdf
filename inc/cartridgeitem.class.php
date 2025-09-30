@@ -36,7 +36,7 @@ class PluginPdfCartridgeItem extends PluginPdfCommon
 
     public function __construct(?CommonGLPI $obj = null)
     {
-        $this->obj = ($obj ? $obj : new CartridgeItem());
+        $this->obj = ($obj ?: new CartridgeItem());
     }
 
     public function defineAllTabsPDF($options = [])
@@ -162,7 +162,7 @@ class PluginPdfCartridgeItem extends PluginPdfCommon
 
         $pdf->setColumnsSize(100);
         $title = '<b>' . _n('Printer model', 'Printer models', $number) . '</b>';
-        if (!$number) {
+        if ($number === 0) {
             $pdf->displayTitle(__('No printel model associated', 'pdf'));
         } else {
             if ($number > $_SESSION['glpilist_limit']) {

@@ -36,7 +36,7 @@ class PluginPdfPhone extends PluginPdfCommon
 
     public function __construct(?CommonGLPI $obj = null)
     {
-        $this->obj = ($obj ? $obj : new Phone());
+        $this->obj = ($obj ?: new Phone());
     }
 
     public function defineAllTabsPDF($options = [])
@@ -87,7 +87,7 @@ class PluginPdfPhone extends PluginPdfCommon
 
         $opts = ['have_headset' => __('Headset'),
             'have_hp'           => __('Speaker')];
-        foreach ($opts as $key => $val) {
+        foreach (array_keys($opts) as $key) {
             if (!$item->fields[$key]) {
                 unset($opts[$key]);
             }

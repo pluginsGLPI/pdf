@@ -39,7 +39,7 @@ class PluginPdfCartridge extends PluginPdfCommon
     **/
     public function __construct(?CommonGLPI $obj = null)
     {
-        $this->obj = ($obj ? $obj : new Cartridge());
+        $this->obj = ($obj ?: new Cartridge());
     }
 
     /**
@@ -105,13 +105,12 @@ class PluginPdfCartridge extends PluginPdfCommon
 
         $result = $DB->request($query);
         $number = count($result);
-        $i      = 0;
         $pages  = $p->fields['init_pages_counter'];
 
         $pdf->setColumnsSize(100);
         $title = '<b>' . ($old ? __('Worn cartridges') : __('Used cartridges')) . '</b>';
 
-        if (!$number) {
+        if ($number === 0) {
             $pdf->displayTitle(sprintf(__('%1$s: %2$s'), $title, __('No item to display')));
         } else {
             $title = sprintf(__('%1$s: %2$s'), $title, $number);
@@ -289,7 +288,7 @@ class PluginPdfCartridge extends PluginPdfCommon
 
         $pages = [];
 
-        if ($number) {
+        if ($number !== 0) {
             if ($state == 'new') {
                 $pdf->setColumnsSize(25, 25, 25, 25);
                 $pdf->displayTitle(

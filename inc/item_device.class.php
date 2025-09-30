@@ -36,7 +36,7 @@ class PluginPdfItem_Device extends PluginPdfCommon
 
     public function __construct(?CommonGLPI $obj = null)
     {
-        $this->obj = ($obj ? $obj : new Item_Devices());
+        $this->obj = ($obj ?: new Item_Devices());
     }
 
     public static function pdfForItem(PluginPdfSimplePDF $pdf, $item)
@@ -73,13 +73,13 @@ class PluginPdfItem_Device extends PluginPdfCommon
             $fk              = $dbu->getForeignKeyFieldForTable($dbu->getTableForItemType($associated_type));
 
             $select_fields = ['COUNT(*) AS NB', 'id', $fk];
-            if (!empty($specif_fields)) {
+            if ($specif_fields !== []) {
                 $select_fields = array_merge($select_fields, $specif_fields);
             }
 
             // Construction of the GROUP BY clause
             $group_by = [$fk];
-            if (!empty($specif_fields)) {
+            if ($specif_fields !== []) {
                 $group_by = array_merge($group_by, $specif_fields);
             }
 
@@ -106,7 +106,7 @@ class PluginPdfItem_Device extends PluginPdfCommon
                 if ($device->getFromDB($data[$fk])) {
                     $spec = $device->getAdditionalFields();
                     $col4 = '';
-                    if (count($spec)) {
+                    if (count($spec) > 0) {
                         $colspan = (60 / count($spec));
                         foreach ($spec as $i => $label) {
                             $toto  = substr($label['name'], 0, strpos($label['name'], '_'));
@@ -135,11 +135,7 @@ class PluginPdfItem_Device extends PluginPdfCommon
                                         $value = $device->fields[$label['name']];
                                     }
                                     if ($label['type'] == 'bool') {
-                                        if ($value == 1) {
-                                            $value = __('Yes');
-                                        } else {
-                                            $value = __('No');
-                                        }
+                                        $value = $value == 1 ? __('Yes') : __('No');
                                     }
                                     if (isset($label['unit'])) {
                                         $labelname = '<b><i>' . sprintf(

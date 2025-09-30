@@ -34,7 +34,7 @@
 global $PLUGIN_HOOKS;
 
 define('GLPI_KEEP_CSRF_TOKEN', true); // 0.90
-$token = (isset($_POST['_glpi_csrf_token']) ? $_POST['_glpi_csrf_token'] : false);
+$token = ($_POST['_glpi_csrf_token'] ?? false);
 
 Session::checkRight('plugin_pdf', READ);
 
@@ -61,7 +61,7 @@ if (isset($_POST['plugin_pdf_inventory_type'])
             }
         }
     }
-    if (empty($tab)) {
+    if ($tab === []) {
         $tab[] = $type . '$main';
     }
 
@@ -71,14 +71,14 @@ if (isset($_POST['plugin_pdf_inventory_type'])
     ) {
         $pdf_class = $PLUGIN_HOOKS['plugin_pdf'][$type];
         if (!is_a($pdf_class, PluginPdfCommon::class, true)) {
-            throw new \RuntimeException('Invalid PDF plugin class for type: ' . $type);
+            throw new RuntimeException('Invalid PDF plugin class for type: ' . $type);
         }
 
         $itempdf = new $pdf_class($item);
-        $itempdf->generatePDF([$_POST['itemID']], $tab, (isset($_POST['page']) ? $_POST['page'] : 0));
+        $itempdf->generatePDF([$_POST['itemID']], $tab, ($_POST['page'] ?? 0));
     } else {
-        throw new \RuntimeException('Missing PDF plugin hook for type: ' . $type);
+        throw new RuntimeException('Missing PDF plugin hook for type: ' . $type);
     }
 } else {
-    throw new \InvalidArgumentException('Missing required context or parameters for PDF generation');
+    throw new InvalidArgumentException('Missing required context or parameters for PDF generation');
 }

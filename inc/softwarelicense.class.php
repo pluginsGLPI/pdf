@@ -36,7 +36,7 @@ class PluginPdfSoftwareLicense extends PluginPdfCommon
 
     public function __construct(?CommonGLPI $obj = null)
     {
-        $this->obj = ($obj ? $obj : new SoftwareLicense());
+        $this->obj = ($obj ?: new SoftwareLicense());
     }
 
     public static function pdfMain(PluginPdfSimplePDF $pdf, SoftwareLicense $license, $main = true, $cpt = true)
@@ -163,7 +163,7 @@ class PluginPdfSoftwareLicense extends PluginPdfCommon
         $pdf->setColumnsSize(100);
         $title = '<b>' . _n('License', 'Licenses', $number) . '</b>';
 
-        if (!$number) {
+        if ($number === 0) {
             $pdf->displayTitle(sprintf(__('%1$s: %2$s'), $title, __('No item to display')));
         } else {
             if ($number > $_SESSION['glpilist_limit']) {

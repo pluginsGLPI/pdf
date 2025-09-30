@@ -36,7 +36,7 @@ class PluginPdfLog extends PluginPdfCommon
 
     public function __construct(?CommonGLPI $obj = null)
     {
-        $this->obj = ($obj ? $obj : new Log());
+        $this->obj = ($obj ?: new Log());
     }
 
     public static function pdfForItem(PluginPdfSimplePDF $pdf, CommonDBTM $item)
@@ -48,7 +48,7 @@ class PluginPdfLog extends PluginPdfCommon
         $pdf->setColumnsSize(100);
         $title = '<b>' . __('Historical') . '</b>';
 
-        if (!$number) {
+        if ($number === 0) {
             $pdf->displayTitle(sprintf(__('%1$s: %2$s'), $title, __('No item to display')));
         } else {
             if ($number > $_SESSION['glpilist_limit']) {

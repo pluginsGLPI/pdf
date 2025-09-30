@@ -36,7 +36,7 @@ class PluginPdfConsumableItem extends PluginPdfCommon
 
     public function __construct(?CommonGLPI $obj = null)
     {
-        $this->obj = ($obj ? $obj : new CartridgeItem());
+        $this->obj = ($obj ?: new CartridgeItem());
     }
 
     public function defineAllTabsPDF($options = [])
@@ -220,10 +220,8 @@ class PluginPdfConsumableItem extends PluginPdfCommon
                     $pdf->displayLine($data['id'], Consumable::getStatus($data['id']), $date_in);
                 } else {
                     $name = '';
-                    if ($item = getItemForItemtype($data['itemtype'])) {
-                        if ($item->getFromDB($data['items_id'])) {
-                            $name = $item->getNameID();
-                        }
+                    if (($item = getItemForItemtype($data['itemtype'])) && $item->getFromDB($data['items_id'])) {
+                        $name = $item->getNameID();
                     }
                     $pdf->setColumnsSize(8, 23, 23, 23, 23);
                     $pdf->displayLine(

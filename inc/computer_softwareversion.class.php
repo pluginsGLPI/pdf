@@ -30,13 +30,44 @@
  *  --------------------------------------------------------------------------
  */
 
+use Glpi\DBAL\QueryExpression;
+
+/**
+ *  -------------------------------------------------------------------------
+ *  LICENSE
+ *
+ *  This file is part of PDF plugin for GLPI.
+ *
+ *  PDF is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Affero General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  PDF is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *  GNU Affero General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Affero General Public License
+ *  along with Reports. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @author    Nelly Mahu-Lasson, Remi Collet, Teclib
+ * @copyright Copyright (c) 2009-2022 PDF plugin team
+ * @license   AGPL License 3.0 or (at your option) any later version
+ * @link      https://github.com/pluginsGLPI/pdf/
+ * @link      http://www.glpi-project.org/
+ * @package   pdf
+ * @since     2009
+ *             http://www.gnu.org/licenses/agpl-3.0-standalone.html
+ *  --------------------------------------------------------------------------
+ */
 class PluginPdfComputer_SoftwareVersion extends PluginPdfCommon
 {
     public static $rightname = 'plugin_pdf';
 
     public function __construct(?CommonGLPI $obj = null)
     {
-        $this->obj = ($obj ? $obj : new Item_SoftwareVersion());
+        $this->obj = ($obj ?: new Item_SoftwareVersion());
     }
 
     public static function pdfForItem(PluginPdfSimplePDF $pdf, CommonDBTM $item)
@@ -160,7 +191,7 @@ class PluginPdfComputer_SoftwareVersion extends PluginPdfCommon
         // Ajout de la restriction d'entités
         $entity_restrict = $dbu->getEntitiesRestrictRequest('', 'glpi_computers');
         if (!empty($entity_restrict)) {
-            $query_params['WHERE'][] = new \Glpi\DBAL\QueryExpression($entity_restrict);
+            $query_params['WHERE'][] = new QueryExpression($entity_restrict);
         }
 
         $pdf->setColumnsSize(100);
@@ -351,7 +382,7 @@ class PluginPdfComputer_SoftwareVersion extends PluginPdfCommon
         $output = [];
 
         $software_category = new SoftwareCategory();
-        $software_version  = new SoftwareVersion();
+        new SoftwareVersion();
 
         foreach ($DB->request($query_params) as $softwareversion) {
             $output[] = $softwareversion;
@@ -371,11 +402,7 @@ class PluginPdfComputer_SoftwareVersion extends PluginPdfCommon
             foreach ($output as $soft) {
                 if ($soft['softwarecategories_id'] != $cat) {
                     $cat = $soft['softwarecategories_id'];
-                    if ($cat && $software_category->getFromDB($cat)) {
-                        $catname = $software_category->getName();
-                    } else {
-                        $catname = __('Uncategorized software');
-                    }
+                    $catname = $cat && $software_category->getFromDB($cat) ? $software_category->getName() : __('Uncategorized software');
 
                     $pdf->setColumnsSize(100);
                     $pdf->displayTitle('<b>' . $catname . '</b>');
@@ -505,7 +532,7 @@ class PluginPdfComputer_SoftwareVersion extends PluginPdfCommon
         ];
 
         if (count($installed)) {
-            $query_affected_params['WHERE'][] = new \Glpi\DBAL\QueryExpression(
+            $query_affected_params['WHERE'][] = new QueryExpression(
                 'glpi_softwarelicenses.id NOT IN (' . implode(',', $installed) . ')',
             );
         }

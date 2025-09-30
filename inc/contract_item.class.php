@@ -36,7 +36,7 @@ class PluginPdfContract_Item extends PluginPdfCommon
 
     public function __construct(?CommonGLPI $obj = null)
     {
-        $this->obj = ($obj ? $obj : new Contract_Item());
+        $this->obj = ($obj ?: new Contract_Item());
     }
 
     public static function pdfForItem(PluginPdfSimplePDF $pdf, CommonDBTM $item)
@@ -46,7 +46,7 @@ class PluginPdfContract_Item extends PluginPdfCommon
 
         $type      = $item->getType();
         $ID        = $item->getField('id');
-        $itemtable = getTableForItemType($type);
+        getTableForItemType($type);
         $con       = new Contract();
         $dbu       = new DbUtils();
 
@@ -65,7 +65,7 @@ class PluginPdfContract_Item extends PluginPdfCommon
 
         $pdf->setColumnsSize(100);
         $title = '<b>' . _n('Associated contract', 'Associated contracts', $number) . '</b>';
-        if (!$number) {
+        if ($number === 0) {
             $pdf->displayTitle(sprintf(__('%1$s: %2$s'), $title, __('No item to display')));
         } else {
             $pdf->displayTitle(sprintf(__('%1$s: %2$s'), $title, $number));
@@ -204,7 +204,7 @@ class PluginPdfContract_Item extends PluginPdfCommon
         $pdf->setColumnsSize(100);
         $title = '<b>' . _n('Item', 'Items', $number) . '</b>';
 
-        if (!$number) {
+        if ($number === 0) {
             $pdf->displayTitle(sprintf(__('%1$s: %2$s'), $title, __('No item to display')));
         } else {
             $title = sprintf(__('%1$s: %2$s'), $title, $number);
@@ -233,11 +233,7 @@ class PluginPdfContract_Item extends PluginPdfCommon
                         if (!$item) {
                             continue;
                         }
-                        if ($item instanceof Item_Devices) {
-                            $name = $objdata['name_device'];
-                        } else {
-                            $name = $objdata['name'];
-                        }
+                        $name = $item instanceof Item_Devices ? $objdata['name_device'] : $objdata['name'];
                         if (empty($data['name'])) {
                             $name = sprintf(__('%1$s (%2$s)'), $name, $objdata['id']);
                         }

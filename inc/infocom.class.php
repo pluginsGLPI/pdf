@@ -36,7 +36,7 @@ class PluginPdfInfocom extends PluginPdfCommon
 
     public function __construct(?CommonGLPI $obj = null)
     {
-        $this->obj = ($obj ? $obj : new Infocom());
+        $this->obj = ($obj ?: new Infocom());
     }
 
     public static function pdfForItem(PluginPdfSimplePDF $pdf, CommonDBTM $item)
