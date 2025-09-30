@@ -345,7 +345,7 @@ class PluginPdfSimplePDF
 
         $this->setColumnsSize(100);
         $text    = $name . ' ' . $content;
-        $content = Html::entity_decode_deep($text);
+        $content = Glpi\RichText\RichText::getEnhancedHtml($text);
         if (!preg_match("/<br\s?\/?>/", $content) && !preg_match('/<p>/', $content)) {
             $content = nl2br($content);
         }
