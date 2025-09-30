@@ -59,7 +59,7 @@ abstract class PluginPdfCommon extends CommonGLPI
             $withtemplate = $options['withtemplate'];
         }
 
-        if (!is_numeric($itemtype) && ($obj = $dbu->getItemForItemtype($itemtype)) && (method_exists($itemtype, 'displayTabContentForPDF') )) {
+        if (!is_numeric($itemtype) && ($obj = $dbu->getItemForItemtype($itemtype)) && (method_exists($itemtype, 'displayTabContentForPDF'))) {
             $titles = $obj->getTabNameForItem($this->obj, $withtemplate);
             if (!is_array($titles)) {
                 $titles = [1 => $titles];

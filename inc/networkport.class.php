@@ -95,7 +95,7 @@ class PluginPdfNetworkPort extends PluginPdfCommon
                 $add = __s('Not connected.');
                 $cid = $contact->getContact($netport->fields['id']);
                 if ($cid && $netport2->getFromDB($cid) && ($device2 = $dbu->getItemForItemtype($netport2->fields['itemtype'])) && $device2->getFromDB($netport2->fields['items_id'])) {
-                        $add = $netport2->getName() . ' ' . __s('on') . ' ' . $device2->getName() . ' (' . $device2->getTypeName() . ')';
+                    $add = $netport2->getName() . ' ' . __s('on') . ' ' . $device2->getName() . ' (' . $device2->getTypeName() . ')';
                 }
 
                 if ($instantiation_type == 'NetworkPortEthernet') {

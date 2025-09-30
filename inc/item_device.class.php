@@ -100,7 +100,7 @@ class PluginPdfItem_Device extends PluginPdfCommon
                     if (method_exists($device, 'getAdditionalFields')) {
                         $spec = $device->getAdditionalFields();
                     }
-                    
+
                     $col4 = '';
                     if (count($spec) > 0) {
                         $colspan = (60 / count($spec));
