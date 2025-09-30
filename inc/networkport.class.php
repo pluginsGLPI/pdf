@@ -59,7 +59,7 @@ class PluginPdfNetworkPort extends PluginPdfCommon
         );
         $nb_connect = count($result);
 
-        $title = '<b>' . _n('Network port', 'Network ports', $nb_connect) . '</b>';
+        $title = '<b>' . _sn('Network port', 'Network ports', $nb_connect) . '</b>';
         if ($nb_connect === 0) {
             $pdf->displayTitle('<b>' . __s('No network port found') . '</b>');
         } else {
@@ -93,9 +93,9 @@ class PluginPdfNetworkPort extends PluginPdfCommon
                 $netport2 = new NetworkPort();
 
                 $add = __s('Not connected.');
-                if ($cid = $contact->getContact($netport->fields['id']) && ($netport2->getFromDB($cid) && $device2 = $dbu->getItemForItemtype($netport2->fields['itemtype'])) && $device2->getFromDB($netport2->fields['items_id'])) {
-                    $add = $netport2->getName() . ' ' . __s('on') . ' ' .
-                           $device2->getName() . ' (' . $device2->getTypeName() . ')';
+                $cid = $contact->getContact($netport->fields['id']);
+                if ($cid && $netport2->getFromDB($cid) && ($device2 = $dbu->getItemForItemtype($netport2->fields['itemtype'])) && $device2->getFromDB($netport2->fields['items_id'])) {
+                        $add = $netport2->getName() . ' ' . __s('on') . ' ' . $device2->getName() . ' (' . $device2->getTypeName() . ')';
                 }
 
                 if ($instantiation_type == 'NetworkPortEthernet') {

@@ -51,7 +51,7 @@ class PluginPdfGroup_User extends PluginPdfCommon
         $number = count($used);
 
         $pdf->setColumnsSize(100);
-        $title = '<b>' . _n('User', 'Users', 2) . '</b>';
+        $title = '<b>' . _sn('User', 'Users', 2) . '</b>';
 
         if ($number === 0) {
             $pdf->displayTitle(sprintf(__s('%1$s: %2$s'), $title, __s('No item to display')));

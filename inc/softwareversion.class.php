@@ -52,7 +52,7 @@ class PluginPdfSoftwareVersion extends PluginPdfCommon
             '<b><i>' . sprintf(__s('%1$s: %2$s'), __s('Name') . '</i></b>', $version->fields['name']),
             '<b><i>' . sprintf(
                 __s('%1$s: %2$s'),
-                _n('Software', 'Software', 2) . '</i></b>',
+                _sn('Software', 'Software', 2) . '</i></b>',
                 Toolbox::stripTags(Dropdown::getDropdownName(
                     'glpi_softwares',
                     $version->fields['softwares_id'],
@@ -125,7 +125,7 @@ class PluginPdfSoftwareVersion extends PluginPdfCommon
                 '<b><i>' . $title . '</i></b>',
                 '<b><i>' . __s('Status') . '</i></b>',
                 '<b><i>' . __s('Operating system') . '</i></b>',
-                '<b><i>' . _n('Installation', 'Installations', 2) . '</i></b>',
+                '<b><i>' . _sn('Installation', 'Installations', 2) . '</i></b>',
                 '<b><i>' . __s('Comments') . '</i></b>',
             );
             $pdf->setColumnsAlign('left', 'left', 'left', 'right', 'left');

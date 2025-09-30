@@ -201,19 +201,19 @@ class PluginPdfComputer_SoftwareVersion extends PluginPdfCommon
             if ($number == $total) {
                 $pdf->displayTitle('<b>' . sprintf(
                     __s('%1$s: %2$s'),
-                    _n('Installation', 'Installations', 2),
+                    _sn('Installation', 'Installations', 2),
                     $number,
                 ) . '</b>');
             } else {
                 $pdf->displayTitle('<b>' . sprintf(
                     __s('%1$s: %2$s'),
-                    _n('Installation', 'Installations', 2),
+                    _sn('Installation', 'Installations', 2),
                     $number . ' / ' . $total,
                 ) . '</b>');
             }
             $pdf->setColumnsSize(8, 12, 10, 10, 12, 8, 10, 5, 17, 8);
             $pdf->displayTitle(
-                '<b><i>' . _n('Version', 'Versions', 2),
+                '<b><i>' . _sn('Version', 'Versions', 2),
                 __s('Name'),
                 __s('Serial number'),
                 __s('Inventory number'),
@@ -221,7 +221,7 @@ class PluginPdfComputer_SoftwareVersion extends PluginPdfCommon
                 __s('Status'),
                 __s('Group'),
                 __s('User'),
-                _n('License', 'Licenses', 2),
+                _sn('License', 'Licenses', 2),
                 __s('Installation date') . '</i></b>',
             );
 
@@ -267,7 +267,7 @@ class PluginPdfComputer_SoftwareVersion extends PluginPdfCommon
                 );
             }
         } else {
-            $pdf->displayTitle('<b>' . _n('Installation', 'Installations', 2) . '</b>');
+            $pdf->displayTitle('<b>' . _sn('Installation', 'Installations', 2) . '</b>');
             $pdf->displayLine(__s('No item found'));
         }
         $pdf->displaySpace();
@@ -294,7 +294,7 @@ class PluginPdfComputer_SoftwareVersion extends PluginPdfCommon
         $pdf->setColumnsSize(75, 25);
         $pdf->setColumnsAlign('left', 'right');
 
-        $pdf->displayTitle('<b>' . __s('Entity'), _n('Installation', 'Installations', 2) . '</b>');
+        $pdf->displayTitle('<b>' . __s('Entity'), _sn('Installation', 'Installations', 2) . '</b>');
 
         $lig = $tot = 0;
         if (in_array(0, $_SESSION['glpiactiveentities'])) {

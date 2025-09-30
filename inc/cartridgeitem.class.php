@@ -161,7 +161,7 @@ class PluginPdfCartridgeItem extends PluginPdfCommon
         }
 
         $pdf->setColumnsSize(100);
-        $title = '<b>' . _n('Printer model', 'Printer models', $number) . '</b>';
+        $title = '<b>' . _sn('Printer model', 'Printer models', $number) . '</b>';
         if ($number === 0) {
             $pdf->displayTitle(__s('No printel model associated', 'pdf'));
         } else {

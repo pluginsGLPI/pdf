@@ -34,7 +34,7 @@
         <div class="card-header">
             <h4 class="card-title d-flex align-items-center">
                 <i class="ti ti-file-type-pdf me-2 text-danger"></i>
-                {{ __('%1$s: %2$s')|format(__('Choose the tables to print in pdf', 'pdf'), item_type_name) }}
+                {{ __s('%1$s: %2$s')|format(__s('Choose the tables to print in pdf', 'pdf'), item_type_name) }}
             </h4>
         </div>
 
@@ -42,7 +42,7 @@
             {% if debug_mode %}
                 <div class="alert alert-info mb-3">
                     <i class="ti ti-info-circle me-2"></i>
-                    {{ __('Debug mode enabled - showing internal references') }}
+                    {{ __s('Debug mode enabled - showing internal references') }}
                 </div>
             {% endif %}
 
@@ -51,21 +51,21 @@
                     <fieldset class="border p-3 mb-3 rounded">
                         <legend class="fs-6 fw-bold mb-3 px-2">
                             <i class="ti ti-table me-1"></i>
-                            {{ __('Available tables', 'pdf') }}
+                            {{ __s('Available tables', 'pdf') }}
                         </legend>
 
                         <div class="mb-3 d-flex flex-wrap gap-2">
                             <button type="button" class="btn btn-sm btn-outline-success" onclick="selectAllCheckboxes('{{ form_id }}')">
                                 <i class="ti ti-check me-1"></i>
-                                {{ __('Check all') }}
+                                {{ __s('Check all') }}
                             </button>
                             <button type="button" class="btn btn-sm btn-outline-secondary" onclick="selectNoCheckboxes('{{ form_id }}')">
                                 <i class="ti ti-x me-1"></i>
-                                {{ __('Uncheck all') }}
+                                {{ __s('Uncheck all') }}
                             </button>
                             <small class="text-muted d-flex align-items-center ms-auto">
                                 <i class="ti ti-info-circle me-1"></i>
-                                {{ __('Select tables to include in PDF export', 'pdf') }}
+                                {{ __s('Select tables to include in PDF export', 'pdf') }}
                             </small>
                         </div>
 
@@ -99,16 +99,16 @@
                     <div class="mb-3">
                         <label for="page_{{ form_id }}" class="form-label">
                             <i class="ti ti-rotate me-1"></i>
-                            {{ __('Page orientation', 'pdf') }}
+                            {{ __s('Page orientation', 'pdf') }}
                         </label>
                         <select name="page" id="page_{{ form_id }}" class="form-select">
                             <option value="0" {{ not landscape ? 'selected' : '' }}>
                                 <i class="ti ti-rectangle-vertical"></i>
-                                {{ __('Portrait', 'pdf') }}
+                                {{ __s('Portrait', 'pdf') }}
                             </option>
                             <option value="1" {{ landscape ? 'selected' : '' }}>
                                 <i class="ti ti-rectangle"></i>
-                                {{ __('Landscape', 'pdf') }}
+                                {{ __s('Landscape', 'pdf') }}
                             </option>
                         </select>
                     </div>
@@ -119,7 +119,7 @@
                         <div class="mb-3">
                             <label class="form-label">
                                 <i class="ti ti-list-numbers me-1"></i>
-                                {{ __('Display (number of items)') }}
+                                {{ __s('Display (number of items)') }}
                             </label>
                             <div class="dropdown-container">
                                 {{ call('Dropdown::showListLimit', [
@@ -136,9 +136,9 @@
         <div class="card-footer d-flex justify-content-between align-items-center">
             <div class="text-muted d-flex align-items-center">
                 <i class="ti ti-info-circle me-1"></i>
-                <span>{{ __('Total options: %d')|format(options|length) }}</span>
+                <span>{{ __s('Total options: %d')|format(options|length) }}</span>
                 <span class="ms-2">|
-                    {{ __('Selected:') }}
+                    {{ __s('Selected:') }}
                     <span id="selected-count-{{ form_id }}">{{ values|length }}</span>
                 </span>
             </div>
@@ -152,12 +152,12 @@
                     <input type="hidden" name="itemID" value="{{ item_id }}">
                     <button type="submit" name="generate" class="btn btn-primary">
                         <i class="ti ti-printer me-2"></i>
-                        {{ __('Print', 'pdf') }}
+                        {{ __s('Print', 'pdf') }}
                     </button>
                 {% else %}
                     <button type="submit" name="plugin_pdf_user_preferences_save" class="btn btn-primary">
                         <i class="ti ti-device-floppy me-2"></i>
-                        {{ __('Save') }}
+                        {{ __s('Save') }}
                     </button>
                 {% endif %}
             </div>

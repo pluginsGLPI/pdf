@@ -94,7 +94,7 @@ class PluginPdfItem_Problem extends PluginPdfCommon
         $totalnb = 0;
 
         $pdf->setColumnsSize(100);
-        $title = '<b>' . _n('Item', 'Items', 2) . '</b>';
+        $title = '<b>' . _sn('Item', 'Items', 2) . '</b>';
         if ($number === 0) {
             $pdf->displayTitle(sprintf(__s('%1$s: %2$s'), $title, __s('No item to display')));
         } else {
@@ -326,7 +326,7 @@ class PluginPdfItem_Problem extends PluginPdfCommon
             $pdf->displayTitle(sprintf(__s('%1$s: %2$s'), $title, __s('No item to display')));
         } else {
             $pdf->displayTitle('<b>' . sprintf(
-                _n('Last %d problem', 'Last %d problems', $number) . '</b>',
+                _sn('Last %d problem', 'Last %d problems', $number) . '</b>',
                 $number,
             ));
         }
@@ -450,9 +450,9 @@ class PluginPdfItem_Problem extends PluginPdfCommon
             $grps = $job->getGroups(CommonITILActor::REQUESTER);
             if (count($grps)) {
                 if (empty($col)) {
-                    $col = sprintf(__s('%1$s %2$s'), $col, _n('Group', 'Groups', 2) . ' </i></b>');
+                    $col = sprintf(__s('%1$s %2$s'), $col, _sn('Group', 'Groups', 2) . ' </i></b>');
                 } else {
-                    $col = sprintf(__s('%1$s - %2$s'), $col, _n('Group', 'Groups', 2) . ' </i></b>');
+                    $col = sprintf(__s('%1$s - %2$s'), $col, _sn('Group', 'Groups', 2) . ' </i></b>');
                 }
                 $first = true;
                 foreach ($grps as $d) {
@@ -491,9 +491,9 @@ class PluginPdfItem_Problem extends PluginPdfCommon
             $grps = $job->getGroups(CommonITILActor::ASSIGN);
             if (count($grps)) {
                 if (empty($col)) {
-                    $col = sprintf(__s('%1$s %2$s'), $col, _n('Group', 'Groups', 2) . ' </i></b>');
+                    $col = sprintf(__s('%1$s %2$s'), $col, _sn('Group', 'Groups', 2) . ' </i></b>');
                 } else {
-                    $col = sprintf(__s('%1$s - %2$s'), $col, _n('Group', 'Groups', 2) . ' </i></b>');
+                    $col = sprintf(__s('%1$s - %2$s'), $col, _sn('Group', 'Groups', 2) . ' </i></b>');
                 }
                 $first = true;
                 foreach ($grps as $d) {

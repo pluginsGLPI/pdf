@@ -49,8 +49,6 @@ class PluginPdfContract extends PluginPdfCommon
 
     public static function pdfMain(PluginPdfSimplePDF $pdf, Contract $contract)
     {
-        new DbUtils();
-
         PluginPdfCommon::mainTitle($pdf, $contract);
 
         $pdf->displayLine(
@@ -102,7 +100,7 @@ class PluginPdfContract extends PluginPdfCommon
                 __s('%1$s: %2$s'),
                 __s('Initial contract period') . '</i></b>',
                 sprintf(
-                    _n('%d month', '%d months', $contract->fields['duration']),
+                    _sn('%d month', '%d months', $contract->fields['duration']),
                     $contract->fields['duration'],
                 ) . $textduration,
             ),
@@ -124,7 +122,7 @@ class PluginPdfContract extends PluginPdfCommon
                 __s('%1$s: %2$s'),
                 __s('Notice') . '</i></b>',
                 sprintf(
-                    _n('%d month', '%d months', $contract->fields['notice']),
+                    _sn('%d month', '%d months', $contract->fields['notice']),
                     $contract->fields['notice'],
                 ) . $textduration,
             ),
@@ -140,7 +138,7 @@ class PluginPdfContract extends PluginPdfCommon
                 __s('%1$s: %2$s'),
                 __s('Contract renewal period') . '</i></b>',
                 sprintf(
-                    _n('%d month', '%d months', $contract->fields['periodicity']),
+                    _sn('%d month', '%d months', $contract->fields['periodicity']),
                     $contract->fields['periodicity'],
                 ),
             ),
@@ -148,7 +146,7 @@ class PluginPdfContract extends PluginPdfCommon
                 __s('%1$s: %2$s'),
                 __s('Invoice period') . '</i></b>',
                 sprintf(
-                    _n('%d month', '%d months', $contract->fields['billing']),
+                    _sn('%d month', '%d months', $contract->fields['billing']),
                     $contract->fields['billing'],
                 ),
             ),
@@ -234,7 +232,7 @@ class PluginPdfContract extends PluginPdfCommon
                 '<b><i>' . __s('Begin date') . '</i></b>',
                 '<b><i>' . __s('End date') . '</i></b>',
                 '<b><i>' . Budget::getTypeName(1) . '</i></b>',
-                '<b><i>' . _n('Cost', 'Costs', 1) . '</i></b>',
+                '<b><i>' . _sn('Cost', 'Costs', 1) . '</i></b>',
             );
 
             $total = 0;

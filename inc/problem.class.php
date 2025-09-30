@@ -61,6 +61,7 @@ class PluginPdfProblem extends PluginPdfCommon
 
         $pdf->setColumnsSize(50, 50);
         $recipient_name = '';
+        $due = '';
         if ($job->fields['users_id_recipient']) {
             $recipient = new User();
             $recipient->getFromDB($job->fields['users_id_recipient']);
@@ -347,7 +348,7 @@ class PluginPdfProblem extends PluginPdfCommon
     public static function pdfStat(PluginPdfSimplePDF $pdf, Problem $job)
     {
         $pdf->setColumnsSize(100);
-        $pdf->displayTitle('<b>' . _n('Date', 'Dates', 2) . '</b>');
+        $pdf->displayTitle('<b>' . _sn('Date', 'Dates', 2) . '</b>');
 
         $pdf->setColumnsSize(50, 50);
         $pdf->displayLine(sprintf(
@@ -377,7 +378,7 @@ class PluginPdfProblem extends PluginPdfCommon
         }
 
         $pdf->setColumnsSize(100);
-        $pdf->displayTitle('<b>' . _n('Time', 'Times', 2) . '</b>');
+        $pdf->displayTitle('<b>' . _sn('Time', 'Times', 2) . '</b>');
 
 
         if ((in_array($job->fields['status'], $job->getSolvedStatusArray()) || in_array($job->fields['status'], $job->getClosedStatusArray())) && $job->fields['solve_delay_stat'] > 0) {

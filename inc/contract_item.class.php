@@ -64,7 +64,7 @@ class PluginPdfContract_Item extends PluginPdfCommon
         $number = count($result);
 
         $pdf->setColumnsSize(100);
-        $title = '<b>' . _n('Associated contract', 'Associated contracts', $number) . '</b>';
+        $title = '<b>' . _sn('Associated contract', 'Associated contracts', $number) . '</b>';
         if ($number === 0) {
             $pdf->displayTitle(sprintf(__s('%1$s: %2$s'), $title, __s('No item to display')));
         } else {
@@ -109,7 +109,7 @@ class PluginPdfContract_Item extends PluginPdfCommon
                         sprintf(
                             __s('%1$s - %2$s'),
                             sprintf(
-                                _n('%d month', '%d months', $con->fields['duration']),
+                                _sn('%d month', '%d months', $con->fields['duration']),
                                 $con->fields['duration'],
                             ),
                             $textduration,
@@ -202,7 +202,7 @@ class PluginPdfContract_Item extends PluginPdfCommon
         }
 
         $pdf->setColumnsSize(100);
-        $title = '<b>' . _n('Item', 'Items', $number) . '</b>';
+        $title = '<b>' . _sn('Item', 'Items', $number) . '</b>';
 
         if ($number === 0) {
             $pdf->displayTitle(sprintf(__s('%1$s: %2$s'), $title, __s('No item to display')));

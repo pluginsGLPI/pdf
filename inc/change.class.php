@@ -61,6 +61,7 @@ class PluginPdfChange extends PluginPdfCommon
 
         $pdf->setColumnsSize(50, 50);
         $recipient_name = '';
+        $due = "";
         if ($job->fields['users_id_recipient']) {
             $recipient = new User();
             $recipient->getFromDB($job->fields['users_id_recipient']);
@@ -355,7 +356,7 @@ class PluginPdfChange extends PluginPdfCommon
         $pdf->setColumnsSize(100);
         $pdf->displayTitle('<b>' . __s('Statistics') . '</b>');
 
-        $pdf->displayTitle('<b>' . _n('Date', 'Dates', 2) . '</b>');
+        $pdf->displayTitle('<b>' . _sn('Date', 'Dates', 2) . '</b>');
 
         $pdf->setColumnsSize(50, 50);
         $pdf->displayLine(__s('Opening date'), Html::convDateTime($job->fields['date']));
@@ -370,7 +371,7 @@ class PluginPdfChange extends PluginPdfCommon
         }
 
         $pdf->setColumnsSize(100);
-        $pdf->displayTitle('<b>' . _n('Time', 'Times', 2) . '</b>');
+        $pdf->displayTitle('<b>' . _sn('Time', 'Times', 2) . '</b>');
 
         $pdf->setColumnsSize(50, 50);
         if (isset($job->fields['takeintoaccount_delay_stat']) > 0) {

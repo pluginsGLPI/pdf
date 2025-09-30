@@ -98,7 +98,7 @@ class PluginPdfUser extends PluginPdfCommon
         $pdf->displayLine(
             '<b><i>' . sprintf(
                 __s('%1$s: %2$s'),
-                _n('Email', 'Emails', Session::getPluralNumber()) . '</i></b>',
+                _sn('Email', 'Emails', Session::getPluralNumber()) . '</i></b>',
                 implode(', ', $emails),
             ),
         );
@@ -340,7 +340,7 @@ class PluginPdfUser extends PluginPdfCommon
                             if (isset($groups[$data[$field_group]])) {
                                 $linktype = sprintf(
                                     __s('%1$s = %2$s'),
-                                    _n('Group', 'Groups', 1),
+                                    _sn('Group', 'Groups', 1),
                                     $groups[$data[$field_group]],
                                 );
                             }

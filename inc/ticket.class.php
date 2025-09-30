@@ -478,7 +478,7 @@ class PluginPdfTicket extends PluginPdfCommon
             $ticket = new Ticket();
             $pdf->displayLine('<b><i>' . sprintf(
                 __s('%1$s: %2$s') . '</i></b>',
-                _n('Linked ticket', 'Linked tickets', 2),
+                _sn('Linked ticket', 'Linked tickets', 2),
                 '',
             ));
             foreach ($tickets as $linkID => $data) {
@@ -507,7 +507,7 @@ class PluginPdfTicket extends PluginPdfCommon
         }
 
         $pdf->setColumnsSize(100);
-        $pdf->displayTitle('<b>' . _n('Date', 'Dates', 2) . '</b>');
+        $pdf->displayTitle('<b>' . _sn('Date', 'Dates', 2) . '</b>');
 
         $pdf->setColumnsSize(50, 50);
         $pdf->setColumnsAlign('right', 'left');
@@ -550,7 +550,7 @@ class PluginPdfTicket extends PluginPdfCommon
         }
 
         $pdf->setColumnsSize(100);
-        $pdf->displayTitle('<b>' . _n('Time', 'Times', 2) . '</b>');
+        $pdf->displayTitle('<b>' . _sn('Time', 'Times', 2) . '</b>');
 
         $pdf->setColumnsSize(50, 50);
         if ($job->fields['takeintoaccount_delay_stat'] > 0) {

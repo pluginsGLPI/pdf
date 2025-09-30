@@ -72,7 +72,7 @@ class PluginPdfChange_Problem extends PluginPdfCommon
             $pdf->displayTitle(sprintf(__s('%1$s: %2$s'), $title, __s('No item to display')));
         } else {
             $pdf->displayTitle('<b>' . sprintf(
-                _n('Last %d problem', 'Last %d problems', $number) . '</b>',
+                _sn('Last %d problem', 'Last %d problems', $number) . '</b>',
                 $number,
             ));
 
@@ -203,9 +203,9 @@ class PluginPdfChange_Problem extends PluginPdfCommon
                 $grps = $job->getGroups(CommonITILActor::REQUESTER);
                 if (count($grps)) {
                     if (empty($col)) {
-                        $col = sprintf(__s('%1$s %2$s'), $col, _n('Group', 'Groups', 2) . ' </i></b>');
+                        $col = sprintf(__s('%1$s %2$s'), $col, _sn('Group', 'Groups', 2) . ' </i></b>');
                     } else {
-                        $col = sprintf(__s('%1$s - %2$s'), $col, _n('Group', 'Groups', 2) . ' </i></b>');
+                        $col = sprintf(__s('%1$s - %2$s'), $col, _sn('Group', 'Groups', 2) . ' </i></b>');
                     }
                     $first = true;
                     foreach ($grps as $d) {
@@ -244,9 +244,9 @@ class PluginPdfChange_Problem extends PluginPdfCommon
                 $grps = $job->getGroups(CommonITILActor::ASSIGN);
                 if (count($grps)) {
                     if (empty($col)) {
-                        $col = sprintf(__s('%1$s %2$s'), $col, _n('Group', 'Groups', 2) . ' </i></b>');
+                        $col = sprintf(__s('%1$s %2$s'), $col, _sn('Group', 'Groups', 2) . ' </i></b>');
                     } else {
-                        $col = sprintf(__s('%1$s - %2$s'), $col, _n('Group', 'Groups', 2) . ' </i></b>');
+                        $col = sprintf(__s('%1$s - %2$s'), $col, _sn('Group', 'Groups', 2) . ' </i></b>');
                     }
                     $first = true;
                     foreach ($grps as $d) {
@@ -310,7 +310,7 @@ class PluginPdfChange_Problem extends PluginPdfCommon
             $pdf->displayTitle(sprintf(__s('%1$s: %2$s'), $title, __s('No item to display')));
         } else {
             $pdf->displayTitle('<b>' . sprintf(
-                _n('Last %d change', 'Last %d changes', $number) . '</b>',
+                _sn('Last %d change', 'Last %d changes', $number) . '</b>',
                 $number,
             ));
 
@@ -430,9 +430,9 @@ class PluginPdfChange_Problem extends PluginPdfCommon
                 $grps = $job->getGroups(CommonITILActor::REQUESTER);
                 if (count($grps)) {
                     if (empty($col)) {
-                        $col = sprintf(__s('%1$s %2$s'), $col, _n('Group', 'Groups', 2) . ' </i></b>');
+                        $col = sprintf(__s('%1$s %2$s'), $col, _sn('Group', 'Groups', 2) . ' </i></b>');
                     } else {
-                        $col = sprintf(__s('%1$s - %2$s'), $col, _n('Group', 'Groups', 2) . ' </i></b>');
+                        $col = sprintf(__s('%1$s - %2$s'), $col, _sn('Group', 'Groups', 2) . ' </i></b>');
                     }
                     $first = true;
                     foreach ($grps as $d) {
@@ -471,9 +471,9 @@ class PluginPdfChange_Problem extends PluginPdfCommon
                 $grps = $job->getGroups(CommonITILActor::ASSIGN);
                 if (count($grps)) {
                     if (empty($col)) {
-                        $col = sprintf(__s('%1$s %2$s'), $col, _n('Group', 'Groups', 2) . ' </i></b>');
+                        $col = sprintf(__s('%1$s %2$s'), $col, _sn('Group', 'Groups', 2) . ' </i></b>');
                     } else {
-                        $col = sprintf(__s('%1$s - %2$s'), $col, _n('Group', 'Groups', 2) . ' </i></b>');
+                        $col = sprintf(__s('%1$s - %2$s'), $col, _sn('Group', 'Groups', 2) . ' </i></b>');
                     }
                     $first = true;
                     foreach ($grps as $d) {

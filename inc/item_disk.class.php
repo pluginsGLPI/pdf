@@ -59,7 +59,7 @@ class PluginPdfItem_Disk extends PluginPdfCommon
         $number = count($result);
 
         $pdf->setColumnsSize(100);
-        $title = '<b>' . _n('Volume', 'Volumes', $number) . '</b>';
+        $title = '<b>' . _sn('Volume', 'Volumes', $number) . '</b>';
 
         if ($number === 0) {
             $pdf->displayTitle(sprintf(__s('%1$s: %2$s'), $title, __s('No item to display')));

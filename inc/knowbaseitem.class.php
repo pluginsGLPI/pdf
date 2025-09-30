@@ -118,7 +118,7 @@ class PluginPdfKnowbaseItem extends PluginPdfCommon
             __s('Creation date'),
             __s('Last update'),
             __s('FAQ'),
-            _n('View', 'Views', 2),
+            _sn('View', 'Views', 2),
         );
         $pdf->displayLine(
             $dbu->getUserName($item->fields['users_id']),
@@ -175,10 +175,10 @@ class PluginPdfKnowbaseItem extends PluginPdfCommon
         $nb = $item->countVisibilities();
         if ($nb) {
             $pdf->setColumnsSize(100);
-            $pdf->displayTitle(_n('Target', 'Targets', $nb));
+            $pdf->displayTitle(_sn('Target', 'Targets', $nb));
 
             $pdf->setColumnsSize(30, 70);
-            $pdf->displayTitle(__s('Type'), _n('Recipient', 'Recipients', 2));
+            $pdf->displayTitle(__s('Type'), _sn('Recipient', 'Recipients', 2));
 
             $recursive = '';
             if (count($entities)) {

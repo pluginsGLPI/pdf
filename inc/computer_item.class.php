@@ -50,10 +50,10 @@ class PluginPdfComputer_Item extends PluginPdfCommon
 
         $ID = $comp->getField('id');
 
-        $items = ['Printer' => _n('Printer', 'Printers', 2),
-            'Monitor'       => _n('Monitor', 'Monitors', 2),
-            'Peripheral'    => _n('Device', 'Devices', 2),
-            'Phone'         => _n('Phone', 'Phones', 2)];
+        $items = ['Printer' => _sn('Printer', 'Printers', 2),
+            'Monitor'       => _sn('Monitor', 'Monitors', 2),
+            'Peripheral'    => _sn('Device', 'Devices', 2),
+            'Phone'         => _sn('Phone', 'Phones', 2)];
 
         $info = new Infocom();
 
@@ -61,9 +61,7 @@ class PluginPdfComputer_Item extends PluginPdfCommon
         $pdf->displayTitle('<b>' . __s('Direct connections') . '</b>');
 
         foreach (array_keys($items) as $type) {
-            if (!($item = $dbu->getItemForItemtype($type))) {
-                continue;
-            }
+            $item = $dbu->getItemForItemtype($type);
             if (!$item->canView()) {
                 continue;
             }

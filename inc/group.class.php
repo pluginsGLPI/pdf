@@ -108,12 +108,12 @@ class PluginPdfGroup extends PluginPdfCommon
         $pdf->displayLine(
             '<b><i>' . sprintf(
                 __s('%1$s - %2$s'),
-                _n('Item', 'Items', 2) . '</i></b>',
+                _sn('Item', 'Items', 2) . '</i></b>',
                 Dropdown::getYesNo($item->fields['is_itemgroup']),
             ),
             '<b><i>' . sprintf(
                 __s('%1$s - %2$s'),
-                _n('User', 'Users', 2) . '</i></b>',
+                _sn('User', 'Users', 2) . '</i></b>',
                 Dropdown::getYesNo($item->fields['is_usergroup']),
             ),
         );

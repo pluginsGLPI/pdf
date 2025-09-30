@@ -94,7 +94,7 @@ class PluginPdfItem_Ticket extends PluginPdfCommon
         $number = count($result);
 
         $pdf->setColumnsSize(100);
-        $title = '<b>' . _n('Item', 'Items', $number) . '</b>';
+        $title = '<b>' . _sn('Item', 'Items', $number) . '</b>';
         if ($number === 0) {
             $pdf->displayTitle(sprintf(__s('%1$s: %2$s'), $title, __s('No item to display')));
         } else {
@@ -364,7 +364,7 @@ class PluginPdfItem_Ticket extends PluginPdfCommon
             $pdf->displayTitle(sprintf(__s('%1$s: %2$s'), $title, __s('No item to display')));
         } else {
             $pdf->displayTitle('<b>' . sprintf(
-                _n('Last %d ticket', 'Last %d tickets', $number) . '</b>',
+                _sn('Last %d ticket', 'Last %d tickets', $number) . '</b>',
                 $number,
             ));
 
@@ -494,9 +494,9 @@ class PluginPdfItem_Ticket extends PluginPdfCommon
                 $grps = $job->getGroups(CommonITILActor::REQUESTER);
                 if (count($grps)) {
                     if (empty($col)) {
-                        $col = sprintf(__s('%1$s %2$s'), $col, _n('Group', 'Groups', 2) . ' </i></b>');
+                        $col = sprintf(__s('%1$s %2$s'), $col, _sn('Group', 'Groups', 2) . ' </i></b>');
                     } else {
-                        $col = sprintf(__s('%1$s - %2$s'), $col, _n('Group', 'Groups', 2) . ' </i></b>');
+                        $col = sprintf(__s('%1$s - %2$s'), $col, _sn('Group', 'Groups', 2) . ' </i></b>');
                     }
                     $first = true;
                     foreach ($grps as $d) {
@@ -535,9 +535,9 @@ class PluginPdfItem_Ticket extends PluginPdfCommon
                 $grps = $job->getGroups(CommonITILActor::ASSIGN);
                 if (count($grps)) {
                     if (empty($col)) {
-                        $col = sprintf(__s('%1$s %2$s'), $col, _n('Group', 'Groups', 2) . ' </i></b>');
+                        $col = sprintf(__s('%1$s %2$s'), $col, _sn('Group', 'Groups', 2) . ' </i></b>');
                     } else {
-                        $col = sprintf(__s('%1$s - %2$s'), $col, _n('Group', 'Groups', 2) . ' </i></b>');
+                        $col = sprintf(__s('%1$s - %2$s'), $col, _sn('Group', 'Groups', 2) . ' </i></b>');
                     }
                     $first = true;
                     foreach ($grps as $d) {
@@ -576,7 +576,7 @@ class PluginPdfItem_Ticket extends PluginPdfCommon
                     if ($first) {
                         $texteitem = '<b><i>' . sprintf(
                             __s('%1$s: %2$s') . '</i></b>',
-                            _n('Associated items', 'Associated items', 2),
+                            _sn('Associated items', 'Associated items', 2),
                             '' . '<br />',
                         );
                     }

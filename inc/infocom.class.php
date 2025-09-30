@@ -186,7 +186,7 @@ class PluginPdfInfocom extends PluginPdfCommon
                     sprintf(
                         __s('%1$s (%2$s)'),
                         sprintf(
-                            _n('%d year', '%d years', $ic->fields['sink_time']),
+                            _sn('%d year', '%d years', $ic->fields['sink_time']),
                             $ic->fields['sink_time'],
                         ),
                         Infocom::getAmortTypeName($ic->fields['sink_type']),
@@ -273,7 +273,7 @@ class PluginPdfInfocom extends PluginPdfCommon
                     sprintf(
                         __s('%1$s - %2$s'),
                         sprintf(
-                            _n(
+                            _sn(
                                 '%d month',
                                 '%d months',
                                 $ic->fields['warranty_duration'],

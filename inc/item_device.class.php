@@ -54,7 +54,7 @@ class PluginPdfItem_Device extends PluginPdfCommon
         }
 
         $pdf->setColumnsSize(100);
-        $pdf->displayTitle('<b>' . Toolbox::ucfirst(_n('Component', 'Components', 2)) . '</b>');
+        $pdf->displayTitle('<b>' . Toolbox::ucfirst(_sn('Component', 'Components', 2)) . '</b>');
 
         $pdf->setColumnsSize(3, 14, 42, 41);
 
@@ -62,9 +62,6 @@ class PluginPdfItem_Device extends PluginPdfCommon
         foreach ($devtypes as $itemtype) {
             $dbu_local = new DbUtils();
             $devicetypes = $dbu_local->getItemForItemtype($itemtype);
-            if (!$devicetypes) {
-                continue;
-            }
             $specificities = $devicetypes->getSpecificities();
             $specif_fields = array_keys($specificities);
 
@@ -94,17 +91,16 @@ class PluginPdfItem_Device extends PluginPdfCommon
             ];
 
             $dbu = new DbUtils();
-            // Validate that the types are valid before using them
-            if (!$dbu->getItemForItemtype($associated_type) || !$dbu->getItemForItemtype($itemtype)) {
-                continue;
-            }
-
             foreach ($DB->request($query_params) as $data) {
                 $device = $dbu->getItemForItemtype($associated_type);
                 $itemdevice = $dbu->getItemForItemtype($itemtype);
                 $itemdevice->getFromDB($data['id']);
                 if ($device->getFromDB($data[$fk])) {
-                    $spec = $device->getAdditionalFields();
+                    $spec = [];
+                    if (method_exists($device, 'getAdditionalFields')) {
+                        $spec = $device->getAdditionalFields();
+                    }
+                    
                     $col4 = '';
                     if (count($spec) > 0) {
                         $colspan = (60 / count($spec));

@@ -36,7 +36,7 @@ class PluginPdfProfile extends Profile
 
     public static function getTypeName($nb = 0)
     {
-        return _n('PDF export', 'PDF export', $nb, 'pdf');
+        return _sn('PDF export', 'PDF export', $nb, 'pdf');
     }
 
     public function rawSearchOptions()

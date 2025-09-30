@@ -111,7 +111,7 @@ function plugin_init_pdf()
 
 function plugin_version_pdf()
 {
-    return ['name'       => __('Print to pdf', 'pdf'),
+    return ['name'       => __s('Print to pdf', 'pdf'),
         'version'        => PLUGIN_PDF_VERSION,
         'author'         => 'Teclib, Remi Collet, Nelly Mahu-Lasson',
         'license'        => 'GPLv3+',

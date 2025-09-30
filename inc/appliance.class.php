@@ -96,15 +96,13 @@ class PluginPdfAppliance extends PluginPdfCommon
 
     public static function pdfMain(PluginPdfSimplePDF $pdf, Appliance $item)
     {
-        new DbUtils();
-
         PluginPdfCommon::mainTitle($pdf, $item);
 
         $pdf->displayLine(
             sprintf(__s('%1$s: %2$s'), '<b><i>' . __s('Name') . '</i></b>', $item->fields['name']),
             sprintf(
                 __s('%1$s: %2$s'),
-                '<b><i>' . _n('Status', 'Statuses', 1) . '</i></b>',
+                '<b><i>' . _sn('Status', 'Statuses', 1) . '</i></b>',
                 Toolbox::stripTags(Dropdown::getDropdownName(
                     'glpi_states',
                     $item->fields['states_id'],
@@ -218,7 +216,7 @@ class PluginPdfAppliance extends PluginPdfCommon
         $instID = $appli->fields['id'];
 
         $pdf->setColumnsSize(100);
-        $pdf->displayTitle('<b>' . _n('Associated item', 'Associated items', 2) . '</b>');
+        $pdf->displayTitle('<b>' . _sn('Associated item', 'Associated items', 2) . '</b>');
 
         $result = $DB->request([
             'SELECT' => 'DISTINCT itemtype',
@@ -435,8 +433,6 @@ class PluginPdfAppliance extends PluginPdfCommon
     {
         /** @var DBmysql $DB */
         global $DB;
-
-        new DbUtils();
 
         $ID       = $item->getField('id');
         $itemtype = get_class($item);

@@ -47,17 +47,11 @@ abstract class PluginPdfCommon extends CommonGLPI
         }
     }
 
-    /**
-     * Add standard define tab
-     *
-     * @param $itemtype  itemtype link to the tab
-     * @param $ong       array defined tab array
-     * @param $options   array of options (for withtemplate)
-     *
-     * @return CommonGLPI (set the tab array)
-    **/
-    final public function addStandardTab($itemtype, &$ong, $options)
+    // cannot override because created in CommonGLPI as final
+    /** @phpstan-ignore-next-line */
+    public function addStandardTab($itemtype, array &$ong, array $options)
     {
+        parent::addStandardTab($itemtype, $ong, $options);
         $dbu = new DbUtils();
 
         $withtemplate = 0;
@@ -65,7 +59,7 @@ abstract class PluginPdfCommon extends CommonGLPI
             $withtemplate = $options['withtemplate'];
         }
 
-        if (!is_numeric($itemtype) && ($obj = $dbu->getItemForItemtype($itemtype)) && (method_exists($itemtype, 'displayTabContentForPDF') && !($obj instanceof PluginPdfCommon))) {
+        if (!is_numeric($itemtype) && ($obj = $dbu->getItemForItemtype($itemtype)) && (method_exists($itemtype, 'displayTabContentForPDF') )) {
             $titles = $obj->getTabNameForItem($this->obj, $withtemplate);
             if (!is_array($titles)) {
                 $titles = [1 => $titles];
@@ -330,7 +324,7 @@ abstract class PluginPdfCommon extends CommonGLPI
         $number = count($notes);
 
         $pdf->setColumnsSize(100);
-        $title = '<b>' . _n('Note', 'Notes', $number) . '</b>';
+        $title = '<b>' . _sn('Note', 'Notes', $number) . '</b>';
 
         if ($number === 0) {
             $pdf->displayTitle(sprintf(__s('%1$s: %2$s'), $title, __s('No item to display')));
@@ -400,6 +394,7 @@ abstract class PluginPdfCommon extends CommonGLPI
                             }
                         } elseif (method_exists($itemtype, 'displayTabContentForPdf')
                                    && ($obj = $dbu->getItemForItemtype($itemtype))) {
+                            /** @phpstan-ignore-next-line */
                             if ($obj->displayTabContentForPdf($this->pdf, $this->obj, $tabnum)) {
                                 continue;
                             }

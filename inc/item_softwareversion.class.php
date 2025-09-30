@@ -77,8 +77,6 @@ class PluginPdfItem_SoftwareVersion extends PluginPdfCommon
         /** @var DBmysql $DB */
         global $DB, $CFG_GLPI;
 
-        new DbUtils();
-
         $ID   = $item->getField('id');
         $type = $item->getType();
         $crit = ($type == 'Software' ? 'softwares_id' : 'id');
@@ -205,7 +203,7 @@ class PluginPdfItem_SoftwareVersion extends PluginPdfCommon
         $iterator = $DB->request($criteria);
 
         $pdf->setColumnsSize(100);
-        $title = '<b>' . _n('Installation', 'Installations', $number) . '</b>';
+        $title = '<b>' . _sn('Installation', 'Installations', $number) . '</b>';
         if (!$number) {
             $pdf->displayTitle(sprintf(__s('%1$s: %2$s'), $title, __s('No item to display')));
         } else {
@@ -218,7 +216,7 @@ class PluginPdfItem_SoftwareVersion extends PluginPdfCommon
 
             $pdf->setColumnsSize(8, 8, 12, 10, 10, 12, 8, 10, 12, 12);
             $pdf->displayTitle(
-                '<b><i>' . _n('Version', 'Versions', 2),
+                '<b><i>' . _sn('Version', 'Versions', 2),
                 __s('Name'),
                 __s('Serial number'),
                 __s('Inventory number'),
@@ -226,7 +224,7 @@ class PluginPdfItem_SoftwareVersion extends PluginPdfCommon
                 __s('Status'),
                 __s('Group'),
                 __s('User'),
-                _n('License', 'Licenses', 2),
+                _sn('License', 'Licenses', 2),
                 __s('Type') . '</i></b>',
             );
 
@@ -296,7 +294,7 @@ class PluginPdfItem_SoftwareVersion extends PluginPdfCommon
         $pdf->setColumnsSize(75, 25);
         $pdf->setColumnsAlign('left', 'right');
 
-        $pdf->displayTitle('<b>' . __s('Entity'), _n('Installation', 'Installations', 2) . '</b>');
+        $pdf->displayTitle('<b>' . __s('Entity'), _sn('Installation', 'Installations', 2) . '</b>');
 
         $lig = $tot = 0;
         if (in_array(0, $_SESSION['glpiactiveentities'])) {

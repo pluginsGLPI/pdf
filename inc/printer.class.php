@@ -145,7 +145,7 @@ class PluginPdfPrinter extends PluginPdfCommon
         $pdf->setColumnsSize(100);
         $pdf->displayLine('<b><i>' . sprintf(
             __s('%1$s: %2$s'),
-            _n('Port', 'Ports', count($opts)) . '</i></b>',
+            _sn('Port', 'Ports', count($opts)) . '</i></b>',
             (count($opts) ? implode(', ', $opts) : __s('None')),
         ));
 

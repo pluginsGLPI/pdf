@@ -161,7 +161,7 @@ class PluginPdfSoftwareLicense extends PluginPdfCommon
         $number = count($result);
 
         $pdf->setColumnsSize(100);
-        $title = '<b>' . _n('License', 'Licenses', $number) . '</b>';
+        $title = '<b>' . _sn('License', 'Licenses', $number) . '</b>';
 
         if ($number === 0) {
             $pdf->displayTitle(sprintf(__s('%1$s: %2$s'), $title, __s('No item to display')));

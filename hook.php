@@ -51,7 +51,7 @@ function plugin_pdf_MassiveActions($type)
         default:
             if (isset($PLUGIN_HOOKS['plugin_pdf'][$type])) {
                 return ['PluginPdfCommon' . MassiveAction::CLASS_ACTION_SEPARATOR . 'DoIt'
-                         => '<i class="ti ti-file-type-pdf"></i>' . __('PDF export', 'pdf')];
+                         => '<i class="ti ti-file-type-pdf"></i>' . __s('PDF export', 'pdf')];
             }
     }
 
