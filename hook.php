@@ -51,7 +51,7 @@ function plugin_pdf_MassiveActions($type)
         default:
             if (isset($PLUGIN_HOOKS['plugin_pdf'][$type])) {
                 return ['PluginPdfCommon' . MassiveAction::CLASS_ACTION_SEPARATOR . 'DoIt'
-                         => __('Print to pdf', 'pdf')];
+                         => '<i class="ti ti-file-type-pdf"></i>' . __s('PDF export', 'pdf')];
             }
     }
 
@@ -99,22 +99,9 @@ function plugin_pdf_uninstall()
     $query = "DELETE
              FROM `glpi_profilerights`
              WHERE `name` = 'plugin_pdf'";
-    $DB->doQueryOrDie($query, $DB->error());
+    $DB->doQuery($query);
 
     $migration->executeMigration();
 
     return true;
-}
-
-
-/**
- * @since version 1.0.2
-**/
-function plugin_pdf_registerMethods()
-{
-    /** @var array $WEBSERVICES_METHOD */
-    global $WEBSERVICES_METHOD;
-
-    $WEBSERVICES_METHOD['pdf.getTabs'] = ['PluginPdfRemote', 'methodGetTabs'];
-    $WEBSERVICES_METHOD['pdf.getPdf']  = ['PluginPdfRemote', 'methodGetPdf'];
 }

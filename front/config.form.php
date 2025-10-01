@@ -30,12 +30,10 @@
  *  --------------------------------------------------------------------------
  */
 
-include('../../../inc/includes.php');
-
 Session::checkLoginUser();
 
 // No autoload when plugin is not activated
-require_once('../inc/config.class.php');
+require_once(__DIR__ . '/../inc/config.class.php');
 
 $config = new PluginPdfConfig();
 if (isset($_POST['update'])) {

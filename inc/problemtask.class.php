@@ -36,7 +36,7 @@ class PluginPdfProblemTask extends PluginPdfCommon
 
     public function __construct(?CommonGLPI $obj = null)
     {
-        $this->obj = ($obj ? $obj : new ProblemTask());
+        $this->obj = ($obj ?: new ProblemTask());
     }
 
     public static function pdfForProblem(PluginPdfSimplePDF $pdf, Problem $job)
@@ -61,23 +61,23 @@ class PluginPdfProblemTask extends PluginPdfCommon
         $pdf->setColumnsSize(100);
         $title = '<b>' . ProblemTask::getTypeName($number) . '</b>';
 
-        if (!$number) {
-            $pdf->displayTitle(sprintf(__('%1$s: %2$s'), $title, __('No item to display')));
+        if ($number === 0) {
+            $pdf->displayTitle(sprintf(__s('%1$s: %2$s'), $title, __s('No item to display')));
         } else {
             if ($number > $_SESSION['glpilist_limit']) {
-                $title = sprintf(__('%1$s (%2$s)'), $title, $_SESSION['glpilist_limit'] . '/' . $number);
+                $title = sprintf(__s('%1$s (%2$s)'), $title, $_SESSION['glpilist_limit'] . '/' . $number);
             } else {
-                $title = sprintf(__('%1$s: %2$s'), $title, $number);
+                $title = sprintf(__s('%1$s: %2$s'), $title, $number);
             }
             $pdf->displayTitle($title);
 
             $pdf->setColumnsSize(30, 10, 20, 20, 20);
             $pdf->displayTitle(
-                '<i>' . __('Type'),
-                __('Date'),
-                __('Duration'),
-                __('Writer'),
-                __('Planning') . '</i>',
+                '<i>' . __s('Type'),
+                __s('Date'),
+                __s('Duration'),
+                __s('Writer'),
+                __s('Planning') . '</i>',
             );
 
             foreach ($result as $id => $data) {
@@ -90,34 +90,30 @@ class PluginPdfProblemTask extends PluginPdfCommon
                 } else {
                     if (isset($data['state']) && $data['state']) {
                         $planification = sprintf(
-                            __('%1$s: %2$s'),
+                            __s('%1$s: %2$s'),
                             _x('item', 'State'),
                             Planning::getState($data['state']),
                         );
                     }
                     $planification .= '<br>' . sprintf(
-                        __('%1$s: %2$s'),
-                        __('Begin'),
+                        __s('%1$s: %2$s'),
+                        __s('Begin'),
                         Html::convDateTime($data['begin']),
                     );
                     $planification .= '<br>' . sprintf(
-                        __('%1$s: %2$s'),
-                        __('End'),
+                        __s('%1$s: %2$s'),
+                        __s('End'),
                         Html::convDateTime($data['end']),
                     );
                     $planification .= '<br>' . sprintf(
-                        __('%1$s: %2$s'),
-                        __('By'),
+                        __s('%1$s: %2$s'),
+                        __s('By'),
                         $dbu->getUserName($data['users_id_tech']),
                     );
                 }
 
 
-                if ($data['taskcategories_id']) {
-                    $lib = Dropdown::getDropdownName('glpi_taskcategories', $data['taskcategories_id']);
-                } else {
-                    $lib = '';
-                }
+                $lib = $data['taskcategories_id'] ? Dropdown::getDropdownName('glpi_taskcategories', $data['taskcategories_id']) : '';
                 $pdf->displayLine(
                     '</b>' . Toolbox::stripTags($lib),
                     Html::convDateTime($data['date']),
@@ -127,7 +123,7 @@ class PluginPdfProblemTask extends PluginPdfCommon
                     1,
                 );
                 $pdf->displayText(
-                    '<b><i>' . sprintf(__('%1$s: %2$s') . '</i></b>', __('Description'), ''),
+                    '<b><i>' . sprintf(__s('%1$s: %2$s') . '</i></b>', __s('Description'), ''),
                     Toolbox::stripTags($data['content']),
                     1,
                 );

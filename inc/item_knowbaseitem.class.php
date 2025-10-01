@@ -36,7 +36,7 @@ class PluginPdfItem_Knowbaseitem extends PluginPdfCommon
 
     public function __construct(?CommonGLPI $obj = null)
     {
-        $this->obj = ($obj ? $obj : new Item_Disk());
+        $this->obj = ($obj ?: new Item_Disk());
     }
 
     public static function pdfForItem(PluginPdfSimplePDF $pdf, CommonDBTM $item)
@@ -47,8 +47,7 @@ class PluginPdfItem_Knowbaseitem extends PluginPdfCommon
         $ID = $item->getField('id');
 
         $result = $DB->request(
-            'glpi_knowbaseitems',
-            ['SELECT' => ['glpi_knowbaseitems.*',
+            ['FROM' => 'glpi_knowbaseitems'] + ['SELECT' => ['glpi_knowbaseitems.*',
                 'glpi_knowbaseitems_items.itemtype',
                 'glpi_knowbaseitems_items.items_id'],
                 'LEFT JOIN' => ['glpi_knowbaseitems_items'
@@ -61,23 +60,23 @@ class PluginPdfItem_Knowbaseitem extends PluginPdfCommon
 
         $pdf->setColumnsSize(100);
 
-        if (!$number) {
-            $pdf->displayTitle('<b>' . __('No knowledge base entries linked') . '</b>');
+        if ($number === 0) {
+            $pdf->displayTitle('<b>' . __s('No knowledge base entries linked') . '</b>');
         } else {
-            $title = '<b>' . __('Link a knowledge base entry') . '</b>';
+            $title = '<b>' . __s('Link a knowledge base entry') . '</b>';
             if ($number > $_SESSION['glpilist_limit']) {
-                $title = sprintf(__('%1$s: %2$s'), $title, $_SESSION['glpilist_limit'] . ' / ' . $number);
+                $title = sprintf(__s('%1$s: %2$s'), $title, $_SESSION['glpilist_limit'] . ' / ' . $number);
             } else {
-                $title = sprintf(__('%1$s: %2$s'), $title, $number);
+                $title = sprintf(__s('%1$s: %2$s'), $title, $number);
             }
             $pdf->displayTitle($title);
 
             $pdf->setColumnsSize(40, 40, 10, 10);
-            $pdf->displayTitle(__('Type'), __('Item'), __('Creation date'), __('Update date'));
+            $pdf->displayTitle(__s('Type'), __s('Item'), __s('Creation date'), __s('Update date'));
 
             foreach ($result as $data) {
                 $pdf->displayLine(
-                    __('Knowledge base'),
+                    __s('Knowledge base'),
                     $data['name'],
                     Html::convDateTime($data['date_creation']),
                     Html::convDateTime($data['date_mod']),

@@ -36,7 +36,7 @@ class PluginPdfPrinter extends PluginPdfCommon
 
     public function __construct(?CommonGLPI $obj = null)
     {
-        $this->obj = ($obj ? $obj : new Printer());
+        $this->obj = ($obj ?: new Printer());
     }
 
     public function defineAllTabsPDF($options = [])
@@ -67,27 +67,27 @@ class PluginPdfPrinter extends PluginPdfCommon
 
         $pdf->displayLine(
             '<b><i>' . sprintf(
-                __('%1$s: %2$s'),
-                __('Sysdescr') . '</i></b>',
+                __s('%1$s: %2$s'),
+                __s('Sysdescr') . '</i></b>',
                 $printer->fields['sysdescr'],
             ),
             '<b><i>' . sprintf(
-                __('%1$s: %2$s'),
-                __('User') . '</i></b>',
+                __s('%1$s: %2$s'),
+                __s('User') . '</i></b>',
                 $dbu->getUserName($printer->fields['users_id']),
             ),
         );
 
         $pdf->displayLine(
             '<b><i>' . sprintf(
-                __('%1$s: %2$s'),
-                __('Management type') . '</i></b>',
-                ($printer->fields['is_global'] ? __('Global management')
-                                              : __('Unit management')),
+                __s('%1$s: %2$s'),
+                __s('Management type') . '</i></b>',
+                ($printer->fields['is_global'] ? __s('Global management')
+                                              : __s('Unit management')),
             ),
             '<b><i>' . sprintf(
-                __('%1$s: %2$s'),
-                __('Network') . '</i></b>',
+                __s('%1$s: %2$s'),
+                __s('Network') . '</i></b>',
                 Toolbox::stripTags(Dropdown::getDropdownName(
                     'glpi_networks',
                     $printer->fields['networks_id'],
@@ -97,13 +97,13 @@ class PluginPdfPrinter extends PluginPdfCommon
 
         $pdf->displayLine(
             '<b><i>' . sprintf(
-                __('%1$s: %2$s'),
-                __('Group') . '</i></b>',
+                __s('%1$s: %2$s'),
+                __s('Group') . '</i></b>',
                 Dropdown::getDropdownName('glpi_groups', $printer->fields['groups_id']),
             ),
             '<b><i>' . sprintf(
-                __('%1$s: %2$s'),
-                __('UUID') . '</i></b>',
+                __s('%1$s: %2$s'),
+                __s('UUID') . '</i></b>',
                 $printer->fields['uuid'],
             ),
         );
@@ -111,32 +111,32 @@ class PluginPdfPrinter extends PluginPdfCommon
 
         $pdf->displayLine(
             '<b><i>' . sprintf(
-                __('%1$s: %2$s'),
-                __('Memory') . '</i></b>',
+                __s('%1$s: %2$s'),
+                __s('Memory') . '</i></b>',
                 $printer->fields['memory_size'],
             ),
             '<b><i>' . sprintf(
-                __('%1$s: %2$s'),
-                __('Initial page counter') . '</i></b>',
+                __s('%1$s: %2$s'),
+                __s('Initial page counter') . '</i></b>',
                 $printer->fields['init_pages_counter'],
             ),
         );
 
         $pdf->displayLine(
             '<b><i>' . sprintf(
-                __('%1$s: %2$s'),
-                __('Current counter of pages') . '</i></b>',
+                __s('%1$s: %2$s'),
+                __s('Current counter of pages') . '</i></b>',
                 $printer->fields['last_pages_counter'],
             ),
         );
 
-        $opts = ['have_serial' => __('Serial'),
-            'have_parallel'    => __('Parallel'),
-            'have_usb'         => __('USB'),
-            'have_ethernet'    => __('Ethernet'),
-            'have_wifi'        => __('Wifi')];
+        $opts = ['have_serial' => __s('Serial'),
+            'have_parallel'    => __s('Parallel'),
+            'have_usb'         => __s('USB'),
+            'have_ethernet'    => __s('Ethernet'),
+            'have_wifi'        => __s('Wifi')];
 
-        foreach ($opts as $key => $val) {
+        foreach (array_keys($opts) as $key) {
             if (!$printer->fields[$key]) {
                 unset($opts[$key]);
             }
@@ -144,9 +144,9 @@ class PluginPdfPrinter extends PluginPdfCommon
 
         $pdf->setColumnsSize(100);
         $pdf->displayLine('<b><i>' . sprintf(
-            __('%1$s: %2$s'),
-            _n('Port', 'Ports', count($opts)) . '</i></b>',
-            (count($opts) ? implode(', ', $opts) : __('None')),
+            __s('%1$s: %2$s'),
+            _sn('Port', 'Ports', count($opts)) . '</i></b>',
+            (count($opts) ? implode(', ', $opts) : __s('None')),
         ));
 
         PluginPdfCommon::mainLine($pdf, $printer, 'comment');

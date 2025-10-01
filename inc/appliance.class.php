@@ -39,7 +39,7 @@ class PluginPdfAppliance extends PluginPdfCommon
      **/
     public function __construct(?CommonGLPI $obj = null)
     {
-        $this->obj = ($obj ? $obj : new Appliance());
+        $this->obj = ($obj ?: new Appliance());
     }
 
     /**
@@ -96,15 +96,13 @@ class PluginPdfAppliance extends PluginPdfCommon
 
     public static function pdfMain(PluginPdfSimplePDF $pdf, Appliance $item)
     {
-        $dbu = new DbUtils();
-
         PluginPdfCommon::mainTitle($pdf, $item);
 
         $pdf->displayLine(
-            sprintf(__('%1$s: %2$s'), '<b><i>' . __('Name') . '</i></b>', $item->fields['name']),
+            sprintf(__s('%1$s: %2$s'), '<b><i>' . __s('Name') . '</i></b>', $item->fields['name']),
             sprintf(
-                __('%1$s: %2$s'),
-                '<b><i>' . _n('Status', 'Statuses', 1) . '</i></b>',
+                __s('%1$s: %2$s'),
+                '<b><i>' . _sn('Status', 'Statuses', 1) . '</i></b>',
                 Toolbox::stripTags(Dropdown::getDropdownName(
                     'glpi_states',
                     $item->fields['states_id'],
@@ -114,13 +112,13 @@ class PluginPdfAppliance extends PluginPdfCommon
 
         $pdf->displayLine(
             sprintf(
-                __('%1$s: %2$s'),
-                '<b><i>' . __('Associable to a ticket') . '</i></b>',
+                __s('%1$s: %2$s'),
+                '<b><i>' . __s('Associable to a ticket') . '</i></b>',
                 Dropdown::getYesNo($item->fields['is_helpdesk_visible']),
             ),
             sprintf(
-                __('%1$s: %2$s'),
-                '<b><i>' . __('Location') . '</i></b>',
+                __s('%1$s: %2$s'),
+                '<b><i>' . __s('Location') . '</i></b>',
                 Toolbox::stripTags(Dropdown::getDropdownName(
                     'glpi_locations',
                     $item->fields['locations_id'],
@@ -130,32 +128,32 @@ class PluginPdfAppliance extends PluginPdfCommon
 
         $pdf->displayLine(
             sprintf(
-                __('%1$s: %2$s'),
-                '<b><i>' . __('Type') . '</i></b>',
+                __s('%1$s: %2$s'),
+                '<b><i>' . __s('Type') . '</i></b>',
                 Toolbox::stripTags(Dropdown::getDropdownName(
                     'glpi_appliancetypes',
                     $item->fields['appliancetypes_id'],
                 )),
             ),
             sprintf(
-                __('%1$s: %2$s'),
-                '<b><i>' . __('Technician in charge of the hardware') . '</i></b>',
+                __s('%1$s: %2$s'),
+                '<b><i>' . __s('Technician in charge of the hardware') . '</i></b>',
                 getUserName($item->fields['users_id_tech']),
             ),
         );
 
         $pdf->displayLine(
             sprintf(
-                __('%1$s: %2$s'),
-                '<b><i>' . __('Manufacturer') . '</i></b>',
+                __s('%1$s: %2$s'),
+                '<b><i>' . __s('Manufacturer') . '</i></b>',
                 Toolbox::stripTags(Dropdown::getDropdownName(
                     'glpi_suppliers',
                     $item->fields['manufacturers_id'],
                 )),
             ),
             sprintf(
-                __('%1$s: %2$s'),
-                '<b><i>' . __('Group in charge of the hardware') . '</i></b>',
+                __s('%1$s: %2$s'),
+                '<b><i>' . __s('Group in charge of the hardware') . '</i></b>',
                 Toolbox::stripTags(Dropdown::getDropdownName(
                     'glpi_groups',
                     $item->fields['groups_id_tech'],
@@ -165,26 +163,26 @@ class PluginPdfAppliance extends PluginPdfCommon
 
         $pdf->displayLine(
             sprintf(
-                __('%1$s: %2$s'),
-                '<b><i>' . __('Serial number') . '</i></b>',
+                __s('%1$s: %2$s'),
+                '<b><i>' . __s('Serial number') . '</i></b>',
                 $item->fields['serial'],
             ),
             sprintf(
-                __('%1$s: %2$s'),
-                '<b><i>' . __('Inventory number') . '</i></b>',
+                __s('%1$s: %2$s'),
+                '<b><i>' . __s('Inventory number') . '</i></b>',
                 $item->fields['otherserial'],
             ),
         );
 
         $pdf->displayLine(
             sprintf(
-                __('%1$s: %2$s'),
-                '<b><i>' . __('User') . '</i></b>',
+                __s('%1$s: %2$s'),
+                '<b><i>' . __s('User') . '</i></b>',
                 getUserName($item->fields['users_id']),
             ),
             sprintf(
-                __('%1$s: %2$s'),
-                '<b><i>' . __('Group') . '</i></b>',
+                __s('%1$s: %2$s'),
+                '<b><i>' . __s('Group') . '</i></b>',
                 Toolbox::stripTags(Dropdown::getDropdownName(
                     'glpi_groups',
                     $item->fields['groups_id'],
@@ -194,8 +192,8 @@ class PluginPdfAppliance extends PluginPdfCommon
 
         $pdf->displayLine(
             sprintf(
-                __('%1$s: %2$s'),
-                '<b><i>' . __('Environment', 'appliances') . '</i></b>',
+                __s('%1$s: %2$s'),
+                '<b><i>' . __s('Environment', 'appliances') . '</i></b>',
                 Toolbox::stripTags(Dropdown::getDropdownName(
                     'glpi_applianceenvironments',
                     $item->fields['applianceenvironments_id'],
@@ -204,7 +202,7 @@ class PluginPdfAppliance extends PluginPdfCommon
         );
 
         $pdf->displayText(
-            sprintf(__('%1$s: %2$s'), '<b><i>' . __('Comments') . '</i></b>', $item->fields['comment']),
+            sprintf(__s('%1$s: %2$s'), '<b><i>' . __s('Comments') . '</i></b>', $item->fields['comment']),
         );
 
         $pdf->displaySpace();
@@ -218,34 +216,36 @@ class PluginPdfAppliance extends PluginPdfCommon
         $instID = $appli->fields['id'];
 
         $pdf->setColumnsSize(100);
-        $pdf->displayTitle('<b>' . _n('Associated item', 'Associated items', 2) . '</b>');
+        $pdf->displayTitle('<b>' . _sn('Associated item', 'Associated items', 2) . '</b>');
 
-        $result = $DB->request('SELECT DISTINCT `itemtype`
-                              FROM `glpi_appliances_items`
-                              WHERE `appliances_id` = ' . $instID);
+        $result = $DB->request([
+            'SELECT' => 'DISTINCT itemtype',
+            'FROM'   => 'glpi_appliances_items',
+            'WHERE'  => ['appliances_id' => $instID],
+        ]);
         $number = count($result);
 
         if (Session::isMultiEntitiesMode()) {
             $pdf->setColumnsSize(12, 27, 25, 18, 18);
             $pdf->displayTitle(
-                '<b><i>' . __('Type'),
-                __('Name'),
-                __('Entity'),
-                __('Serial number'),
-                __('Inventory number') . '</i></b>',
+                '<b><i>' . __s('Type'),
+                __s('Name'),
+                __s('Entity'),
+                __s('Serial number'),
+                __s('Inventory number') . '</i></b>',
             );
         } else {
             $pdf->setColumnsSize(25, 31, 22, 22);
             $pdf->displayTitle(
-                '<b><i>' . __('Type'),
-                __('Name'),
-                __('Serial number'),
-                __('Inventory number') . '</i></b>',
+                '<b><i>' . __s('Type'),
+                __s('Name'),
+                __s('Serial number'),
+                __s('Inventory number') . '</i></b>',
             );
         }
 
-        if (!$number) {
-            $pdf->displayLine(__('No item found'));
+        if ($number === 0) {
+            $pdf->displayLine(__s('No item found'));
         } else {
             $dbu = new DbUtils();
             foreach ($result as $id => $row) {
@@ -286,21 +286,21 @@ class PluginPdfAppliance extends PluginPdfCommon
                     $query['ORDER'] = ['glpi_entities.completename', $item->getTable() . '.' . $column];
 
                     $result_linked = $DB->request($query);
-                    if (count($result_linked)) {
+                    if (count($result_linked) > 0) {
                         foreach ($result_linked as $id => $data) {
                             if (!$item->getFromDB($data['id'])) {
                                 continue;
                             }
 
                             if ($type == 'Ticket') {
-                                $data['name'] = sprintf(__('%1$s %2$s'), __('Ticket'), $data['id']);
+                                $data['name'] = sprintf(__s('%1$s %2$s'), __s('Ticket'), $data['id']);
                             }
                             if ($type == 'KnowbaseItem') {
                                 $data['name'] = $data['question'];
                             }
                             $name = $data['name'];
                             if (empty($data['name'])) {
-                                $name = sprintf(__('%1$s (%2$s)'), $name, $data['id']);
+                                $name = sprintf(__s('%1$s (%2$s)'), $name, $data['id']);
                             }
 
                             if (Session::isMultiEntitiesMode()) {
@@ -312,16 +312,16 @@ class PluginPdfAppliance extends PluginPdfCommon
                                         'glpi_entities',
                                         $data['entities_id'],
                                     ),
-                                    (isset($data['serial']) ? $data['serial'] : '-'),
-                                    (isset($data['otherserial']) ? $data['otherserial'] : '-'),
+                                    ($data['serial'] ?? '-'),
+                                    ($data['otherserial'] ?? '-'),
                                 );
                             } else {
                                 $pdf->setColumnsSize(25, 31, 22, 22);
                                 $pdf->displayTitle(
                                     $item->getTypeName(1),
                                     $name,
-                                    (isset($data['serial']) ? $data['serial'] : '-'),
-                                    (isset($data['otherserial']) ? $data['otherserial'] : '-'),
+                                    ($data['serial'] ?? '-'),
+                                    ($data['otherserial'] ?? '-'),
                                 );
                             }
 
@@ -348,7 +348,10 @@ class PluginPdfAppliance extends PluginPdfCommon
 
         $item = $relation->fields['itemtype'];
 
-        $objtype = new $item();
+        $objtype = $dbu->getItemForItemtype($item);
+        if (!$objtype) {
+            return;
+        }
 
         // selects all the attached relations
         $tablename = $dbu->getTableForItemType($item);
@@ -374,8 +377,8 @@ class PluginPdfAppliance extends PluginPdfCommon
         }
         $pdf->setColumnsSize(100);
         $pdf->displayLine(sprintf(
-            __('%1$s: %2$s'),
-            '<b><i>' . __('Relations') . "&nbsp;$title </i> </b>",
+            __s('%1$s: %2$s'),
+            '<b><i>' . __s('Relations') . "&nbsp;$title </i> </b>",
             implode(', ', $opts),
         ));
     }
@@ -398,7 +401,7 @@ class PluginPdfAppliance extends PluginPdfCommon
             'ORDER'                              => 'vvalues']);
         $number_champs = count($result_app_opt);
 
-        if (!$number_champs) {
+        if ($number_champs === 0) {
             return;
         }
 
@@ -420,8 +423,8 @@ class PluginPdfAppliance extends PluginPdfCommon
 
         $pdf->setColumnsSize(100);
         $pdf->displayLine(sprintf(
-            __('%1$s: %2$s'),
-            '<b><i>' . __('User fields', 'appliances') . '</i></b>',
+            __s('%1$s: %2$s'),
+            '<b><i>' . __s('User fields', 'appliances') . '</i></b>',
             implode(', ', $opts),
         ));
     }
@@ -431,13 +434,11 @@ class PluginPdfAppliance extends PluginPdfCommon
         /** @var DBmysql $DB */
         global $DB;
 
-        $dbu = new DbUtils();
-
         $ID       = $item->getField('id');
         $itemtype = get_class($item);
 
         $pdf->setColumnsSize(100);
-        $pdf->displayTitle('<b>' . __('Associated appliances', 'appliances') . '</b>');
+        $pdf->displayTitle('<b>' . __s('Associated appliances', 'appliances') . '</b>');
 
         $query = ['FIELDS' => ['glpi_plugin_appliances_appliances_items.id AS entID',
             'glpi_plugin_appliances_appliances.*'],
@@ -462,15 +463,15 @@ class PluginPdfAppliance extends PluginPdfCommon
         $result = $DB->request($query);
         $number = count($result);
 
-        if (!$number) {
-            $pdf->displayLine(__('No item found'));
+        if ($number === 0) {
+            $pdf->displayLine(__s('No item found'));
         } else {
             if (Session::isMultiEntitiesMode()) {
                 $pdf->setColumnsSize(30, 30, 20, 20);
-                $pdf->displayTitle('<b><i>' . __('Name'), __('Entity'), __('Group'), __('Type') . '</i></b>');
+                $pdf->displayTitle('<b><i>' . __s('Name'), __s('Entity'), __s('Group'), __s('Type') . '</i></b>');
             } else {
                 $pdf->setColumnsSize(50, 25, 25);
-                $pdf->displayTitle('<b><i>' . __('Name'), __('Group'), __('Type') . '</i></b>');
+                $pdf->displayTitle('<b><i>' . __s('Name'), __s('Group'), __s('Type') . '</i></b>');
             }
 
             while ($data = $result->current()) {

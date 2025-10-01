@@ -36,7 +36,7 @@ class PluginPdfChange extends PluginPdfCommon
 
     public function __construct(?CommonGLPI $obj = null)
     {
-        $this->obj = ($obj ? $obj : new Change());
+        $this->obj = ($obj ?: new Change());
     }
 
     public static function pdfMain(PluginPdfSimplePDF $pdf, Change $job)
@@ -51,7 +51,7 @@ class PluginPdfChange extends PluginPdfCommon
         $pdf->setColumnsSize(100);
 
         $pdf->displayTitle('<b>' .
-                 (empty($job->fields['name']) ? __('Without title') : $name = $job->fields['name']) . '</b>');
+                 (empty($job->fields['name']) ? __s('Without title') : $name = $job->fields['name']) . '</b>');
 
         if (count($_SESSION['glpiactiveentities']) > 1) {
             $entity = ' (' . Dropdown::getDropdownName('glpi_entities', $job->fields['entities_id']) . ')';
@@ -61,24 +61,23 @@ class PluginPdfChange extends PluginPdfCommon
 
         $pdf->setColumnsSize(50, 50);
         $recipient_name = '';
+        $due = "";
         if ($job->fields['users_id_recipient']) {
             $recipient = new User();
             $recipient->getFromDB($job->fields['users_id_recipient']);
             $recipient_name = $recipient->getName();
         }
-
-        $sla = $due = $commentsla = '';
         if ($job->fields['time_to_resolve']) {
             $due = '<b><i>' . sprintf(
-                __('%1$s: %2$s'),
-                __('Time to resolve') . '</b></i>',
+                __s('%1$s: %2$s'),
+                __s('Time to resolve') . '</b></i>',
                 Html::convDateTime($job->fields['time_to_resolve']),
             );
         }
         $pdf->displayLine(
             '<b><i>' . sprintf(
-                __('%1$s: %2$s'),
-                __('Opening date') . '</i></b>',
+                __s('%1$s: %2$s'),
+                __s('Opening date') . '</i></b>',
                 Html::convDateTime($job->fields['date']),
             ),
             $due,
@@ -88,29 +87,29 @@ class PluginPdfChange extends PluginPdfCommon
         $lastupdate = Html::convDateTime($job->fields['date_mod']);
         if ($job->fields['users_id_lastupdater'] > 0) {
             $lastupdate = sprintf(
-                __('%1$s by %2$s'),
+                __s('%1$s by %2$s'),
                 $lastupdate,
                 $dbu->getUserName($job->fields['users_id_lastupdater']),
             );
         }
 
         $pdf->displayLine(
-            '<b><i>' . sprintf(__('%1$s: %2$s'), __('By') . '</i></b>', $recipient_name),
-            '<b><i>' . sprintf(__('%1$s: %2$s'), __('Last update') . '</i></b>', $lastupdate),
+            '<b><i>' . sprintf(__s('%1$s: %2$s'), __s('By') . '</i></b>', $recipient_name),
+            '<b><i>' . sprintf(__s('%1$s: %2$s'), __s('Last update') . '</i></b>', $lastupdate),
         );
 
         $status = '';
         if (in_array($job->fields['status'], $job->getSolvedStatusArray())
               || in_array($job->fields['status'], $job->getClosedStatusArray())) {
-            $status = sprintf(__('%1$s %2$s'), '-', Html::convDateTime($job->fields['solvedate']));
+            $status = sprintf(__s('%1$s %2$s'), '-', Html::convDateTime($job->fields['solvedate']));
         }
         if (in_array($job->fields['status'], $job->getClosedStatusArray())) {
-            $status = sprintf(__('%1$s %2$s'), '-', Html::convDateTime($job->fields['closedate']));
+            $status = sprintf(__s('%1$s %2$s'), '-', Html::convDateTime($job->fields['closedate']));
         }
 
         if ($job->fields['status'] == Change::WAITING) {
             $status = sprintf(
-                __('%1$s %2$s'),
+                __s('%1$s %2$s'),
                 '-',
                 Html::convDateTime($job->fields['begin_waiting_date']),
             );
@@ -118,13 +117,13 @@ class PluginPdfChange extends PluginPdfCommon
 
         $pdf->displayLine(
             '<b><i>' . sprintf(
-                __('%1$s: %2$s'),
-                __('Status') . '</i></b>',
+                __s('%1$s: %2$s'),
+                __s('Status') . '</i></b>',
                 Toolbox::stripTags($job->getStatus($job->fields['status'])) . $status,
             ),
             '<b><i>' . sprintf(
-                __('%1$s: %2$s'),
-                __('Urgency') . '</i></b>',
+                __s('%1$s: %2$s'),
+                __s('Urgency') . '</i></b>',
                 Toolbox::stripTags($job->getUrgencyName($job->fields['urgency'])),
             ),
         );
@@ -132,29 +131,29 @@ class PluginPdfChange extends PluginPdfCommon
 
         $pdf->displayLine(
             '<b><i>' . sprintf(
-                __('%1$s: %2$s'),
-                __('Category') . '</i></b>',
+                __s('%1$s: %2$s'),
+                __s('Category') . '</i></b>',
                 Dropdown::getDropdownName(
                     'glpi_itilcategories',
                     $job->fields['itilcategories_id'],
                 ),
             ),
             '<b><i>' . sprintf(
-                __('%1$s: %2$s'),
-                __('Impact') . '</i></b>',
+                __s('%1$s: %2$s'),
+                __s('Impact') . '</i></b>',
                 Toolbox::stripTags($job->getImpactName($job->fields['impact'])),
             ),
         );
 
         $pdf->displayLine(
             '<b><i>' . sprintf(
-                __('%1$s: %2$s'),
-                __('Total duration') . '</i></b>',
+                __s('%1$s: %2$s'),
+                __s('Total duration') . '</i></b>',
                 Toolbox::stripTags(CommonITILObject::getActionTime($job->fields['actiontime'])),
             ),
             '<b><i>' . sprintf(
-                __('%1$s: %2$s'),
-                __('Priority') . '</i></b>',
+                __s('%1$s: %2$s'),
+                __s('Priority') . '</i></b>',
                 Toolbox::stripTags($job->getPriorityName($job->fields['priority'])),
             ),
         );
@@ -164,7 +163,7 @@ class PluginPdfChange extends PluginPdfCommon
         // Requester
         $users     = [];
         $listusers = '';
-        $requester = '<b><i>' . sprintf(__('%1$s: %2$s') . '</i></b>', __('Requester'), $listusers);
+        $requester = '<b><i>' . sprintf(__s('%1$s: %2$s') . '</i></b>', __s('Requester'), $listusers);
         foreach ($job->getUsers(CommonITILActor::REQUESTER) as $d) {
             if ($d['users_id']) {
                 $tmp = Toolbox::stripTags($dbu->getUserName($d['users_id']));
@@ -184,8 +183,8 @@ class PluginPdfChange extends PluginPdfCommon
         $groups         = [];
         $listgroups     = '';
         $requestergroup = '<b><i>' . sprintf(
-            __('%1$s: %2$s') . '</i></b>',
-            __('Requester group'),
+            __s('%1$s: %2$s') . '</i></b>',
+            __s('Requester group'),
             $listgroups,
         );
         foreach ($job->getGroups(CommonITILActor::REQUESTER) as $d) {
@@ -200,7 +199,7 @@ class PluginPdfChange extends PluginPdfCommon
         // Observer
         $users     = [];
         $listusers = '';
-        $watcher   = '<b><i>' . sprintf(__('%1$s: %2$s') . '</i></b>', __('Watcher'), $listusers);
+        $watcher   = '<b><i>' . sprintf(__s('%1$s: %2$s') . '</i></b>', __s('Watcher'), $listusers);
         foreach ($job->getUsers(CommonITILActor::OBSERVER) as $d) {
             if ($d['users_id']) {
                 $tmp = Toolbox::stripTags($dbu->getUserName($d['users_id']));
@@ -220,8 +219,8 @@ class PluginPdfChange extends PluginPdfCommon
         $groups       = [];
         $listgroups   = '';
         $watchergroup = '<b><i>' . sprintf(
-            __('%1$s: %2$s') . '</i></b>',
-            __('Watcher group'),
+            __s('%1$s: %2$s') . '</i></b>',
+            __s('Watcher group'),
             $listgroups,
         );
         foreach ($job->getGroups(CommonITILActor::OBSERVER) as $d) {
@@ -237,8 +236,8 @@ class PluginPdfChange extends PluginPdfCommon
         $users     = [];
         $listusers = '';
         $assign    = '<b><i>' . sprintf(
-            __('%1$s: %2$s') . '</i></b>',
-            __('Assigned to technicians'),
+            __s('%1$s: %2$s') . '</i></b>',
+            __s('Assigned to technicians'),
             $listusers,
         );
         foreach ($job->getUsers(CommonITILActor::ASSIGN) as $d) {
@@ -260,8 +259,8 @@ class PluginPdfChange extends PluginPdfCommon
         $groups      = [];
         $listgroups  = '';
         $assigngroup = '<b><i>' . sprintf(
-            __('%1$s: %2$s') . '</i></b>',
-            __('Assigned to groups'),
+            __s('%1$s: %2$s') . '</i></b>',
+            __s('Assigned to groups'),
             $listgroups,
         );
         foreach ($job->getGroups(CommonITILActor::ASSIGN) as $d) {
@@ -277,8 +276,8 @@ class PluginPdfChange extends PluginPdfCommon
         $suppliers      = [];
         $listsuppliers  = '';
         $assignsupplier = '<b><i>' . sprintf(
-            __('%1$s: %2$s') . '</i></b>',
-            __('Assigned to a supplier'),
+            __s('%1$s: %2$s') . '</i></b>',
+            __s('Assigned to a supplier'),
             $listsuppliers,
         );
         foreach ($job->getSuppliers(CommonITILActor::ASSIGN) as $d) {
@@ -294,11 +293,11 @@ class PluginPdfChange extends PluginPdfCommon
 
         $pdf->setColumnsSize(100);
         $pdf->displayLine(
-            '<b><i>' . sprintf(__('%1$s: %2$s'), __('Title') . '</i></b>', $job->fields['name']),
+            '<b><i>' . sprintf(__s('%1$s: %2$s'), __s('Title') . '</i></b>', $job->fields['name']),
         );
 
         $pdf->displayText(
-            '<b><i>' . sprintf(__('%1$s: %2$s') . '</i></b>', __('Description'), ''),
+            '<b><i>' . sprintf(__s('%1$s: %2$s') . '</i></b>', __s('Description'), ''),
             Toolbox::stripTags($job->fields['content']),
             1,
         );
@@ -309,19 +308,19 @@ class PluginPdfChange extends PluginPdfCommon
     public static function pdfAnalysis(PluginPdfSimplePDF $pdf, Change $job)
     {
         $pdf->setColumnsSize(100);
-        $pdf->displayTitle('<b>' . __('Analysis') . '</b>');
+        $pdf->displayTitle('<b>' . __s('Analysis') . '</b>');
 
         $pdf->setColumnsSize(10, 90);
 
         $pdf->displayText(sprintf(
-            __('%1$s: %2$s'),
-            '<b><i>' . __('Impacts') . '</i></b>',
+            __s('%1$s: %2$s'),
+            '<b><i>' . __s('Impacts') . '</i></b>',
             $job->fields['impactcontent'],
         ));
 
         $pdf->displayText(sprintf(
-            __('%1$s: %2$s'),
-            '<b><i>' . __('Control list') . '</i></b>',
+            __s('%1$s: %2$s'),
+            '<b><i>' . __s('Control list') . '</i></b>',
             $job->fields['controlistcontent'],
         ));
     }
@@ -329,25 +328,25 @@ class PluginPdfChange extends PluginPdfCommon
     public static function pdfPlan(PluginPdfSimplePDF $pdf, Change $job)
     {
         $pdf->setColumnsSize(100);
-        $pdf->displayTitle('<b>' . __('Plans') . '</b>');
+        $pdf->displayTitle('<b>' . __s('Plans') . '</b>');
 
         $pdf->setColumnsSize(10, 90);
 
         $pdf->displayText(sprintf(
-            __('%1$s: %2$s'),
-            '<b><i>' . __('Deployment plan') . '</i></b>',
+            __s('%1$s: %2$s'),
+            '<b><i>' . __s('Deployment plan') . '</i></b>',
             $job->fields['rolloutplancontent'],
         ));
 
         $pdf->displayText(sprintf(
-            __('%1$s: %2$s'),
-            '<b><i>' . __('Backup plan') . '</i></b>',
+            __s('%1$s: %2$s'),
+            '<b><i>' . __s('Backup plan') . '</i></b>',
             $job->fields['backoutplancontent'],
         ));
 
         $pdf->displayText(sprintf(
-            __('%1$s: %2$s'),
-            '<b><i>' . __('Checklist') . '</i></b>',
+            __s('%1$s: %2$s'),
+            '<b><i>' . __s('Checklist') . '</i></b>',
             $job->fields['checklistcontent'],
         ));
     }
@@ -355,24 +354,24 @@ class PluginPdfChange extends PluginPdfCommon
     public static function pdfStat(PluginPdfSimplePDF $pdf, Change $job)
     {
         $pdf->setColumnsSize(100);
-        $pdf->displayTitle('<b>' . __('Statistics') . '</b>');
+        $pdf->displayTitle('<b>' . __s('Statistics') . '</b>');
 
-        $pdf->displayTitle('<b>' . _n('Date', 'Dates', 2) . '</b>');
+        $pdf->displayTitle('<b>' . _sn('Date', 'Dates', 2) . '</b>');
 
         $pdf->setColumnsSize(50, 50);
-        $pdf->displayLine(__('Opening date'), Html::convDateTime($job->fields['date']));
-        $pdf->displayLine(__('Time to resolve'), Html::convDateTime($job->fields['time_to_resolve']));
+        $pdf->displayLine(__s('Opening date'), Html::convDateTime($job->fields['date']));
+        $pdf->displayLine(__s('Time to resolve'), Html::convDateTime($job->fields['time_to_resolve']));
 
         if (in_array($job->fields['status'], $job->getSolvedStatusArray())
             || in_array($job->fields['status'], $job->getClosedStatusArray())) {
-            $pdf->displayLine(__('Resolution date'), Html::convDateTime($job->fields['solvedate']));
+            $pdf->displayLine(__s('Resolution date'), Html::convDateTime($job->fields['solvedate']));
         }
         if (in_array($job->fields['status'], $job->getClosedStatusArray())) {
-            $pdf->displayLine(__('Closing date'), Html::convDateTime($job->fields['closedate']));
+            $pdf->displayLine(__s('Closing date'), Html::convDateTime($job->fields['closedate']));
         }
 
         $pdf->setColumnsSize(100);
-        $pdf->displayTitle('<b>' . _n('Time', 'Times', 2) . '</b>');
+        $pdf->displayTitle('<b>' . _sn('Time', 'Times', 2) . '</b>');
 
         $pdf->setColumnsSize(50, 50);
         if (isset($job->fields['takeintoaccount_delay_stat']) > 0) {
@@ -380,31 +379,26 @@ class PluginPdfChange extends PluginPdfCommon
                 $accountdelay = Toolbox::stripTags(Html::timestampToString($job->fields['takeintoaccount_delay_stat'], false));
             }
             $pdf->displayLine(
-                __('Take into account'),
-                isset($accountdelay) ? $accountdelay : '',
+                __s('Take into account'),
+                $accountdelay ?? '',
             );
         }
 
-        if (in_array($job->fields['status'], $job->getSolvedStatusArray())
-            || in_array($job->fields['status'], $job->getClosedStatusArray())) {
-            if ($job->fields['solve_delay_stat'] > 0) {
-                $pdf->displayLine(
-                    __('Resolution'),
-                    Toolbox::stripTags(Html::timestampToString($job->fields['solve_delay_stat'], false)),
-                );
-            }
+        if ((in_array($job->fields['status'], $job->getSolvedStatusArray()) || in_array($job->fields['status'], $job->getClosedStatusArray())) && $job->fields['solve_delay_stat'] > 0) {
+            $pdf->displayLine(
+                __s('Resolution'),
+                Toolbox::stripTags(Html::timestampToString($job->fields['solve_delay_stat'], false)),
+            );
         }
-        if (in_array($job->fields['status'], $job->getClosedStatusArray())) {
-            if ($job->fields['close_delay_stat'] > 0) {
-                $pdf->displayLine(
-                    __('Closing'),
-                    Toolbox::stripTags(Html::timestampToString($job->fields['close_delay_stat'], false)),
-                );
-            }
+        if (in_array($job->fields['status'], $job->getClosedStatusArray()) && $job->fields['close_delay_stat'] > 0) {
+            $pdf->displayLine(
+                __s('Closing'),
+                Toolbox::stripTags(Html::timestampToString($job->fields['close_delay_stat'], false)),
+            );
         }
         if ($job->fields['waiting_duration'] > 0) {
             $pdf->displayLine(
-                __('Pending'),
+                __s('Pending'),
                 Toolbox::stripTags(Html::timestampToString($job->fields['waiting_duration'], false)),
             );
         }
@@ -421,7 +415,7 @@ class PluginPdfChange extends PluginPdfCommon
         if (Session::haveRight('change', Change::READALL) // for technician
               || Session::haveRight('followup', ITILFollowup::SEEPRIVATE)
               || Session::haveRight('task', TicketTask::SEEPRIVATE)) {
-            $onglets['_private_'] = __('Private');
+            $onglets['_private_'] = __s('Private');
         }
 
         return $onglets;

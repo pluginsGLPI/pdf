@@ -36,7 +36,7 @@ class PluginPdfSoftware extends PluginPdfCommon
 
     public function __construct(?CommonGLPI $obj = null)
     {
-        $this->obj = ($obj ? $obj : new Software());
+        $this->obj = ($obj ?: new Software());
     }
 
     public static function pdfMain(PluginPdfSimplePDF $pdf, Software $software)
@@ -46,10 +46,10 @@ class PluginPdfSoftware extends PluginPdfCommon
         PluginPdfCommon::mainTitle($pdf, $software);
 
         $pdf->displayLine(
-            '<b><i>' . sprintf(__('%1$s: %2$s'), __('Name') . '</i></b>', $software->fields['name']),
+            '<b><i>' . sprintf(__s('%1$s: %2$s'), __s('Name') . '</i></b>', $software->fields['name']),
             '<b><i>' . sprintf(
-                __('%1$s: %2$s'),
-                __('Publisher') . '</i></b>',
+                __s('%1$s: %2$s'),
+                __s('Publisher') . '</i></b>',
                 Toolbox::stripTags(Dropdown::getDropdownName(
                     'glpi_manufacturers',
                     $software->fields['manufacturers_id'],
@@ -59,16 +59,16 @@ class PluginPdfSoftware extends PluginPdfCommon
 
         $pdf->displayLine(
             '<b><i>' . sprintf(
-                __('%1$s: %2$s'),
-                __('Location') . '</i></b>',
+                __s('%1$s: %2$s'),
+                __s('Location') . '</i></b>',
                 Dropdown::getDropdownName(
                     'glpi_locations',
                     $software->fields['locations_id'],
                 ),
             ),
             '<b><i>' . sprintf(
-                __('%1$s: %2$s'),
-                __('Category') . '</i></b>',
+                __s('%1$s: %2$s'),
+                __s('Category') . '</i></b>',
                 Dropdown::getDropdownName(
                     'glpi_softwarecategories',
                     $software->fields['softwarecategories_id'],
@@ -78,51 +78,51 @@ class PluginPdfSoftware extends PluginPdfCommon
 
         $pdf->displayLine(
             '<b><i>' . sprintf(
-                __('%1$s: %2$s'),
-                __('Technician in charge of the hardware') . '</i></b>',
+                __s('%1$s: %2$s'),
+                __s('Technician in charge of the hardware') . '</i></b>',
                 $dbu->getUserName($software->fields['users_id_tech']),
             ),
             '<b><i>' . sprintf(
-                __('%1$s: %2$s'),
-                __('Associable to a ticket') . '</i></b>',
-                ($software->fields['is_helpdesk_visible'] ? __('Yes') : __('No')),
+                __s('%1$s: %2$s'),
+                __s('Associable to a ticket') . '</i></b>',
+                ($software->fields['is_helpdesk_visible'] ? __s('Yes') : __s('No')),
             ),
         );
 
         $pdf->displayLine(
             '<b><i>' . sprintf(
-                __('%1$s: %2$s'),
-                __('Group in charge of the hardware') . '</i></b>',
+                __s('%1$s: %2$s'),
+                __s('Group in charge of the hardware') . '</i></b>',
                 Dropdown::getDropdownName(
                     'glpi_groups',
                     $software->fields['groups_id_tech'],
                 ),
             ),
             '<b><i>' . sprintf(
-                __('%1$s: %2$s'),
-                __('User') . '</i></b>',
+                __s('%1$s: %2$s'),
+                __s('User') . '</i></b>',
                 $dbu->getUserName($software->fields['users_id']),
             ),
         );
 
         $pdf->displayLine(
             '<b><i>' . sprintf(
-                __('%1$s: %2$s'),
-                __('Group') . '</i></b>',
+                __s('%1$s: %2$s'),
+                __s('Group') . '</i></b>',
                 Dropdown::getDropdownName('glpi_groups', $software->fields['groups_id']),
             ),
         );
 
         $pdf->displayLine(
             '<b><i>' . sprintf(
-                __('Last update on %s'),
+                __s('Last update on %s'),
                 Html::convDateTime($software->fields['date_mod']),
             ),
         );
 
 
         if ($software->fields['softwares_id'] > 0) {
-            $col2 = '<b><i> ' . __('from') . ' </i></b> ' .
+            $col2 = '<b><i> ' . __s('from') . ' </i></b> ' .
                      Toolbox::stripTags(Dropdown::getDropdownName(
                          'glpi_softwares',
                          $software->fields['softwares_id'],
@@ -133,9 +133,9 @@ class PluginPdfSoftware extends PluginPdfCommon
 
         $pdf->displayLine(
             '<b><i>' . sprintf(
-                __('%1$s: %2$s'),
-                __('Upgrade') . '</i></b>',
-                ($software->fields['is_update'] ? __('Yes') : __('No')),
+                __s('%1$s: %2$s'),
+                __s('Upgrade') . '</i></b>',
+                ($software->fields['is_update'] ? __s('Yes') : __s('No')),
                 $col2,
             ),
         );

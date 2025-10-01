@@ -36,7 +36,7 @@ class PluginPdfInfocom extends PluginPdfCommon
 
     public function __construct(?CommonGLPI $obj = null)
     {
-        $this->obj = ($obj ? $obj : new Infocom());
+        $this->obj = ($obj ?: new Infocom());
     }
 
     public static function pdfForItem(PluginPdfSimplePDF $pdf, CommonDBTM $item)
@@ -54,71 +54,71 @@ class PluginPdfInfocom extends PluginPdfCommon
         $ic = new Infocom();
 
         $pdf->setColumnsSize(100);
-        $title = '<b>' . __('Financial and administratives information') . '</b>';
+        $title = '<b>' . __s('Financial and administratives information') . '</b>';
 
         if (!$ic->getFromDBforDevice(get_class($item), $ID)) {
-            $pdf->displayTitle(sprintf(__('%1$s: %2$s'), $title, __('No item to display')));
+            $pdf->displayTitle(sprintf(__s('%1$s: %2$s'), $title, __s('No item to display')));
         } else {
-            $pdf->displayTitle('<b>' . __('Asset lifecycle') . '</b>');
+            $pdf->displayTitle('<b>' . __s('Asset lifecycle') . '</b>');
 
             $pdf->setColumnsSize(50, 50);
 
             $pdf->displayLine(
                 '<b><i>' . sprintf(
-                    __('%1$s: %2$s'),
-                    __('Order date') . '</i></b>',
+                    __s('%1$s: %2$s'),
+                    __s('Order date') . '</i></b>',
                     Html::convDate($ic->fields['order_date']),
                 ),
                 '<b><i>' . sprintf(
-                    __('%1$s: %2$s'),
-                    __('Date of purchase') . '</i></b>',
+                    __s('%1$s: %2$s'),
+                    __s('Date of purchase') . '</i></b>',
                     Html::convDate($ic->fields['buy_date']),
                 ),
             );
 
             $pdf->displayLine(
                 '<b><i>' . sprintf(
-                    __('%1$s: %2$s'),
-                    __('Delivery date') . '</i></b>',
+                    __s('%1$s: %2$s'),
+                    __s('Delivery date') . '</i></b>',
                     Html::convDate($ic->fields['delivery_date']),
                 ),
                 '<b><i>' . sprintf(
-                    __('%1$s: %2$s'),
-                    __('Startup date') . '</i></b>',
+                    __s('%1$s: %2$s'),
+                    __s('Startup date') . '</i></b>',
                     Html::convDate($ic->fields['use_date']),
                 ),
             );
 
             $pdf->displayLine(
                 '<b><i>' . sprintf(
-                    __('%1$s: %2$s'),
-                    __('Date of last physical inventory') . '</i></b>',
+                    __s('%1$s: %2$s'),
+                    __s('Date of last physical inventory') . '</i></b>',
                     Html::convDate($ic->fields['inventory_date']),
                 ),
                 '<b><i>' . sprintf(
-                    __('%1$s: %2$s'),
-                    __('Decommission date') . '</i></b>',
+                    __s('%1$s: %2$s'),
+                    __s('Decommission date') . '</i></b>',
                     Html::convDate($ic->fields['decommission_date']),
                 ),
             );
 
             $pdf->setColumnsSize(100);
-            $pdf->displayTitle('<b>' . __('Financial and administrative information') . '</b>');
+            $pdf->displayTitle('<b>' . __s('Financial and administrative information') . '</b>');
 
             $pdf->setColumnsSize(50, 50);
 
             $pdf->displayLine(
                 '<b><i>' . sprintf(
-                    __('%1$s: %2$s'),
-                    __('Supplier') . '</i></b>',
+                    __s('%1$s: %2$s'),
+                    __s('Supplier') . '</i></b>',
                     Toolbox::stripTags(Dropdown::getDropdownName(
                         'glpi_suppliers',
                         $ic->fields['suppliers_id'],
                     )),
                 ),
                 '<b><i>' . sprintf(
-                    __('%1$s: %2$s'),
-                    __('Budget') . '</i></b>',
+                    __s('%1$s: %2$s'),
+                    __s('Budget') . '</i></b>',
                     Toolbox::stripTags(Dropdown::getDropdownName(
                         'glpi_budgets',
                         $ic->fields['budgets_id'],
@@ -128,47 +128,47 @@ class PluginPdfInfocom extends PluginPdfCommon
 
             $pdf->displayLine(
                 '<b><i>' . sprintf(
-                    __('%1$s: %2$s'),
-                    __('Order number') . '</i></b>',
+                    __s('%1$s: %2$s'),
+                    __s('Order number') . '</i></b>',
                     $ic->fields['order_number'],
                 ),
                 '<b><i>' . sprintf(
-                    __('%1$s: %2$s'),
-                    __('Immobilization number') . '</i></b>',
+                    __s('%1$s: %2$s'),
+                    __s('Immobilization number') . '</i></b>',
                     $ic->fields['immo_number'],
                 ),
             );
 
             $pdf->displayLine(
                 '<b><i>' . sprintf(
-                    __('%1$s: %2$s'),
-                    __('Invoice number') . '</i></b>',
+                    __s('%1$s: %2$s'),
+                    __s('Invoice number') . '</i></b>',
                     $ic->fields['bill'],
                 ),
                 '<b><i>' . sprintf(
-                    __('%1$s: %2$s'),
-                    __('Delivery form') . '</i></b>',
+                    __s('%1$s: %2$s'),
+                    __s('Delivery form') . '</i></b>',
                     $ic->fields['delivery_number'],
                 ),
             );
 
             $pdf->displayLine(
                 '<b><i>' . sprintf(
-                    __('%1$s: %2$s'),
+                    __s('%1$s: %2$s'),
                     _x('price', 'Value') . '</i></b>',
                     PluginPdfConfig::formatNumber($ic->fields['value']),
                 ),
                 '<b><i>' . sprintf(
-                    __('%1$s: %2$s'),
-                    __('Warranty extension value') . '</i></b>',
+                    __s('%1$s: %2$s'),
+                    __s('Warranty extension value') . '</i></b>',
                     PluginPdfConfig::formatNumber($ic->fields['warranty_value']),
                 ),
             );
 
             $pdf->displayLine(
                 '<b><i>' . sprintf(
-                    __('%1$s: %2$s'),
-                    __('Account net value') . '</i></b>',
+                    __s('%1$s: %2$s'),
+                    __s('Account net value') . '</i></b>',
                     PluginPdfConfig::formatNumber(Infocom::Amort(
                         $ic->fields['sink_type'],
                         $ic->fields['value'],
@@ -181,12 +181,12 @@ class PluginPdfInfocom extends PluginPdfCommon
                     )),
                 ),
                 '<b><i>' . sprintf(
-                    __('%1$s: %2$s'),
-                    __('Amortization duration') . '</i></b>',
+                    __s('%1$s: %2$s'),
+                    __s('Amortization duration') . '</i></b>',
                     sprintf(
-                        __('%1$s (%2$s)'),
+                        __s('%1$s (%2$s)'),
                         sprintf(
-                            _n('%d year', '%d years', $ic->fields['sink_time']),
+                            _sn('%d year', '%d years', $ic->fields['sink_time']),
                             $ic->fields['sink_time'],
                         ),
                         Infocom::getAmortTypeName($ic->fields['sink_type']),
@@ -196,13 +196,13 @@ class PluginPdfInfocom extends PluginPdfCommon
 
             $pdf->displayLine(
                 '<b><i>' . sprintf(
-                    __('%1$s: %2$s'),
-                    __('Amortization type') . '</i></b>',
+                    __s('%1$s: %2$s'),
+                    __s('Amortization type') . '</i></b>',
                     Infocom::getAmortTypeName($ic->fields['sink_type']),
                 ),
                 '<b><i>' . sprintf(
-                    __('%1$s: %2$s'),
-                    __('Amortization coefficient') . '</i></b>',
+                    __s('%1$s: %2$s'),
+                    __s('Amortization coefficient') . '</i></b>',
                     $ic->fields['sink_coeff'],
                 ),
             );
@@ -217,10 +217,10 @@ class PluginPdfInfocom extends PluginPdfCommon
             }
             $pdf->displayLine(
                 '<b><i>' . sprintf(
-                    __('%1$s: %2$s'),
-                    __('TCO (value + tracking cost)') . '</i></b>',
+                    __s('%1$s: %2$s'),
+                    __s('TCO (value + tracking cost)') . '</i></b>',
                     sprintf(
-                        __('%1$s %2$s'),
+                        __s('%1$s %2$s'),
                         Toolbox::stripTags((string) Infocom::showTco(
                             $item->getField('ticket_tco'),
                             $ic->fields['value'],
@@ -229,10 +229,10 @@ class PluginPdfInfocom extends PluginPdfCommon
                     ),
                 ),
                 '<b><i>' . sprintf(
-                    __('%1$s: %2$s'),
-                    __('Monthly TCO') . '</i></b>',
+                    __s('%1$s: %2$s'),
+                    __s('Monthly TCO') . '</i></b>',
                     sprintf(
-                        __('%1$s %2$s'),
+                        __s('%1$s %2$s'),
                         Toolbox::stripTags((string) Infocom::showTco(
                             $item->getField('ticket_tco'),
                             $ic->fields['value'],
@@ -245,8 +245,8 @@ class PluginPdfInfocom extends PluginPdfCommon
 
             $pdf->displayLine(
                 '<b><i>' . sprintf(
-                    __('%1$s: %2$s'),
-                    __('Business criticity') . '</i></b>',
+                    __s('%1$s: %2$s'),
+                    __s('Business criticity') . '</i></b>',
                     Dropdown::getDropdownName(
                         'glpi_businesscriticities',
                         $ic->fields['businesscriticities_id'],
@@ -257,23 +257,23 @@ class PluginPdfInfocom extends PluginPdfCommon
             PluginPdfCommon::mainLine($pdf, $ic, 'comment');
 
             $pdf->setColumnsSize(100);
-            $pdf->displayTitle('<b>' . __('Warranty information') . '</b>');
+            $pdf->displayTitle('<b>' . __s('Warranty information') . '</b>');
 
             $pdf->setColumnsSize(50, 50);
 
             $pdf->displayLine(
                 '<b><i>' . sprintf(
-                    __('%1$s: %2$s'),
-                    __('Start date of warranty') . '</i></b>',
+                    __s('%1$s: %2$s'),
+                    __s('Start date of warranty') . '</i></b>',
                     Html::convDate($ic->fields['warranty_date']),
                 ),
                 '<b><i>' . sprintf(
-                    __('%1$s: %2$s'),
-                    __('Warranty duration') . '</i></b>',
+                    __s('%1$s: %2$s'),
+                    __s('Warranty duration') . '</i></b>',
                     sprintf(
-                        __('%1$s - %2$s'),
+                        __s('%1$s - %2$s'),
                         sprintf(
-                            _n(
+                            _sn(
                                 '%d month',
                                 '%d months',
                                 $ic->fields['warranty_duration'],
@@ -281,7 +281,7 @@ class PluginPdfInfocom extends PluginPdfCommon
                             $ic->fields['warranty_duration'],
                         ),
                         sprintf(
-                            __('Valid to %s'),
+                            __s('Valid to %s'),
                             Infocom::getWarrantyExpir(
                                 $ic->fields['buy_date'],
                                 $ic->fields['warranty_duration'],
@@ -291,16 +291,16 @@ class PluginPdfInfocom extends PluginPdfCommon
                 ),
             );
 
-            $col1 = '<b><i>' . __('Alarms on financial and administrative information') . '</i></b>';
+            $col1 = '<b><i>' . __s('Alarms on financial and administrative information') . '</i></b>';
             if ($ic->fields['alert'] == 0) {
-                $col1 = sprintf(__('%1$s: %2$s'), $col1, __('No'));
+                $col1 = sprintf(__s('%1$s: %2$s'), $col1, __s('No'));
             } elseif ($ic->fields['alert'] == 4) {
-                $col1 = sprintf(__('%1$s: %2$s'), $col1, __('Warranty expiration date'));
+                $col1 = sprintf(__s('%1$s: %2$s'), $col1, __s('Warranty expiration date'));
             }
             $pdf->displayLine(
                 '<b><i>' . sprintf(
-                    __('%1$s: %2$s'),
-                    __('Warranty information') . '</i></b>',
+                    __s('%1$s: %2$s'),
+                    __s('Warranty information') . '</i></b>',
                     $ic->fields['warranty_info'],
                 ),
                 $col1,

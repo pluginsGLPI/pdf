@@ -36,7 +36,7 @@ class PluginPdfItem_Disk extends PluginPdfCommon
 
     public function __construct(?CommonGLPI $obj = null)
     {
-        $this->obj = ($obj ? $obj : new Item_Disk());
+        $this->obj = ($obj ?: new Item_Disk());
     }
 
     public static function pdfForItem(PluginPdfSimplePDF $pdf, CommonDBTM $item)
@@ -47,8 +47,7 @@ class PluginPdfItem_Disk extends PluginPdfCommon
         $ID = $item->getField('id');
 
         $result = $DB->request(
-            'glpi_items_disks',
-            ['SELECT'       => ['glpi_filesystems.name', 'glpi_items_disks.*'],
+            ['FROM' => 'glpi_items_disks'] + ['SELECT'       => ['glpi_filesystems.name', 'glpi_items_disks.*'],
                 'LEFT JOIN' => ['glpi_filesystems'
                                 => ['FKEY' => ['glpi_items_disks' => 'filesystems_id',
                                     'glpi_filesystems'            => 'id']]],
@@ -60,27 +59,27 @@ class PluginPdfItem_Disk extends PluginPdfCommon
         $number = count($result);
 
         $pdf->setColumnsSize(100);
-        $title = '<b>' . _n('Volume', 'Volumes', $number) . '</b>';
+        $title = '<b>' . _sn('Volume', 'Volumes', $number) . '</b>';
 
-        if (!$number) {
-            $pdf->displayTitle(sprintf(__('%1$s: %2$s'), $title, __('No item to display')));
+        if ($number === 0) {
+            $pdf->displayTitle(sprintf(__s('%1$s: %2$s'), $title, __s('No item to display')));
         } else {
             if ($number > $_SESSION['glpilist_limit']) {
-                $title = sprintf(__('%1$s: %2$s'), $title, $_SESSION['glpilist_limit'] . ' / ' . $number);
+                $title = sprintf(__s('%1$s: %2$s'), $title, $_SESSION['glpilist_limit'] . ' / ' . $number);
             } else {
-                $title = sprintf(__('%1$s: %2$s'), $title, $number);
+                $title = sprintf(__s('%1$s: %2$s'), $title, $number);
             }
             $pdf->displayTitle($title);
 
             $pdf->setColumnsSize(21, 21, 20, 9, 9, 9, 11);
             $pdf->displayTitle(
-                '<b>' . __('Name'),
-                __('Partition'),
-                __('Mount point'),
-                __('File system'),
-                __('Global size'),
-                __('Free size'),
-                __('Free percentage') . '</b>',
+                '<b>' . __s('Name'),
+                __s('Partition'),
+                __s('Mount point'),
+                __s('File system'),
+                __s('Global size'),
+                __s('Free size'),
+                __s('Free percentage') . '</b>',
             );
 
             $pdf->setColumnsAlign('left', 'left', 'left', 'left', 'center', 'right', 'right');
@@ -96,7 +95,7 @@ class PluginPdfItem_Disk extends PluginPdfCommon
                     $data['mountpoint'],
                     $data['name'],
                     sprintf(
-                        __('%s Mio'),
+                        __s('%s Mio'),
                         Toolbox::stripTags(Html::formatNumber(
                             $data['totalsize'],
                             false,
@@ -104,7 +103,7 @@ class PluginPdfItem_Disk extends PluginPdfCommon
                         )),
                     ),
                     sprintf(
-                        __('%s Mio'),
+                        __s('%s Mio'),
                         Toolbox::stripTags(Html::formatNumber(
                             $data['freesize'],
                             false,
@@ -112,7 +111,7 @@ class PluginPdfItem_Disk extends PluginPdfCommon
                         )),
                     ),
                     sprintf(
-                        __('%s %s'),
+                        __s('%s %s'),
                         Toolbox::stripTags(Html::formatNumber($percent, false, 0)),
                         '%',
                     ),

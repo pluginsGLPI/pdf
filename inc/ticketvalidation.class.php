@@ -36,7 +36,7 @@ class PluginPdfTicketValidation extends PluginPdfCommon
 
     public function __construct(?CommonGLPI $obj = null)
     {
-        $this->obj = ($obj ? $obj : new TicketValidation());
+        $this->obj = ($obj ?: new TicketValidation());
     }
 
     public static function pdfForTicket(PluginPdfSimplePDF $pdf, Ticket $ticket)
@@ -47,29 +47,28 @@ class PluginPdfTicketValidation extends PluginPdfCommon
         $dbu = new DbUtils();
 
         $pdf->setColumnsSize(100);
-        $pdf->displayTitle('<b>' . __('Approvals for the ticket', 'pdf') . '</b>');
+        $pdf->displayTitle('<b>' . __s('Approvals for the ticket', 'pdf') . '</b>');
 
         if (!Session::haveRightsOr('ticketvalidation', TicketValidation::getValidateRights())) {
             return false;
         }
-        $ID = $ticket->getField('id');
+        $ticket->getField('id');
 
         $result = $DB->request(
-            'glpi_ticketvalidations',
-            ['WHERE'    => ['tickets_id' => $ticket->getField('id')],
+            ['FROM' => 'glpi_ticketvalidations'] + ['WHERE'    => ['tickets_id' => $ticket->getField('id')],
                 'ORDER' => 'submission_date DESC'],
         );
 
         $number = count($result);
 
-        if ($number) {
+        if ($number !== 0) {
             $pdf->setColumnsSize(20, 19, 21, 19, 21);
             $pdf->displayTitle(
                 _x('item', 'State'),
-                __('Request date'),
-                __('Approval requester'),
-                __('Approval date'),
-                __('Approver'),
+                __s('Request date'),
+                __s('Approval requester'),
+                __s('Approval date'),
+                __s('Approver'),
             );
 
             foreach ($result as $row) {
@@ -83,26 +82,26 @@ class PluginPdfTicketValidation extends PluginPdfCommon
                 );
                 $tmp = trim($row['comment_submission']);
                 $pdf->displayText('<b><i>' . sprintf(
-                    __('%1$s: %2$s'),
-                    __('Request comments') . '</i></b>',
+                    __s('%1$s: %2$s'),
+                    __s('Request comments') . '</i></b>',
                     '',
-                ), (empty($tmp) ? __('None') : $tmp), 1);
+                ), (empty($tmp) ? __s('None') : $tmp), 1);
 
                 if ($row['validation_date']) {
                     $tmp = trim($row['comment_validation']);
                     $pdf->displayText(
                         '<b><i>' . sprintf(
-                            __('%1$s: %2$s'),
-                            __('Approval comments') . '</i></b>',
+                            __s('%1$s: %2$s'),
+                            __s('Approval comments') . '</i></b>',
                             '',
                         ),
-                        (empty($tmp) ? __('None') : $tmp),
+                        (empty($tmp) ? __s('None') : $tmp),
                         1,
                     );
                 }
             }
         } else {
-            $pdf->displayLine(__('No item found'));
+            $pdf->displayLine(__s('No item found'));
         }
         $pdf->displaySpace();
     }

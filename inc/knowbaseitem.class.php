@@ -36,7 +36,7 @@ class PluginPdfKnowbaseItem extends PluginPdfCommon
 
     public function __construct(?CommonGLPI $obj = null)
     {
-        $this->obj = ($obj ? $obj : new KnowbaseItem());
+        $this->obj = ($obj ?: new KnowbaseItem());
     }
 
     public function defineAllTabsPDF($options = [])
@@ -54,7 +54,7 @@ class PluginPdfKnowbaseItem extends PluginPdfCommon
     {
         $dbu = new DbUtils();
 
-        $ID = $item->getField('id');
+        $item->getField('id');
 
         if (!Session::haveRightsOr(
             'knowbase',
@@ -71,13 +71,9 @@ class PluginPdfKnowbaseItem extends PluginPdfCommon
         ));
 
         $question
-        = Toolbox::stripTags(Glpi\Toolbox\Sanitizer::unsanitize(html_entity_decode(
-            $item->getField('name'),
-            ENT_QUOTES,
-            'UTF-8',
-        )));
+        = Toolbox::stripTags(html_entity_decode($item->getField('name')));
 
-        $answer = Glpi\Toolbox\Sanitizer::unsanitize(Html::entity_decode_deep($item->getField('answer')));
+        $answer = $item->getField('answer');
         $answer = preg_replace('#data:image/[^;]+;base64,#', '@', $answer);
 
         preg_match_all('/<img [^>]*src=[\'"]([^\'"]*docid=([0-9]*))[^>]*>/', $answer, $res, PREG_SET_ORDER);
@@ -98,31 +94,31 @@ class PluginPdfKnowbaseItem extends PluginPdfCommon
         $pdf->setColumnsSize(100);
 
         if (Toolbox::strlen($fullcategoryname) > 0) {
-            $pdf->displayTitle('<b>' . __('Category name') . '</b>');
+            $pdf->displayTitle('<b>' . __s('Category name') . '</b>');
             $pdf->displayLine($fullcategoryname);
         }
 
         if (Toolbox::strlen($question) > 0) {
-            $pdf->displayTitle('<b>' . __('Subject') . '</b>');
+            $pdf->displayTitle('<b>' . __s('Subject') . '</b>');
             $pdf->displayText('', $question, 5);
         } else {
-            $pdf->displayTitle('<b>' . __('No question found', 'pdf') . '</b>');
+            $pdf->displayTitle('<b>' . __s('No question found', 'pdf') . '</b>');
         }
 
         if (Toolbox::strlen($answer) > 0) {
-            $pdf->displayTitle('<b>' . __('Content') . '</b>');
+            $pdf->displayTitle('<b>' . __s('Content') . '</b>');
             $pdf->displayText('', $answer, 5);
         } else {
-            $pdf->displayTitle('<b>' . __('No answer found', 'pdf') . '</b>');
+            $pdf->displayTitle('<b>' . __s('No answer found', 'pdf') . '</b>');
         }
 
         $pdf->setColumnsSize(50, 15, 15, 10, 10);
         $pdf->displayTitle(
-            __('Writer'),
-            __('Creation date'),
-            __('Last update'),
-            __('FAQ'),
-            _n('View', 'Views', 2),
+            __s('Writer'),
+            __s('Creation date'),
+            __s('Last update'),
+            __s('FAQ'),
+            _sn('View', 'Views', 2),
         );
         $pdf->displayLine(
             $dbu->getUserName($item->fields['users_id']),
@@ -179,22 +175,22 @@ class PluginPdfKnowbaseItem extends PluginPdfCommon
         $nb = $item->countVisibilities();
         if ($nb) {
             $pdf->setColumnsSize(100);
-            $pdf->displayTitle(_n('Target', 'Targets', $nb));
+            $pdf->displayTitle(_sn('Target', 'Targets', $nb));
 
             $pdf->setColumnsSize(30, 70);
-            $pdf->displayTitle(__('Type'), _n('Recipient', 'Recipients', 2));
+            $pdf->displayTitle(__s('Type'), _sn('Recipient', 'Recipients', 2));
 
             $recursive = '';
             if (count($entities)) {
                 foreach ($entities as $key => $val) {
                     foreach ($val as $data) {
                         if ($data['is_recursive']) {
-                            $recursive = '(' . __('R') . ')';
+                            $recursive = '(' . __s('R') . ')';
                         }
                         $pdf->displayLine(
-                            __('Entity'),
+                            __s('Entity'),
                             sprintf(
-                                __('%1s %2s'),
+                                __s('%1s %2s'),
                                 Dropdown::getDropdownName(
                                     'glpi_entities',
                                     $data['entities_id'],
@@ -210,13 +206,13 @@ class PluginPdfKnowbaseItem extends PluginPdfCommon
                 foreach ($profiles as $key => $val) {
                     foreach ($val as $data) {
                         if ($data['is_recursive']) {
-                            $recursive = '(' . __('R') . ')';
+                            $recursive = '(' . __s('R') . ')';
                         }
                         $names = Dropdown::getDropdownName('glpi_profiles', $data['profiles_id']);
                         $profilename = '';
                         if ($data['entities_id'] >= 0) {
                             $profilename = sprintf(
-                                __('%1$s / %2$s'),
+                                __s('%1$s / %2$s'),
                                 $names,
                                 Dropdown::getDropdownName(
                                     'glpi_entities',
@@ -224,10 +220,10 @@ class PluginPdfKnowbaseItem extends PluginPdfCommon
                                 ),
                             );
                             if ($data['is_recursive']) {
-                                $profilename = sprintf(__('%1$s %2$s'), $profilename, $recursive);
+                                $profilename = sprintf(__s('%1$s %2$s'), $profilename, $recursive);
                             }
                         }
-                        $pdf->displayLine(__('Profile'), $profilename);
+                        $pdf->displayLine(__s('Profile'), $profilename);
                     }
                 }
             }
@@ -236,13 +232,13 @@ class PluginPdfKnowbaseItem extends PluginPdfCommon
                 foreach ($groups as $key => $val) {
                     foreach ($val as $data) {
                         if ($data['is_recursive']) {
-                            $recursive = '(' . __('R') . ')';
+                            $recursive = '(' . __s('R') . ')';
                         }
                         $names = Dropdown::getDropdownName('glpi_groups', $data['groups_id']);
                         $groupname = '';
                         if ($data['entities_id'] >= 0) {
                             $groupname = sprintf(
-                                __('%1$s / %2$s'),
+                                __s('%1$s / %2$s'),
                                 $names,
                                 Dropdown::getDropdownName(
                                     'glpi_entities',
@@ -250,10 +246,10 @@ class PluginPdfKnowbaseItem extends PluginPdfCommon
                                 ),
                             );
                             if ($data['is_recursive']) {
-                                $groupname = sprintf(__('%1$s %2$s'), $groupname, $recursive);
+                                $groupname = sprintf(__s('%1$s %2$s'), $groupname, $recursive);
                             }
                         }
-                        $pdf->displayLine(__('Group'), $groupname);
+                        $pdf->displayLine(__s('Group'), $groupname);
                     }
                 }
             }
@@ -261,7 +257,7 @@ class PluginPdfKnowbaseItem extends PluginPdfCommon
             if (count($users)) {
                 foreach ($users as $key => $val) {
                     foreach ($val as $data) {
-                        $pdf->displayLine(__('User'), $dbu->getUserName($data['users_id']));
+                        $pdf->displayLine(__s('User'), $dbu->getUserName($data['users_id']));
                     }
                 }
             }

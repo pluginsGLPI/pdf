@@ -36,7 +36,7 @@ class PluginPdfComputerAntivirus extends PluginPdfCommon
 
     public function __construct(?CommonGLPI $obj = null)
     {
-        $this->obj = ($obj ? $obj : new ComputerAntivirus());
+        $this->obj = ($obj ?: new ItemAntivirus());
     }
 
     public static function pdfForComputer(PluginPdfSimplePDF $pdf, Computer $item)
@@ -46,35 +46,35 @@ class PluginPdfComputerAntivirus extends PluginPdfCommon
 
         $ID = $item->getField('id');
 
-        $result = $DB->request('glpi_computerantiviruses', ['computers_id' => $ID,
+        $result = $DB->request(['FROM' => 'glpi_itemantiviruses'] + ['computers_id' => $ID,
             'is_deleted'                                                   => 0]);
         $number = count($result);
 
         $pdf->setColumnsSize(100);
-        $title = '<b>' . __('Antivirus') . '</b>';
+        $title = '<b>' . __s('Antivirus') . '</b>';
 
-        if (!$number) {
-            $pdf->displayTitle(sprintf(__('%1$s: %2$s'), $title, __('No item to display')));
+        if ($number === 0) {
+            $pdf->displayTitle(sprintf(__s('%1$s: %2$s'), $title, __s('No item to display')));
         } else {
             if ($number > $_SESSION['glpilist_limit']) {
-                $title = sprintf(__('%1$s: %2$s'), $title, $_SESSION['glpilist_limit'] . ' / ' . $number);
+                $title = sprintf(__s('%1$s: %2$s'), $title, $_SESSION['glpilist_limit'] . ' / ' . $number);
             } else {
-                $title = sprintf(__('%1$s: %2$s'), $title, $number);
+                $title = sprintf(__s('%1$s: %2$s'), $title, $number);
             }
             $pdf->displayTitle($title);
 
             $pdf->setColumnsSize(25, 20, 15, 15, 5, 5, 15);
             $pdf->displayTitle(
-                __('Name'),
-                __('Manufacturer'),
-                __('Antivirus version'),
-                __('Signature database version'),
-                __('Active'),
-                __('Up to date'),
-                __('Expiration date'),
+                __s('Name'),
+                __s('Manufacturer'),
+                __s('Antivirus version'),
+                __s('Signature database version'),
+                __s('Active'),
+                __s('Up to date'),
+                __s('Expiration date'),
             );
 
-            $antivirus = new ComputerAntivirus();
+            $antivirus = new ItemAntivirus();
             foreach ($result as $data) {
                 $pdf->displayLine(
                     $data['name'],

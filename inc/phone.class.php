@@ -36,7 +36,7 @@ class PluginPdfPhone extends PluginPdfCommon
 
     public function __construct(?CommonGLPI $obj = null)
     {
-        $this->obj = ($obj ? $obj : new Phone());
+        $this->obj = ($obj ?: new Phone());
     }
 
     public function defineAllTabsPDF($options = [])
@@ -65,29 +65,29 @@ class PluginPdfPhone extends PluginPdfCommon
 
         $pdf->displayLine(
             '<b><i>' . sprintf(
-                __('%1$s: %2$s'),
-                __('Group') . '</i></b>',
+                __s('%1$s: %2$s'),
+                __s('Group') . '</i></b>',
                 Dropdown::getDropdownName('glpi_groups', $item->fields['groups_id']),
             ),
             '<b><i>' . sprintf(
-                __('%1$s: %2$s'),
-                __('UUID') . '</i></b>',
+                __s('%1$s: %2$s'),
+                __s('UUID') . '</i></b>',
                 $item->fields['uuid'],
             ),
         );
 
         $pdf->displayLine(
-            '<b><i>' . sprintf(__('%1$s: %2$s'), __('Brand') . '</i></b>', $item->fields['brand']),
+            '<b><i>' . sprintf(__s('%1$s: %2$s'), __s('Brand') . '</i></b>', $item->fields['brand']),
             '<b><i>' . sprintf(
-                __('%1$s: %2$s'),
+                __s('%1$s: %2$s'),
                 _x('quantity', 'Number of lines') . '</i></b>',
                 $item->fields['number_line'],
             ),
         );
 
-        $opts = ['have_headset' => __('Headset'),
-            'have_hp'           => __('Speaker')];
-        foreach ($opts as $key => $val) {
+        $opts = ['have_headset' => __s('Headset'),
+            'have_hp'           => __s('Speaker')];
+        foreach (array_keys($opts) as $key) {
             if (!$item->fields[$key]) {
                 unset($opts[$key]);
             }
@@ -95,14 +95,14 @@ class PluginPdfPhone extends PluginPdfCommon
 
         $pdf->displayLine(
             '<b><i>' . sprintf(
-                __('%1$s: %2$s'),
-                __('Power supply') . '</i></b>',
+                __s('%1$s: %2$s'),
+                __s('Power supply') . '</i></b>',
                 Dropdown::getYesNo($item->fields['phonepowersupplies_id']),
             ),
             '<b><i>' . sprintf(
-                __('%1$s: %2$s'),
-                __('Flags') . '</i></b>',
-                (count($opts) ? implode(', ', $opts) : __('None')),
+                __s('%1$s: %2$s'),
+                __s('Flags') . '</i></b>',
+                (count($opts) ? implode(', ', $opts) : __s('None')),
             ),
         );
 

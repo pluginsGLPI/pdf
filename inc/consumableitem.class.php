@@ -36,7 +36,7 @@ class PluginPdfConsumableItem extends PluginPdfCommon
 
     public function __construct(?CommonGLPI $obj = null)
     {
-        $this->obj = ($obj ? $obj : new CartridgeItem());
+        $this->obj = ($obj ?: new CartridgeItem());
     }
 
     public function defineAllTabsPDF($options = [])
@@ -53,10 +53,10 @@ class PluginPdfConsumableItem extends PluginPdfCommon
         PluginPdfCommon::mainTitle($pdf, $consitem);
 
         $pdf->displayLine(
-            '<b><i>' . sprintf(__('%1$s: %2$s'), __('Name') . '</i></b>', $consitem->fields['name']),
+            '<b><i>' . sprintf(__s('%1$s: %2$s'), __s('Name') . '</i></b>', $consitem->fields['name']),
             '<b><i>' . sprintf(
-                __('%1$s: %2$s'),
-                __('Type') . '</i></b>',
+                __s('%1$s: %2$s'),
+                __s('Type') . '</i></b>',
                 Toolbox::stripTags(Dropdown::getDropdownName(
                     'glpi_consumableitemtypes',
                     $consitem->fields['consumableitemtypes_id'],
@@ -64,10 +64,10 @@ class PluginPdfConsumableItem extends PluginPdfCommon
             ),
         );
         $pdf->displayLine(
-            '<b><i>' . sprintf(__('%1$s: %2$s'), __('Reference') . '</i></b>', $consitem->fields['ref']),
+            '<b><i>' . sprintf(__s('%1$s: %2$s'), __s('Reference') . '</i></b>', $consitem->fields['ref']),
             '<b><i>' . sprintf(
-                __('%1$s: %2$s'),
-                __('Manufacturer') . '</i></b>',
+                __s('%1$s: %2$s'),
+                __s('Manufacturer') . '</i></b>',
                 Toolbox::stripTags(Dropdown::getDropdownName(
                     'glpi_manufacturers',
                     $consitem->fields['manufacturers_id'],
@@ -77,13 +77,13 @@ class PluginPdfConsumableItem extends PluginPdfCommon
 
         $pdf->displayLine(
             '<b><i>' . sprintf(
-                __('%1$s: %2$s'),
-                __('Technician in charge of the hardware') . '</i></b>',
+                __s('%1$s: %2$s'),
+                __s('Technician in charge of the hardware') . '</i></b>',
                 $dbu->getUserName($consitem->fields['users_id_tech']),
             ),
             '<b><i>' . sprintf(
-                __('%1$s: %2$s'),
-                __('Group in charge of the hardware') . '</i></b>',
+                __s('%1$s: %2$s'),
+                __s('Group in charge of the hardware') . '</i></b>',
                 Dropdown::getDropdownName(
                     'glpi_groups',
                     $consitem->fields['groups_id_tech'],
@@ -93,24 +93,24 @@ class PluginPdfConsumableItem extends PluginPdfCommon
 
         $pdf->displayLine(
             '<b><i>' . sprintf(
-                __('%1$s: %2$s'),
-                __('Stock location') . '</i></b>',
+                __s('%1$s: %2$s'),
+                __s('Stock location') . '</i></b>',
                 Dropdown::getDropdownName(
                     'glpi_locations',
                     $consitem->fields['locations_id'],
                 ),
             ),
             '<b><i>' . sprintf(
-                __('%1$s: %2$s'),
-                __('Alert threshold') . '</i></b>',
+                __s('%1$s: %2$s'),
+                __s('Alert threshold') . '</i></b>',
                 $consitem->getField('alarm_threshold'),
             ),
         );
 
         $pdf->displayLine(
             '<b><i>' . sprintf(
-                __('%1$s: %2$s'),
-                __('Inventory number') . '</i></b>',
+                __s('%1$s: %2$s'),
+                __s('Inventory number') . '</i></b>',
                 $consitem->fields['otherserial'],
             ),
         );
@@ -161,54 +161,53 @@ class PluginPdfConsumableItem extends PluginPdfCommon
         $number = $dbu->countElementsInTable('glpi_consumables', $where);
 
         $iterator = $DB->request(
-            'glpi_consumables',
-            ['WHERE'    => $where,
+            ['FROM' => 'glpi_consumables'] + ['WHERE'    => $where,
                 'ORDER' => $order],
         );
 
         if (!$number) {
             $pdf->setColumnsSize(100);
-            $pdf->displayTitle(__('No consumable'));
+            $pdf->displayTitle(__s('No consumable'));
         } else {
             if (!$show_old) {
                 $pdf->setColumnsSize(50, 50);
                 $pdf->displayTitle(
                     '<b><i>' . sprintf(
-                        __('%1$s: %2$s'),
-                        __('Total'),
+                        __s('%1$s: %2$s'),
+                        __s('Total'),
                         Consumable::getTotalNumber($instID),
                     ) . '</i></b>',
                     '<b><i>' . sprintf(
-                        __('%1$s: %2$s'),
+                        __s('%1$s: %2$s'),
                         _nx('consumable', 'New', 'New', $instID),
                         Consumable::getUnusedNumber($instID),
                     ) . '</i></b>',
                 );
                 $pdf->displayTitle('', '<b><i>' . sprintf(
-                    __('%1$s: %2$s'),
+                    __s('%1$s: %2$s'),
                     _nx('consumable', 'Used', 'Used', $instID),
                     Consumable::getOldNumber($instID),
                 ));
             } else { // Old
                 $pdf->setColumnsSize(100);
-                $pdf->displayTitle('<b>' . __('Used consumables') . '</b>');
+                $pdf->displayTitle('<b>' . __s('Used consumables') . '</b>');
             }
 
             if (!$show_old) {
                 $pdf->setColumnsSize(10, 45, 45);
                 $pdf->displayLine(
-                    '<b>' . __('ID') . '</b>',
+                    '<b>' . __s('ID') . '</b>',
                     '<b>' . _x('item', 'State') . '</b>',
-                    '<b>' . __('Add date') . '</b>',
+                    '<b>' . __s('Add date') . '</b>',
                 );
             } else {
                 $pdf->setColumnsSize(8, 23, 23, 23, 23);
                 $pdf->displayLine(
-                    '<b>' . __('ID') . '</b>',
+                    '<b>' . __s('ID') . '</b>',
                     '<b>' . _x('item', 'State') . '</b>',
-                    '<b>' . __('Add date') . '</b>',
-                    '<b>' . __('Use date') . '</b>',
-                    '<b>' . __('Given to') . '</b>',
+                    '<b>' . __s('Add date') . '</b>',
+                    '<b>' . __s('Use date') . '</b>',
+                    '<b>' . __s('Given to') . '</b>',
                 );
             }
 
@@ -221,10 +220,8 @@ class PluginPdfConsumableItem extends PluginPdfCommon
                     $pdf->displayLine($data['id'], Consumable::getStatus($data['id']), $date_in);
                 } else {
                     $name = '';
-                    if ($item = getItemForItemtype($data['itemtype'])) {
-                        if ($item->getFromDB($data['items_id'])) {
-                            $name = $item->getNameID();
-                        }
+                    if (($item = getItemForItemtype($data['itemtype'])) && $item->getFromDB($data['items_id'])) {
+                        $name = $item->getNameID();
                     }
                     $pdf->setColumnsSize(8, 23, 23, 23, 23);
                     $pdf->displayLine(

@@ -42,22 +42,16 @@ abstract class PluginPdfCommon extends CommonGLPI
     **/
     public function __construct(?CommonGLPI $obj = null)
     {
-        if ($obj) {
+        if ($obj instanceof CommonGLPI) {
             $this->obj = $obj;
         }
     }
 
-    /**
-     * Add standard define tab
-     *
-     * @param $itemtype  itemtype link to the tab
-     * @param $ong       array defined tab array
-     * @param $options   array of options (for withtemplate)
-     *
-     * @return CommonGLPI (set the tab array)
-    **/
-    final public function addStandardTab($itemtype, &$ong, $options)
+    // cannot override because created in CommonGLPI as final
+    /** @phpstan-ignore-next-line */
+    public function addStandardTab($itemtype, array &$ong, array $options)
     {
+        parent::addStandardTab($itemtype, $ong, $options);
         $dbu = new DbUtils();
 
         $withtemplate = 0;
@@ -65,19 +59,14 @@ abstract class PluginPdfCommon extends CommonGLPI
             $withtemplate = $options['withtemplate'];
         }
 
-        if (!is_numeric($itemtype)
-            && ($obj = $dbu->getItemForItemtype($itemtype))) {
-            if (method_exists($itemtype, 'displayTabContentForPDF')
-                && !($obj instanceof PluginPdfCommon)) {
-                $titles = $obj->getTabNameForItem($this->obj, $withtemplate);
-                if (!is_array($titles)) {
-                    $titles = [1 => $titles];
-                }
-
-                foreach ($titles as $key => $val) {
-                    if (!empty($val)) {
-                        $ong[$itemtype . '$' . $key] = $val;
-                    }
+        if (!is_numeric($itemtype) && ($obj = $dbu->getItemForItemtype($itemtype)) && (method_exists($itemtype, 'displayTabContentForPDF'))) {
+            $titles = $obj->getTabNameForItem($this->obj, $withtemplate);
+            if (!is_array($titles)) {
+                $titles = [1 => $titles];
+            }
+            foreach ($titles as $key => $val) {
+                if (!empty($val)) {
+                    $ong[$itemtype . '$' . $key] = $val;
                 }
             }
         }
@@ -121,10 +110,8 @@ abstract class PluginPdfCommon extends CommonGLPI
     **/
     public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
     {
-        if (Session::haveRight('plugin_pdf', READ)) {
-            if (empty($withtemplate)) {
-                return __('Print to pdf', 'pdf');
-            }
+        if (Session::haveRight('plugin_pdf', READ) && empty($withtemplate)) {
+            return self::createTabEntry(__s('PDF export', 'pdf'), 0, $item::getType(), PluginPdfConfig::getIcon());
         }
         return '';
     }
@@ -280,8 +267,11 @@ abstract class PluginPdfCommon extends CommonGLPI
     **/
     public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
     {
+        /** @var array $CFG_GLPI */
+        global $CFG_GLPI;
+
         $pref = new PluginPdfPreference();
-        $pref->menu($item, Plugin::getWebDir('pdf') . '/front/export.php');
+        $pref->menu($item, $CFG_GLPI['root_doc'] . '/plugins/pdf/front/export.php');
 
         return true;
     }
@@ -302,21 +292,21 @@ abstract class PluginPdfCommon extends CommonGLPI
                 && $this->obj->getField('name')) {
                 $name = $this->obj->getField('name');
             } else {
-                $name = sprintf(__('%1$s %2$s'), __('ID'), $ID);
+                $name = sprintf(__s('%1$s %2$s'), __s('ID'), $ID);
             }
 
             if (Session::isMultiEntitiesMode() && $this->obj->isEntityAssign()) {
                 $entity = ' (' . Dropdown::getDropdownName('glpi_entities', $this->obj->getEntityID()) . ')';
             }
-            $header = Glpi\Toolbox\Sanitizer::unsanitize(sprintf(
-                __('%1$s - %2$s'),
+            $header = sprintf(
+                __s('%1$s - %2$s'),
                 $this->obj->getTypeName(),
                 sprintf(
-                    __('%1$s %2$s'),
+                    __s('%1$s %2$s'),
                     $name,
                     $entity,
                 ),
-            ));
+            );
             $this->pdf->setHeader($header);
 
             return true;
@@ -334,15 +324,15 @@ abstract class PluginPdfCommon extends CommonGLPI
         $number = count($notes);
 
         $pdf->setColumnsSize(100);
-        $title = '<b>' . _n('Note', 'Notes', $number) . '</b>';
+        $title = '<b>' . _sn('Note', 'Notes', $number) . '</b>';
 
-        if (!$number) {
-            $pdf->displayTitle(sprintf(__('%1$s: %2$s'), $title, __('No item to display')));
+        if ($number === 0) {
+            $pdf->displayTitle(sprintf(__s('%1$s: %2$s'), $title, __s('No item to display')));
         } else {
             if ($number > $_SESSION['glpilist_limit']) {
-                $title = sprintf(__('%1$s: %2$s'), $title, $_SESSION['glpilist_limit'] . ' / ' . $number);
+                $title = sprintf(__s('%1$s: %2$s'), $title, $_SESSION['glpilist_limit'] . ' / ' . $number);
             } else {
-                $title = sprintf(__('%1$s: %2$s'), $title, $number);
+                $title = sprintf(__s('%1$s: %2$s'), $title, $number);
             }
             $pdf->displayTitle($title);
 
@@ -384,12 +374,12 @@ abstract class PluginPdfCommon extends CommonGLPI
             }
 
             foreach ($tabs as $tab) {
-                if (!$this->displayTabContentForPDF($this->pdf, $this->obj, $tab)
-                    && !$this->displayCommonTabForPDF($this->pdf, $this->obj, $tab)) {
+                if (!static::displayTabContentForPDF($this->pdf, $this->obj, $tab)
+                    && !static::displayCommonTabForPDF($this->pdf, $this->obj, $tab)) {
                     $data     = explode('$', $tab);
                     $itemtype = $data[0];
                     // Default set
-                    $tabnum = (isset($data[1]) ? $data[1] : 1);
+                    $tabnum = ($data[1] ?? 1);
 
                     if (!is_numeric($itemtype)
                         && ($itemtype != 'empty')) {
@@ -404,6 +394,7 @@ abstract class PluginPdfCommon extends CommonGLPI
                             }
                         } elseif (method_exists($itemtype, 'displayTabContentForPdf')
                                    && ($obj = $dbu->getItemForItemtype($itemtype))) {
+                            /** @phpstan-ignore-next-line */
                             if ($obj->displayTabContentForPdf($this->pdf, $this->obj, $tabnum)) {
                                 continue;
                             }
@@ -411,7 +402,7 @@ abstract class PluginPdfCommon extends CommonGLPI
                     }
                     Toolbox::logInFile(
                         'php-errors',
-                        sprintf(__("PDF: don't know how to display %s tab") . '\n', $tab),
+                        sprintf(__s("PDF: don't know how to display %s tab") . '\n', $tab),
                     );
                 }
             }
@@ -433,19 +424,19 @@ abstract class PluginPdfCommon extends CommonGLPI
     {
         $pdf->setColumnsSize(50, 50);
 
-        $col1 = '<b>' . sprintf(__('%1$s %2$s'), __('ID'), $item->fields['id']) . '</b>';
+        $col1 = '<b>' . sprintf(__s('%1$s %2$s'), __s('ID'), $item->fields['id']) . '</b>';
         $col2 = sprintf(
-            __('%1$s: %2$s'),
-            __('Last update'),
+            __s('%1$s: %2$s'),
+            __s('Last update'),
             Html::convDateTime($item->fields['date_mod']),
         );
         if (!empty($item->fields['template_name'])) {
             $col2 = sprintf(
-                __('%1$s (%2$s)'),
+                __s('%1$s (%2$s)'),
                 $col2,
                 sprintf(
-                    __('%1$s: %2$s'),
-                    __('Template name'),
+                    __s('%1$s: %2$s'),
+                    __s('Template name'),
                     $item->fields['template_name'],
                 ),
             );
@@ -463,13 +454,13 @@ abstract class PluginPdfCommon extends CommonGLPI
             case 'name-status':
                 return $pdf->displayLine(
                     '<b><i>' . sprintf(
-                        __('%1$s: %2$s'),
-                        __('Name') . '</i></b>',
+                        __s('%1$s: %2$s'),
+                        __s('Name') . '</i></b>',
                         $item->fields['name'],
                     ),
                     '<b><i>' . sprintf(
-                        __('%1$s: %2$s'),
-                        __('Status') . '</i></b>',
+                        __s('%1$s: %2$s'),
+                        __s('Status') . '</i></b>',
                         Toolbox::stripTags(Dropdown::getDropdownName(
                             'glpi_states',
                             $item->fields['states_id'],
@@ -480,16 +471,16 @@ abstract class PluginPdfCommon extends CommonGLPI
             case 'location-type':
                 return $pdf->displayLine(
                     '<b><i>' . sprintf(
-                        __('%1$s: %2$s'),
-                        __('Location') . '</i></b>',
+                        __s('%1$s: %2$s'),
+                        __s('Location') . '</i></b>',
                         Dropdown::getDropdownName(
                             'glpi_locations',
                             $item->fields['locations_id'],
                         ),
                     ),
                     '<b><i>' . sprintf(
-                        __('%1$s: %2$s'),
-                        __('Type') . '</i></b>',
+                        __s('%1$s: %2$s'),
+                        __s('Type') . '</i></b>',
                         Toolbox::stripTags(Dropdown::getDropdownName(
                             'glpi_' . $type . 'types',
                             $item->fields[$type . 'types_id'],
@@ -500,13 +491,13 @@ abstract class PluginPdfCommon extends CommonGLPI
             case 'tech-manufacturer':
                 return $pdf->displayLine(
                     '<b><i>' . sprintf(
-                        __('%1$s: %2$s'),
-                        __('Technician in charge of the hardware') . '</i></b>',
+                        __s('%1$s: %2$s'),
+                        __s('Technician in charge of the hardware') . '</i></b>',
                         $dbu->getUserName($item->fields['users_id_tech']),
                     ),
                     '<b><i>' . sprintf(
-                        __('%1$s: %2$s'),
-                        __('Manufacturer') . '</i></b>',
+                        __s('%1$s: %2$s'),
+                        __s('Manufacturer') . '</i></b>',
                         Toolbox::stripTags(Dropdown::getDropdownName(
                             'glpi_manufacturers',
                             $item->fields['manufacturers_id'],
@@ -516,16 +507,16 @@ abstract class PluginPdfCommon extends CommonGLPI
             case 'group-model':
                 return $pdf->displayLine(
                     '<b><i>' . sprintf(
-                        __('%1$s: %2$s'),
-                        __('Group in charge of the hardware') . '</i></b>',
+                        __s('%1$s: %2$s'),
+                        __s('Group in charge of the hardware') . '</i></b>',
                         Dropdown::getDropdownName(
                             'glpi_groups',
                             $item->fields['groups_id_tech'],
                         ),
                     ),
                     '<b><i>' . sprintf(
-                        __('%1$s: %2$s'),
-                        __('Model') . '</i></b>',
+                        __s('%1$s: %2$s'),
+                        __s('Model') . '</i></b>',
                         Toolbox::stripTags(Dropdown::getDropdownName(
                             'glpi_' . $type . 'models',
                             $item->fields[$type . 'models_id'],
@@ -536,13 +527,13 @@ abstract class PluginPdfCommon extends CommonGLPI
             case 'contactnum-serial':
                 return $pdf->displayLine(
                     '<b><i>' . sprintf(
-                        __('%1$s: %2$s'),
-                        __('Alternate username number') . '</i></b>',
+                        __s('%1$s: %2$s'),
+                        __s('Alternate username number') . '</i></b>',
                         $item->fields['contact_num'],
                     ),
                     '<b><i>' . sprintf(
-                        __('%1$s: %2$s'),
-                        __('Serial number') . '</i></b>',
+                        __s('%1$s: %2$s'),
+                        __s('Serial number') . '</i></b>',
                         $item->fields['serial'],
                     ),
                 );
@@ -550,13 +541,13 @@ abstract class PluginPdfCommon extends CommonGLPI
             case 'contact-otherserial':
                 return $pdf->displayLine(
                     '<b><i>' . sprintf(
-                        __('%1$s: %2$s'),
-                        __('Alternate username') . '</i></b>',
+                        __s('%1$s: %2$s'),
+                        __s('Alternate username') . '</i></b>',
                         $item->fields['contact'],
                     ),
                     '<b><i>' . sprintf(
-                        __('%1$s: %2$s'),
-                        __('Inventory number') . '</i></b>',
+                        __s('%1$s: %2$s'),
+                        __s('Inventory number') . '</i></b>',
                         $item->fields['otherserial'],
                     ),
                 );
@@ -564,22 +555,22 @@ abstract class PluginPdfCommon extends CommonGLPI
             case 'user-management':
                 return $pdf->displayLine(
                     '<b><i>' . sprintf(
-                        __('%1$s: %2$s'),
-                        __('User') . '</i></b>',
+                        __s('%1$s: %2$s'),
+                        __s('User') . '</i></b>',
                         $dbu->getUserName($item->fields['users_id']),
                     ),
                     '<b><i>' . sprintf(
-                        __('%1$s: %2$s'),
-                        __('Management type') . '</i></b>',
-                        ($item->fields['is_global'] ? __('Global management')
-                                                   : __('Unit management')),
+                        __s('%1$s: %2$s'),
+                        __s('Management type') . '</i></b>',
+                        ($item->fields['is_global'] ? __s('Global management')
+                                                   : __s('Unit management')),
                     ),
                 );
 
             case 'comment':
                 return $pdf->displayText('<b><i>' . sprintf(
-                    __('%1$s: %2$s'),
-                    __('Comments') . '</i></b>',
+                    __s('%1$s: %2$s'),
+                    __s('Comments') . '</i></b>',
                     '',
                 ), $item->fields['comment']);
 
@@ -611,6 +602,9 @@ abstract class PluginPdfCommon extends CommonGLPI
         CommonDBTM $item,
         array $ids
     ) {
+        /** @var array $CFG_GLPI */
+        global $CFG_GLPI;
+
         switch ($ma->getAction()) {
             case 'DoIt':
                 $tab_id = [];
@@ -621,9 +615,8 @@ abstract class PluginPdfCommon extends CommonGLPI
                 }
                 $_SESSION['plugin_pdf']['type']   = $item->getType();
                 $_SESSION['plugin_pdf']['tab_id'] = serialize($tab_id);
-                $webDir                           = Plugin::getWebDir('pdf');
                 echo "<script type='text/javascript'>
-                      location.href='$webDir/front/export.massive.php'</script>";
+                      location.href='" . $CFG_GLPI['root_doc'] . "/plugins/pdf/front/export.massive.php'</script>";
                 break;
         }
     }

@@ -36,7 +36,7 @@ class PluginPdfDocument extends PluginPdfCommon
 
     public function __construct(?CommonGLPI $obj = null)
     {
-        $this->obj = ($obj ? $obj : new Document());
+        $this->obj = ($obj ?: new Document());
     }
 
     public static function pdfForItem(PluginPdfSimplePDF $pdf, CommonDBTM $item)
@@ -48,8 +48,7 @@ class PluginPdfDocument extends PluginPdfCommon
         $type = get_class($item);
 
         $result = $DB->request(
-            'glpi_documents_items',
-            ['SELECT' => ['glpi_documents_items.id',
+            ['FROM' => 'glpi_documents_items'] + ['SELECT' => ['glpi_documents_items.id',
                 'glpi_documents_items.date_mod',
                 'glpi_documents.*', 'glpi_entities.id',
                 'completename'],
@@ -67,27 +66,27 @@ class PluginPdfDocument extends PluginPdfCommon
         $number = count($result);
 
         $pdf->setColumnsSize(100);
-        $title = '<b>' . _n('Document', 'Documents', $number) . '</b>';
-        if (!$number) {
-            $pdf->displayTitle(sprintf(__('%1$s: %2$s'), $title, __('No item to display')));
+        $title = '<b>' . _sn('Document', 'Documents', $number) . '</b>';
+        if ($number === 0) {
+            $pdf->displayTitle(sprintf(__s('%1$s: %2$s'), $title, __s('No item to display')));
         } else {
             if ($number > $_SESSION['glpilist_limit']) {
-                $title = sprintf(__('%1$s: %2$s'), $title, $_SESSION['glpilist_limit'] . ' / ' . $number);
+                $title = sprintf(__s('%1$s: %2$s'), $title, $_SESSION['glpilist_limit'] . ' / ' . $number);
             } else {
-                $title = sprintf(__('%1$s: %2$s'), $title, $number);
+                $title = sprintf(__s('%1$s: %2$s'), $title, $number);
             }
             $pdf->displayTitle($title);
 
             $pdf->setColumnsSize(20, 15, 10, 10, 10, 8, 20, 7);
             $pdf->displayTitle(
-                __('Name'),
-                __('Entity'),
-                __('File'),
-                __('Web link'),
-                __('Heading'),
-                __('MIME type'),
-                __('Tag'),
-                __('Date'),
+                __s('Name'),
+                __s('Entity'),
+                __s('File'),
+                __s('Web link'),
+                __s('Heading'),
+                __s('MIME type'),
+                __s('Tag'),
+                __s('Date'),
             );
             foreach ($result as $data) {
                 if (empty($data['link'])) {

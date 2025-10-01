@@ -34,12 +34,17 @@ class PluginPdfProfile extends Profile
 {
     public static $rightname = 'profile';
 
+    public static function getTypeName($nb = 0)
+    {
+        return _sn('PDF export', 'PDF export', $nb, 'pdf');
+    }
+
     public function rawSearchOptions()
     {
         $tab = [];
 
         $tab[] = ['id' => 'common',
-            'name'     => __('Print to pdf', 'pdf')];
+            'name'     => __s('PDF export', 'pdf')];
 
 
         $tab[] = ['id'  => '2',
@@ -67,11 +72,11 @@ class PluginPdfProfile extends Profile
             $checked = 1;
         }
         echo "<table class='tab_cadre_fixe'>";
-        echo "<tr><th colspan='2' class='center b'>" . __('Print to pdf', 'pdf');
+        echo "<tr><th colspan='2' class='center b'>" . __s('PDF export', 'pdf');
         echo '</th></tr>';
 
         echo "<tr class='tab_bg_1'>";
-        echo '<td>' . __('Print to pdf', 'pdf') . '</td><td>';
+        echo '<td>' . __s('PDF export', 'pdf') . '</td><td>';
         Html::showCheckbox(['name' => '_plugin_pdf',
             'checked'              => $checked]);
         echo "</td></tr></table>\n";
@@ -91,7 +96,7 @@ class PluginPdfProfile extends Profile
     public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
     {
         if ($item->getType() == 'Profile') {
-            return __('Print to pdf', 'pdf');
+            return self::createTabEntry(self::getTypeName(), 0, $item::getType(), PluginPdfConfig::getIcon());
         }
 
         return '';
@@ -99,7 +104,7 @@ class PluginPdfProfile extends Profile
 
     public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
     {
-        if ($item instanceof \Profile) {
+        if ($item instanceof Profile) {
             $prof = new self();
             $ID   = $item->getField('id');
             $prof->showForm($ID);
@@ -147,7 +152,7 @@ class PluginPdfProfile extends Profile
     public static function getAllRights($all = false)
     {
         $rights = [['itemtype' => 'PluginPdf',
-            'label'            => __('Print to pdf', 'pdf'),
+            'label'            => __s('PDF export', 'pdf'),
             'field'            => 'plugin_pdf']];
 
         return $rights;
@@ -172,8 +177,7 @@ class PluginPdfProfile extends Profile
         }
 
         foreach ($DB->request(
-            'glpi_profilerights',
-            ['profiles_id' => $_SESSION['glpiactiveprofile']['id'],
+            ['FROM' => 'glpi_profilerights'] + ['profiles_id' => $_SESSION['glpiactiveprofile']['id'],
                 'name'     => ['LIKE', '%plugin_pdf%']],
         ) as $prof) {
             $_SESSION['glpiactiveprofile'][$prof['name']] = $prof['rights'];
@@ -209,7 +213,13 @@ class PluginPdfProfile extends Profile
             $profileRight = new ProfileRight();
 
             if ($DB->tableExists($table)) {
-                foreach ($DB->request($table, ['use' => 1]) as $data) {
+                $criterias = [
+                    'FROM' => $table,
+                    'WHERE' => [
+                        'use' => 1,
+                    ],
+                ];
+                foreach ($DB->request($criterias) as $data) {
                     $right['profiles_id'] = $data['id'];
                     $right['name']        = 'plugin_pdf';
                     $right['rights']      = $data['use'];

@@ -36,7 +36,7 @@ class PluginPdfComputerVirtualMachine extends PluginPdfCommon
 
     public function __construct(?CommonGLPI $obj = null)
     {
-        $this->obj = ($obj ? $obj : new ComputerVirtualMachine());
+        $this->obj = ($obj ?: new ItemVirtualMachine());
     }
 
     public static function pdfForComputer(PluginPdfSimplePDF $pdf, Computer $item)
@@ -47,40 +47,40 @@ class PluginPdfComputerVirtualMachine extends PluginPdfCommon
 
         // From ComputerVirtualMachine::showForComputer()
         $virtualmachines = $dbu->getAllDataFromTable(
-            'glpi_computervirtualmachines',
+            'glpi_itemvirtualmachines',
             ['computers_id' => $ID],
         );
         $pdf->setColumnsSize(100);
-        $title = '<b>' . __('List of virtualized environments') . '</b>';
+        $title = '<b>' . __s('List of virtualized environments') . '</b>';
 
         $number = count($virtualmachines);
 
-        if (!$number) {
-            $pdf->displayTitle('<b>' . __('No virtualized environment associated with the computer') . '</b>');
+        if ($number === 0) {
+            $pdf->displayTitle('<b>' . __s('No virtualized environment associated with the computer') . '</b>');
         } else {
             if ($number > $_SESSION['glpilist_limit']) {
-                $title = sprintf(__('%1$s: %2$s'), $title, $_SESSION['glpilist_limit'] . ' / ' . $number);
+                $title = sprintf(__s('%1$s: %2$s'), $title, $_SESSION['glpilist_limit'] . ' / ' . $number);
             } else {
-                $title = sprintf(__('%1$s: %2$s'), $title, $number);
+                $title = sprintf(__s('%1$s: %2$s'), $title, $number);
             }
             $pdf->displayTitle($title);
 
             $pdf->setColumnsSize(19, 11, 11, 8, 20, 8, 8, 15);
             $pdf->displayTitle(
-                __('Name'),
-                __('Virtualization system'),
-                __('Virtualization model'),
-                __('State'),
-                __('UUID'),
+                __s('Name'),
+                __s('Virtualization system'),
+                __s('Virtualization model'),
+                __s('State'),
+                __s('UUID'),
                 _x('quantity', 'Processors number'),
-                sprintf(__('%1$s (%2$s)'), __('Memory'), __('Mio')),
-                __('Machine'),
+                sprintf(__s('%1$s (%2$s)'), __s('Memory'), __s('Mio')),
+                __s('Machine'),
             );
             $pdf->setColumnsAlign('left', 'center', 'center', 'center', 'left', 'right', 'right', 'left');
 
             foreach ($virtualmachines as $virtualmachine) {
                 $name = '';
-                if ($link_computer = ComputerVirtualMachine::findVirtualMachine($virtualmachine)) {
+                if ($link_computer = ItemVirtualMachine::findVirtualMachine($virtualmachine)) {
                     $computer = new Computer();
                     if ($computer->getFromDB($link_computer)) {
                         $name = $computer->getName();
@@ -114,17 +114,17 @@ class PluginPdfComputerVirtualMachine extends PluginPdfCommon
                 $item::getTable(),
                 ['RAW'
                  => ['LOWER(uuid)'
-                     => ComputerVirtualMachine::getUUIDRestrictCriteria($item->fields['uuid']),
+                     => ItemVirtualMachine::getUUIDRestrictCriteria($item->fields['uuid']),
                  ],
                 ],
             );
 
             if (count($hosts)) {
                 $pdf->setColumnsSize(100);
-                $pdf->displayTitle('<b>' . __('List of virtualized environments') . '</b>');
+                $pdf->displayTitle('<b>' . __s('List of virtualized environments') . '</b>');
 
                 $pdf->setColumnsSize(26, 37, 37);
-                $pdf->displayTitle(__('Name'), __('Operating system'), __('Entity'));
+                $pdf->displayTitle(__s('Name'), __s('Operating system'), __s('Entity'));
 
                 $computer = new Computer();
                 foreach ($hosts as $host) {

@@ -36,7 +36,7 @@ class PluginPdfItem_OperatingSystem extends PluginPdfCommon
 
     public function __construct(?CommonGLPI $obj = null)
     {
-        $this->obj = ($obj ? $obj : new Item_OperatingSystem());
+        $this->obj = ($obj ?: new Item_OperatingSystem());
     }
 
     public static function pdfForItem(PluginPdfSimplePDF $pdf, $item)
@@ -85,27 +85,27 @@ class PluginPdfItem_OperatingSystem extends PluginPdfCommon
         $number = count($result);
 
         $pdf->setColumnsSize(100);
-        $title = '<b>' . __('Operating system') . '</b>';
-        if (!$number) {
-            $pdf->displayTitle(sprintf(__('%1$s: %2$s'), $title, __('No item to display')));
+        $title = '<b>' . __s('Operating system') . '</b>';
+        if ($number === 0) {
+            $pdf->displayTitle(sprintf(__s('%1$s: %2$s'), $title, __s('No item to display')));
         } else {
             if ($number > $_SESSION['glpilist_limit']) {
-                $title = sprintf(__('%1$s: %2$s'), $title, $_SESSION['glpilist_limit'] . ' / ' . $number);
+                $title = sprintf(__s('%1$s: %2$s'), $title, $_SESSION['glpilist_limit'] . ' / ' . $number);
             } else {
-                $title = sprintf(__('%1$s: %2$s'), $title, $number);
+                $title = sprintf(__s('%1$s: %2$s'), $title, $number);
             }
             $pdf->displayTitle($title);
 
             $pdf->setColumnsSize(17, 10, 14, 15, 10, 10, 12, 12);
             $pdf->displayTitle(
-                __('Name'),
-                __('Version'),
-                __('Architecture'),
-                __('Service pack'),
-                __('Kernel'),
-                __('Edition'),
-                __('Product ID'),
-                __('Serial number'),
+                __s('Name'),
+                __s('Version'),
+                __s('Architecture'),
+                __s('Service pack'),
+                __s('Kernel'),
+                __s('Edition'),
+                __s('Product ID'),
+                __s('Serial number'),
             );
         }
 

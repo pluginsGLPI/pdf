@@ -36,7 +36,7 @@ class PluginPdfMonitor extends PluginPdfCommon
 
     public function __construct(?CommonGLPI $obj = null)
     {
-        $this->obj = ($obj ? $obj : new Monitor());
+        $this->obj = ($obj ?: new Monitor());
     }
 
     public function defineAllTabsPDF($options = [])
@@ -62,26 +62,26 @@ class PluginPdfMonitor extends PluginPdfCommon
 
         $pdf->displayLine(
             '<b><i>' . sprintf(
-                __('%1$s: %2$s'),
-                __('Group') . '</i></b>',
+                __s('%1$s: %2$s'),
+                __s('Group') . '</i></b>',
                 Dropdown::getDropdownName('glpi_groups', $item->fields['groups_id']),
             ),
             '<b><i>' . sprintf(
-                __('%1$s: %2$s'),
-                __('Size') . '</i></b>',
-                sprintf(__('%1$s %2$s'), $item->fields['size'], '"'),
+                __s('%1$s: %2$s'),
+                __s('Size') . '</i></b>',
+                sprintf(__s('%1$s %2$s'), $item->fields['size'], '"'),
             ),
         );
 
-        $opts = ['have_micro'  => __('Microphone'),
-            'have_speaker'     => __('Speakers'),
-            'have_subd'        => __('Sub-D'),
-            'have_bnc'         => __('BNC'),
-            'have_dvi'         => __('DVI'),
-            'have_pivot'       => __('Pivot'),
-            'have_hdmi'        => __('HDMI'),
-            'have_displayport' => __('DisplayPort')];
-        foreach ($opts as $key => $val) {
+        $opts = ['have_micro'  => __s('Microphone'),
+            'have_speaker'     => __s('Speakers'),
+            'have_subd'        => __s('Sub-D'),
+            'have_bnc'         => __s('BNC'),
+            'have_dvi'         => __s('DVI'),
+            'have_pivot'       => __s('Pivot'),
+            'have_hdmi'        => __s('HDMI'),
+            'have_displayport' => __s('DisplayPort')];
+        foreach (array_keys($opts) as $key) {
             if (!$item->fields[$key]) {
                 unset($opts[$key]);
             }
@@ -89,9 +89,9 @@ class PluginPdfMonitor extends PluginPdfCommon
         $pdf->setColumnsSize(100);
         $pdf->displayLine(
             '<b><i>' . sprintf(
-                __('%1$s: %2$s'),
-                __('Flags') . '</i></b>',
-                (count($opts) ? implode(', ', $opts) : __('None')),
+                __s('%1$s: %2$s'),
+                __s('Flags') . '</i></b>',
+                (count($opts) ? implode(', ', $opts) : __s('None')),
             ),
         );
 

@@ -36,7 +36,7 @@ class PluginPdfChangeTask extends PluginPdfCommon
 
     public function __construct(?CommonGLPI $obj = null)
     {
-        $this->obj = ($obj ? $obj : new ChangeTask());
+        $this->obj = ($obj ?: new ChangeTask());
     }
 
     public static function pdfForChange(PluginPdfSimplePDF $pdf, Change $job)
@@ -48,30 +48,30 @@ class PluginPdfChangeTask extends PluginPdfCommon
 
         $ID = $job->getField('id');
 
-        $result = $DB->request(
-            'glpi_changetasks',
-            ['WHERE'    => ['changes_id' => $ID],
-                'ORDER' => 'date DESC'],
-        );
+        $result = $DB->request([
+            'FROM'      => 'glpi_changetasks',
+            'WHERE'     => ['changes_id' => $ID],
+            'ORDER'     => 'date DESC',
+        ]);
 
         $number = count($result);
 
         $pdf->setColumnsSize(100);
         $title = '<b>' . ChangeTask::getTypeName(2) . '</b>';
-        if (!$number) {
-            $pdf->displayTitle(sprintf(__('%1$s: %2$s'), $title, __('No item to display')));
+        if ($number === 0) {
+            $pdf->displayTitle(sprintf(__s('%1$s: %2$s'), $title, __s('No item to display')));
         } else {
-            $title = sprintf(__('%1$s: %2$s'), $title, $number);
+            $title = sprintf(__s('%1$s: %2$s'), $title, $number);
             $pdf->displayTitle($title);
 
             foreach ($result as $data) {
                 $pdf->setColumnsSize(20, 20, 20, 20, 20);
                 $pdf->displayTitle(
-                    '<i>' . __('Type'),
-                    __('Date'),
-                    __('Duration'),
-                    __('Writer'),
-                    __('Planning') . '</i>',
+                    '<i>' . __s('Type'),
+                    __s('Date'),
+                    __s('Duration'),
+                    __s('Writer'),
+                    __s('Planning') . '</i>',
                 );
 
                 $actiontime    = Html::timestampToString($data['actiontime'], false);
@@ -83,33 +83,29 @@ class PluginPdfChangeTask extends PluginPdfCommon
                 } else {
                     if (isset($data['state']) && $data['state']) {
                         $planification = sprintf(
-                            __('%1$s: %2$s'),
+                            __s('%1$s: %2$s'),
                             _x('item', 'State'),
                             Planning::getState($data['state']),
                         );
                     }
                     $planification .= '<br>' . sprintf(
-                        __('%1$s: %2$s'),
-                        __('Begin'),
+                        __s('%1$s: %2$s'),
+                        __s('Begin'),
                         Html::convDateTime($data['begin']),
                     );
                     $planification .= '<br>' . sprintf(
-                        __('%1$s: %2$s'),
-                        __('End'),
+                        __s('%1$s: %2$s'),
+                        __s('End'),
                         Html::convDateTime($data['end']),
                     );
                     $planification .= '<br>' . sprintf(
-                        __('%1$s: %2$s'),
-                        __('By'),
+                        __s('%1$s: %2$s'),
+                        __s('By'),
                         $dbu->getUserName($data['users_id_tech']),
                     );
                 }
 
-                if ($data['taskcategories_id']) {
-                    $lib = Dropdown::getDropdownName('glpi_taskcategories', $data['taskcategories_id']);
-                } else {
-                    $lib = '';
-                }
+                $lib = $data['taskcategories_id'] ? Dropdown::getDropdownName('glpi_taskcategories', $data['taskcategories_id']) : '';
 
                 $pdf->displayLine(
                     '</b>' . Toolbox::stripTags($lib),
@@ -120,7 +116,7 @@ class PluginPdfChangeTask extends PluginPdfCommon
                     1,
                 );
                 $pdf->displayText(
-                    '<b><i>' . sprintf(__('%1$s: %2$s') . '</i></b>', __('Description'), ''),
+                    '<b><i>' . sprintf(__s('%1$s: %2$s') . '</i></b>', __s('Description'), ''),
                     $data['content'],
                     1,
                 );

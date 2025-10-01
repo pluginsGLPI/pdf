@@ -36,7 +36,7 @@ class PluginPdfCommonItilCost extends PluginPdfCommon
 
     public function __construct(?CommonGLPI $obj = null)
     {
-        $this->obj = ($obj ? $obj : new TicketCost());
+        $this->obj = ($obj ?: new TicketCost());
     }
 
     public static function pdfForItem(PluginPdfSimplePDF $pdf, CommonDBTM $job)
@@ -49,31 +49,34 @@ class PluginPdfCommonItilCost extends PluginPdfCommon
         $table     = 'glpi_' . (strtolower($type)) . 'costs';
         $classname = $type . 'Cost';
 
-        $result = $DB->request($table, ['WHERE' => [$job->getForeignKeyField() => $ID],
-            'ORDER'                             => 'begin_date']);
+        $result = $DB->request([
+            'FROM'  => $table,
+            'WHERE' => [$job->getForeignKeyField() => $ID],
+            'ORDER' => 'begin_date',
+        ]);
 
         $number = count($result);
 
-        if (!$number) {
+        if ($number === 0) {
             $pdf->setColumnsSize(100);
             $pdf->displayTitle(sprintf(
-                __('%1$s: %2$s'),
+                __s('%1$s: %2$s'),
                 '<b>' . $classname::getTypeName(2) . '</b>',
-                __('No item to display'),
+                __s('No item to display'),
             ));
         } else {
             $pdf->setColumnsSize(60, 20, 20);
             $title = $classname::getTypeName($number);
             if (!empty(PluginPdfConfig::currencyName())) {
                 $title = sprintf(
-                    __('%1$s (%2$s)'),
+                    __s('%1$s (%2$s)'),
                     $classname::getTypeName($number),
                     PluginPdfConfig::currencyName(),
                 );
             }
             $pdf->displayTitle(
                 '<b>' . $title . '</b>',
-                '<b>' . __('Duration') . '</b>',
+                '<b>' . __s('Duration') . '</b>',
                 '<b>' . CommonITILObject::getActionTime($job->fields['actiontime']) . '</b>',
             );
 
@@ -90,15 +93,15 @@ class PluginPdfCommonItilCost extends PluginPdfCommon
                 'right',
             );
             $pdf->displayTitle(
-                '<b><i>' . __('Name') . '</i></b>',
-                '<b><i>' . __('Begin date') . '</i></b>',
-                '<b><i>' . __('End date') . '</i></b>',
-                '<b><i>' . __('Budget') . '</i></b>',
-                '<b><i>' . __('Duration') . '</i></b>',
-                '<b><i>' . __('Time cost') . '</i></b>',
-                '<b><i>' . __('Fixed cost') . '</i></b>',
-                '<b><i>' . __('Material cost') . '</i></b>',
-                '<b><i>' . __('Total cost') . '</i></b>',
+                '<b><i>' . __s('Name') . '</i></b>',
+                '<b><i>' . __s('Begin date') . '</i></b>',
+                '<b><i>' . __s('End date') . '</i></b>',
+                '<b><i>' . __s('Budget') . '</i></b>',
+                '<b><i>' . __s('Duration') . '</i></b>',
+                '<b><i>' . __s('Time cost') . '</i></b>',
+                '<b><i>' . __s('Fixed cost') . '</i></b>',
+                '<b><i>' . __s('Material cost') . '</i></b>',
+                '<b><i>' . __s('Total cost') . '</i></b>',
             );
 
             $total          = 0;
@@ -138,7 +141,7 @@ class PluginPdfCommonItilCost extends PluginPdfCommon
             $pdf->setColumnsSize(52, 8, 10, 10, 10, 10);
             $pdf->setColumnsAlign('right', 'right', 'right', 'right', 'right', 'right');
             $pdf->displayLine(
-                '<b>' . __('Total') . '</b>',
+                '<b>' . __s('Total') . '</b>',
                 '<b>' . CommonITILObject::getActionTime($total_time) . '</b>',
                 '<b>' . PluginPdfConfig::formatNumber($total_costtime) . '</b>',
                 '<b>' . PluginPdfConfig::formatNumber($total_fixed) . '</b>',

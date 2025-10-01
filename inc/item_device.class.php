@@ -36,7 +36,7 @@ class PluginPdfItem_Device extends PluginPdfCommon
 
     public function __construct(?CommonGLPI $obj = null)
     {
-        $this->obj = ($obj ? $obj : new Item_Devices());
+        $this->obj = ($obj ?: new Item_Devices());
     }
 
     public static function pdfForItem(PluginPdfSimplePDF $pdf, $item)
@@ -54,40 +54,55 @@ class PluginPdfItem_Device extends PluginPdfCommon
         }
 
         $pdf->setColumnsSize(100);
-        $pdf->displayTitle('<b>' . Toolbox::ucfirst(_n('Component', 'Components', 2)) . '</b>');
+        $pdf->displayTitle('<b>' . Toolbox::ucfirst(_sn('Component', 'Components', 2)) . '</b>');
 
         $pdf->setColumnsSize(3, 14, 42, 41);
 
         $vide = true;
         foreach ($devtypes as $itemtype) {
-            $devicetypes   = new $itemtype();
+            $dbu_local = new DbUtils();
+            $devicetypes = $dbu_local->getItemForItemtype($itemtype);
             $specificities = $devicetypes->getSpecificities();
             $specif_fields = array_keys($specificities);
-            $specif_text   = implode(',', $specif_fields);
 
-            if (!empty($specif_text)) {
-                $specif_text = ' ,' . $specif_text . ' ';
-            }
             $associated_type = str_replace('Item_', '', $itemtype);
             $linktable       = $dbu->getTableForItemType($itemtype);
             $fk              = $dbu->getForeignKeyFieldForTable($dbu->getTableForItemType($associated_type));
 
-            $query = 'SELECT count(*) AS NB, `id`, `' . $fk . '`' . $specif_text . '
-                   FROM `' . $linktable . "`
-                   WHERE `items_id` = '" . $ID . "'
-                         AND `itemtype` = '" . $item->getType() . "'
-                   GROUP BY `" . $fk . '`' . $specif_text;
+            $select_fields = ['COUNT(*) AS NB', 'id', $fk];
+            if ($specif_fields !== []) {
+                $select_fields = array_merge($select_fields, $specif_fields);
+            }
 
+            // Construction of the GROUP BY clause
+            $group_by = [$fk];
+            if ($specif_fields !== []) {
+                $group_by = array_merge($group_by, $specif_fields);
+            }
 
+            $query_params = [
+                'SELECT' => $select_fields,
+                'FROM' => $linktable,
+                'WHERE' => [
+                    'items_id' => $ID,
+                    'itemtype' => $item->getType(),
+                ],
+                'GROUPBY' => $group_by,
+            ];
 
-            $device     = new $associated_type();
-            $itemdevice = new $itemtype();
-            foreach ($DB->request($query) as $data) {
+            $dbu = new DbUtils();
+            foreach ($DB->request($query_params) as $data) {
+                $device = $dbu->getItemForItemtype($associated_type);
+                $itemdevice = $dbu->getItemForItemtype($itemtype);
                 $itemdevice->getFromDB($data['id']);
                 if ($device->getFromDB($data[$fk])) {
-                    $spec = $device->getAdditionalFields();
+                    $spec = [];
+                    if (method_exists($device, 'getAdditionalFields')) {
+                        $spec = $device->getAdditionalFields();
+                    }
+
                     $col4 = '';
-                    if (count($spec)) {
+                    if (count($spec) > 0) {
                         $colspan = (60 / count($spec));
                         foreach ($spec as $i => $label) {
                             $toto  = substr($label['name'], 0, strpos($label['name'], '_'));
@@ -107,7 +122,7 @@ class PluginPdfItem_Device extends PluginPdfCommon
                                         );
                                     }
                                     $col4 .= '<b><i>' . sprintf(
-                                        __('%1$s: %2$s'),
+                                        __s('%1$s: %2$s'),
                                         $label['label'] . '</i></b>',
                                         Toolbox::stripTags($value) . ' ',
                                     );
@@ -116,27 +131,23 @@ class PluginPdfItem_Device extends PluginPdfCommon
                                         $value = $device->fields[$label['name']];
                                     }
                                     if ($label['type'] == 'bool') {
-                                        if ($value == 1) {
-                                            $value = __('Yes');
-                                        } else {
-                                            $value = __('No');
-                                        }
+                                        $value = $value == 1 ? __s('Yes') : __s('No');
                                     }
                                     if (isset($label['unit'])) {
                                         $labelname = '<b><i>' . sprintf(
-                                            __('%1$s (%2$s)'),
+                                            __s('%1$s (%2$s)'),
                                             $label['label'],
                                             $label['unit'],
                                         ) . '</i></b>';
                                     } else {
                                         $labelname = $label['label'];
                                     }
-                                    $col4 .= '<b><i>' . sprintf(__('%1$s: %2$s'), $labelname . '</i></b>', $value . ' ');
+                                    $col4 .= '<b><i>' . sprintf(__s('%1$s: %2$s'), $labelname . '</i></b>', $value . ' ');
                                 }
                             } elseif (isset($device->fields[$label['name'] . '_default'])
                                        && !empty($device->fields[$label['name'] . '_default'])) {
                                 $col4 .= '<b><i>' . sprintf(
-                                    __('%1$s: %2$s'),
+                                    __s('%1$s: %2$s'),
                                     $label['label'] . '</i></b>',
                                     $device->fields[$label['name'] . '_default'] . ' ',
                                 );
@@ -151,7 +162,7 @@ class PluginPdfItem_Device extends PluginPdfCommon
         if ($vide) {
             $pdf->setColumnsSize(100);
             $pdf->setColumnsAlign('center');
-            $pdf->displayLine(__('No item to display'));
+            $pdf->displayLine(__s('No item to display'));
         }
 
         $pdf->displaySpace();

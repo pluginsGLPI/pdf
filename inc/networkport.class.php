@@ -38,7 +38,7 @@ class PluginPdfNetworkPort extends PluginPdfCommon
 
     public function __construct(?CommonGLPI $obj = null)
     {
-        $this->obj = ($obj ? $obj : new NetworkPort());
+        $this->obj = ($obj ?: new NetworkPort());
     }
 
     public static function pdfForItem(PluginPdfSimplePDF $pdf, CommonDBTM $item)
@@ -52,22 +52,21 @@ class PluginPdfNetworkPort extends PluginPdfCommon
 
         $pdf->setColumnsSize(100);
         $result = $DB->request(
-            'glpi_networkports',
-            ['SELECT'   => ['id', 'name', 'logical_number'],
+            ['FROM' => 'glpi_networkports'] + ['SELECT'   => ['id', 'name', 'logical_number'],
                 'WHERE' => ['items_id' => $ID,
                     'itemtype'         => $type],
                 'ORDER' => ['name', 'logical_number']],
         );
         $nb_connect = count($result);
 
-        $title = '<b>' . _n('Network port', 'Network ports', $nb_connect) . '</b>';
-        if (!$nb_connect) {
-            $pdf->displayTitle('<b>' . __('No network port found') . '</b>');
+        $title = '<b>' . _sn('Network port', 'Network ports', $nb_connect) . '</b>';
+        if ($nb_connect === 0) {
+            $pdf->displayTitle('<b>' . __s('No network port found') . '</b>');
         } else {
             if ($nb_connect > $_SESSION['glpilist_limit']) {
-                $title = sprintf(__('%1$s: %2$s'), $title, $_SESSION['glpilist_limit'] . ' / ' . $nb_connect);
+                $title = sprintf(__s('%1$s: %2$s'), $title, $_SESSION['glpilist_limit'] . ' / ' . $nb_connect);
             } else {
-                $title = sprintf(__('%1$s: %2$d'), $title, $nb_connect);
+                $title = sprintf(__s('%1$s: %2$d'), $title, $nb_connect);
             }
             $pdf->displayTitle($title);
 
@@ -79,35 +78,30 @@ class PluginPdfNetworkPort extends PluginPdfCommon
                 $pdf->displayTitle('<b>' . $instname . '</b>');
 
                 $pdf->displayLine('<b>' . sprintf(
-                    __('%1$s: %2$s'),
+                    __s('%1$s: %2$s'),
                     '#</b>',
                     $netport->fields['logical_number'],
                 ));
 
                 $pdf->displayLine('<b>' . sprintf(
-                    __('%1$s: %2$s'),
-                    __('Name') . '</b>',
+                    __s('%1$s: %2$s'),
+                    __s('Name') . '</b>',
                     $netport->fields['name'],
                 ));
 
                 $contact  = new NetworkPort();
                 $netport2 = new NetworkPort();
 
-                $add = __('Not connected.');
-                if ($cid = $contact->getContact($netport->fields['id'])) {
-                    if ($netport2->getFromDB($cid)
-                        && ($device2 = $dbu->getItemForItemtype($netport2->fields['itemtype']))) {
-                        if ($device2->getFromDB($netport2->fields['items_id'])) {
-                            $add = $netport2->getName() . ' ' . __('on') . ' ' .
-                                   $device2->getName() . ' (' . $device2->getTypeName() . ')';
-                        }
-                    }
+                $add = __s('Not connected.');
+                $cid = $contact->getContact($netport->fields['id']);
+                if ($cid && $netport2->getFromDB($cid) && ($device2 = $dbu->getItemForItemtype($netport2->fields['itemtype'])) && $device2->getFromDB($netport2->fields['items_id'])) {
+                    $add = $netport2->getName() . ' ' . __s('on') . ' ' . $device2->getName() . ' (' . $device2->getTypeName() . ')';
                 }
 
                 if ($instantiation_type == 'NetworkPortEthernet') {
                     $pdf->displayLine('<b>' . sprintf(
-                        __('%1$s: %2$s'),
-                        __('Connected to') . '</b>',
+                        __s('%1$s: %2$s'),
+                        __s('Connected to') . '</b>',
                         $add,
                     ));
                     $netportethernet = new NetworkPortEthernet();
@@ -118,10 +112,10 @@ class PluginPdfNetworkPort extends PluginPdfCommon
                         $type  = NetworkPortEthernet::getPortTypeName($netportethernet->fields['type']);
                     }
                     $pdf->displayLine(
-                        '<b>' . sprintf(__('%1$s: %2$s'), __('Ethernet port speed') . '</b>', $speed),
+                        '<b>' . sprintf(__s('%1$s: %2$s'), __s('Ethernet port speed') . '</b>', $speed),
                     );
                     $pdf->displayLine(
-                        '<b>' . sprintf(__('%1$s: %2$s'), __('Ethernet port type') . '</b>', $type),
+                        '<b>' . sprintf(__s('%1$s: %2$s'), __s('Ethernet port type') . '</b>', $type),
                     );
 
                     $netpoint = new Socket();
@@ -132,15 +126,15 @@ class PluginPdfNetworkPort extends PluginPdfCommon
                     }
                     $pdf->displayLine(
                         '<b>' . sprintf(
-                            __('%1$s: %2$s'),
-                            __('Network outlet') . '</b>',
+                            __s('%1$s: %2$s'),
+                            __s('Network outlet') . '</b>',
                             $outlet,
                         ),
                     );
                 }
                 $pdf->displayLine('<b>' . sprintf(
-                    __('%1$s: %2$s'),
-                    __('MAC') . '</b>',
+                    __s('%1$s: %2$s'),
+                    __s('MAC') . '</b>',
                     $netport->fields['mac'],
                 ));
 
@@ -156,7 +150,7 @@ class PluginPdfNetworkPort extends PluginPdfCommon
                 if ($ip->getFromDBByRequest($sqlip)) {
                     $ipname = $ip->fields['name'];
 
-                    $pdf->displayLine('<b>' . sprintf(__('%1$s: %2$s'), __('ip') . '</b>', $ipname));
+                    $pdf->displayLine('<b>' . sprintf(__s('%1$s: %2$s'), __s('ip') . '</b>', $ipname));
 
                     $sql = ['SELECT' => 'glpi_ipaddresses_ipnetworks.ipnetworks_id',
                         'FROM'       => 'glpi_ipaddresses_ipnetworks',
@@ -171,8 +165,8 @@ class PluginPdfNetworkPort extends PluginPdfCommon
                         $ipnetwork = new IPNetwork();
                         if ($ipnetwork->getFromDB($row['ipnetworks_id'])) {
                             $pdf->displayLine('<b>' . sprintf(
-                                __('%1$s: %2$s'),
-                                __('IP network') . '</b>',
+                                __s('%1$s: %2$s'),
+                                __s('IP network') . '</b>',
                                 $ipnetwork->fields['completename'],
                             ));
                         }

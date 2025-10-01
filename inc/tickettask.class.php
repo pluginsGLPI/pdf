@@ -36,7 +36,7 @@ class PluginPdfTicketTask extends PluginPdfCommon
 
     public function __construct(?CommonGLPI $obj = null)
     {
-        $this->obj = ($obj ? $obj : new TicketTask());
+        $this->obj = ($obj ?: new TicketTask());
     }
 
     public static function pdfForTicket(PluginPdfSimplePDF $pdf, Ticket $job, $private)
@@ -71,23 +71,23 @@ class PluginPdfTicketTask extends PluginPdfCommon
         $pdf->setColumnsSize(100);
         $title = '<b>' . TicketTask::getTypeName($number) . '</b>';
 
-        if (!$number) {
-            $pdf->displayTitle(sprintf(__('%1$s: %2$s'), $title, __('No item to display')));
+        if ($number === 0) {
+            $pdf->displayTitle(sprintf(__s('%1$s: %2$s'), $title, __s('No item to display')));
         } else {
             if ($number > $_SESSION['glpilist_limit']) {
-                $title = sprintf(__('%1$s (%2$s)'), $title, $_SESSION['glpilist_limit'] . '/' . $number);
+                $title = sprintf(__s('%1$s (%2$s)'), $title, $_SESSION['glpilist_limit'] . '/' . $number);
             } else {
-                $title = sprintf(__('%1$s: %2$s'), $title, $number);
+                $title = sprintf(__s('%1$s: %2$s'), $title, $number);
             }
             $pdf->displayTitle($title);
 
             $pdf->setColumnsSize(20, 20, 20, 20, 20);
             $pdf->displayTitle(
-                '<i>' . __('Type'),
-                __('Date'),
-                __('Duration'),
-                __('Writer'),
-                __('Planning') . '</i>',
+                '<i>' . __s('Type'),
+                __s('Date'),
+                __s('Duration'),
+                __s('Writer'),
+                __s('Planning') . '</i>',
             );
 
 
@@ -96,47 +96,43 @@ class PluginPdfTicketTask extends PluginPdfCommon
                 $planification = '';
                 if (isset($data['state'])) {
                     $planification = sprintf(
-                        __('%1$s: %2$s'),
+                        __s('%1$s: %2$s'),
                         _x('item', 'State'),
                         Planning::getState($data['state']),
                     );
                 }
                 if (!empty($data['begin'])) {
                     $planification .= '<br>' . sprintf(
-                        __('%1$s: %2$s'),
-                        __('Begin'),
+                        __s('%1$s: %2$s'),
+                        __s('Begin'),
                         Html::convDateTime($data['begin']),
                     );
                     $planification .= '<br>' . sprintf(
-                        __('%1$s: %2$s'),
-                        __('End'),
+                        __s('%1$s: %2$s'),
+                        __s('End'),
                         Html::convDateTime($data['end']),
                     );
                 }
                 if ($data['users_id_tech'] > 0) {
                     $planification .= '<br>' . sprintf(
-                        __('%1$s: %2$s'),
-                        __('By user', 'pdf'),
+                        __s('%1$s: %2$s'),
+                        __s('By user', 'pdf'),
                         $dbu->getUserName($data['users_id_tech']),
                     );
                 }
                 if ($data['groups_id_tech'] > 0) {
                     $planification .= '<br>' . sprintf(
-                        __('%1$s: %2$s'),
-                        __('By group', 'pdf'),
+                        __s('%1$s: %2$s'),
+                        __s('By group', 'pdf'),
                         Dropdown::getDropdownName(
                             'glpi_groups',
                             $data['groups_id_tech'],
                         ),
                     );
                 }
-                if ($data['taskcategories_id']) {
-                    $lib = Dropdown::getDropdownName('glpi_taskcategories', $data['taskcategories_id']);
-                } else {
-                    $lib = '';
-                }
+                $lib = $data['taskcategories_id'] ? Dropdown::getDropdownName('glpi_taskcategories', $data['taskcategories_id']) : '';
                 if ($data['is_private']) {
-                    $lib = sprintf(__('%1$s (%2$s)'), $lib, __('Private'));
+                    $lib = sprintf(__s('%1$s (%2$s)'), $lib, __s('Private'));
                 }
 
                 $pdf->displayLine(
@@ -146,7 +142,7 @@ class PluginPdfTicketTask extends PluginPdfCommon
                     Toolbox::stripTags($dbu->getUserName($data['users_id'])),
                     $planification,
                 );
-                $content = Glpi\Toolbox\Sanitizer::unsanitize(Html::entity_decode_deep($data['content']));
+                $content = $data['content'];
                 $content = preg_replace('#data:image/[^;]+;base64,#', '@', $content);
 
                 preg_match_all('/<img [^>]*src=[\'"]([^\'"]*docid=([0-9]*))[^>]*>/', $content, $res, PREG_SET_ORDER);
@@ -160,7 +156,7 @@ class PluginPdfTicketTask extends PluginPdfCommon
                 }
 
                 $pdf->displayText(
-                    "<b><i>" . sprintf(__('%1$s: %2$s') . "</i></b>", __('Description'), ''),
+                    "<b><i>" . sprintf(__s('%1$s: %2$s') . "</i></b>", __s('Description'), ''),
                     $content,
                     1,
                 );
