@@ -346,10 +346,30 @@ class PluginPdfSimplePDF
         $this->setColumnsSize(100);
         $text    = $name . ' ' . $content;
         $content = Glpi\RichText\RichText::getEnhancedHtml($text);
-        if (!preg_match("/<br\s?\/?>/", $content) && !preg_match('/<p>/', $content)) {
-            $content = nl2br($content);
+
+        // Split content by tables, keeping tables in the result
+        $segments = preg_split('/(<table[^>]*>.*?<\/table>)/s', $content, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
+
+        // Process segments and rebuild content
+        $formatted_content = '';
+        foreach ($segments as $segment) {
+            if (strpos($segment, '<table') !== false) {
+                // Add border to tables if missing
+                if (!preg_match('/border\s*=\s*["\']?[1-9]/i', $segment)) {
+                    $segment = preg_replace('/<table/i', '<table border="1"', $segment);
+                }
+                $formatted_content .= $segment;
+            } else {
+                // Apply nl2br only to text segments
+                if (!preg_match("/<br\s?\/?>/", $segment) && !preg_match('/<p>/', $segment)) {
+                    $segment = nl2br($segment);
+                }
+                $formatted_content .= $segment;
+            }
         }
-        $this->displayInternal(240, 0.5, self::LEFT, $minline * 5, [$content]);
+
+        $this->displayInternal(240, 0.5, self::LEFT, $minline * 5, [$formatted_content]);
+
         /* Restore */
         list(
             $this->cols,
