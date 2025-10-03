@@ -348,7 +348,7 @@ class PluginPdfSimplePDF
         $content = Glpi\RichText\RichText::getEnhancedHtml($text);
 
         // Split content by tables, keeping tables in the result
-        $segments = preg_split('/(<table[^>]*>.*?<\/table>)/s', $content, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
+        $segments = preg_split('/(<table\b[^>]*>.*?<\/table>)/is', $content, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
 
         // Process segments and rebuild content
         $formatted_content = '';
