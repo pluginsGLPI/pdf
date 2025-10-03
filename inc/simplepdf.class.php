@@ -353,7 +353,7 @@ class PluginPdfSimplePDF
         // Process segments and rebuild content
         $formatted_content = '';
         foreach ($segments as $segment) {
-            if (strpos($segment, '<table') !== false) {
+            if (str_contains($segment, '<table')) {
                 // Add border to tables if missing
                 if (!preg_match('/border\s*=\s*["\']?[1-9]/i', $segment)) {
                     $segment = preg_replace('/<table/i', '<table border="1"', $segment);
