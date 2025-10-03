@@ -361,7 +361,7 @@ class PluginPdfSimplePDF
                 $formatted_content .= $segment;
             } else {
                 // Apply nl2br only to text segments
-                if (!preg_match("/<br\s?\/?>/", $segment) && !preg_match('/<p>/', $segment)) {
+                if (!str_contains($segment, '<br') && !str_contains($segment, '<p>')) {
                     $segment = nl2br($segment);
                 }
                 $formatted_content .= $segment;
