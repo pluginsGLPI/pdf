@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [UNRELEASE]
 
+### Fixed
+
+- Fixed table formatting and border in PDF
+
 ## [4.0.2] - 2025-09-30
 
 - Fix missing images in exported Knowledge Base PDFs
