@@ -36,21 +36,21 @@
     'currency',
     selected_currency,
     currency_options,
-    __s('Choose your international currency', 'pdf')
+    __('Choose your international currency', 'pdf')
 ) }}
 
 <input type="hidden" id="use_branding_logo_hidden" name="use_branding_logo" value="{{ (use_branding_logo and is_branding_active) ? 1 : 0 }}" />
 <div class="form-field row align-items-center col-12 col-sm-6  mb-2">
     <label class="col-form-label col-xxl-5 text-xxl-end ">
         <span class="d-inline-flex align-items-center">
-            <span>{{ __s('Use logo from Branding plugin', 'pdf') }}</span>
+            <span>{{ __('Use logo from Branding plugin', 'pdf') }}</span>
         </span>
     </label>
     <div class ="col-1 field-container">
         {% if is_branding_active %}
             <label class="form-switch mt-1" style="padding-left: 1rem;"
                 data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-trigger="hover"
-                title="{{ __s('The logo will be used in the header of generated PDFs.', 'pdf') }}">
+                title="{{ __('The logo will be used in the header of generated PDFs.', 'pdf') }}">
                 <input type="checkbox" class="form-check-input ms-0 me-1 mt-0" id="use_branding_logo_checkbox"
                     {{ use_branding_logo ? 'checked' : '' }} />
             </label>
@@ -62,7 +62,7 @@
         {% else %}
             <label class="form-switch mt-1" style="padding-left: 1rem;"
                 data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-trigger="hover"
-                title="{{ __s('The Branding plugin is either disabled, missing, or its version is below 3.0.0.', 'pdf') }}">
+                title="{{ __('The Branding plugin is either disabled, missing, or its version is below 3.0.0.', 'pdf') }}">
                 <input type="checkbox" class="form-check-input ms-0 me-1 mt-0" disabled />
             </label>
         {% endif %}
@@ -72,7 +72,7 @@
 {{ fields.textareaField(
     'add_text',
     add_text,
-    __s('Text to add at the end of the PDF generation', 'pdf'),
+    __('Text to add at the end of the PDF generation', 'pdf'),
     {
         'rows': 5,
         'style': 'width:95%'
