@@ -354,7 +354,7 @@ class PluginPdfSimplePDF
         $formatted_content = '';
         foreach ($segments as $segment) {
             if (str_contains($segment, '<table')) {
-                $segment = preg_replace('/width\s*:\s*0\s*px\s*;?/i', '', $segment);
+                $segment = preg_replace('/\bwidth\s*:\s*0\s*px\s*;?/i', '', $segment);
                 // Add border to tables if missing
                 if (!preg_match('/border\s*=\s*["\']?[1-9]/i', $segment)) {
                     $segment = preg_replace('/<table/i', '<table border="1"', $segment);
