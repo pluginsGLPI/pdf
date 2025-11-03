@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 
 - Fixed table formatting and border in PDF
+- Fixed table cell width in PDF generation
 
 ## [4.0.2] - 2025-09-30
 
