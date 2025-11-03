@@ -345,7 +345,7 @@ class PluginPdfSimplePDF
 
         $this->setColumnsSize(100);
         $text    = $name . ' ' . $content;
-        $content = Glpi\RichText\RichText::getEnhancedHtml($text);
+        $content = Glpi\RichText\RichText::getEnhancedHtml($text, ['text_maxsize' => 0]);
 
         // Split content by tables, keeping tables in the result
         $segments = preg_split('/(<table\b[^>]*>.*?<\/table>)/is', $content, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
@@ -354,6 +354,7 @@ class PluginPdfSimplePDF
         $formatted_content = '';
         foreach ($segments as $segment) {
             if (str_contains($segment, '<table')) {
+                $segment = preg_replace('/width\s*:\s*0\s*px\s*;?/i', '', $segment);
                 // Add border to tables if missing
                 if (!preg_match('/border\s*=\s*["\']?[1-9]/i', $segment)) {
                     $segment = preg_replace('/<table/i', '<table border="1"', $segment);
