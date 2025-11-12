@@ -355,8 +355,11 @@ class PluginPdfSimplePDF
         $formatted_content = '';
         foreach ($segments as $segment) {
             if (str_contains($segment, '<table')) {
-                // Clean up table HTML for PDF rendering
-                $segment = $this->cleanTableHtml($segment);
+                $segment = preg_replace('/\bwidth\s*:\s*0\s*px\s*;?/i', '', $segment);
+                // Add border to tables if missing
+                if (!preg_match('/border\s*=\s*["\']?[1-9]/i', $segment)) {
+                    $segment = preg_replace('/<table/i', '<table border="1"', $segment);
+                }
                 $formatted_content .= $segment;
             } else {
                 // Apply nl2br only to text segments
@@ -381,48 +384,6 @@ class PluginPdfSimplePDF
     public function displaySpace($nb = 1)
     {
         $this->pdf->Ln(4 * $nb);
-    }
-
-    /**
-     * Clean table HTML for proper PDF rendering
-     * Removes problematic attributes and styles that cause tables to overflow
-     *
-     * @param string $html Table HTML code
-     * @return string Cleaned HTML
-     */
-    private function cleanTableHtml($html)
-    {
-        // Remove colgroup entirely (causes fixed widths)
-        $html = preg_replace('/<colgroup\b[^>]*>.*?<\/colgroup>/is', '', $html);
-
-        // Remove table-layout:fixed style (prevents auto-sizing)
-        $html = preg_replace('/table-layout\s*:\s*fixed\s*;?/i', '', $html);
-
-        // Remove ALL width styles from elements (including px, %, em, etc.)
-        $html = preg_replace('/\bwidth\s*:\s*[^;"\'>]+;?/i', '', $html);
-
-        // Remove ALL height styles from elements
-        $html = preg_replace('/\bheight\s*:\s*[^;"\'>]+;?/i', '', $html);
-
-        // Remove width attributes from any tag
-        $html = preg_replace('/(<[^>]+)\s+width\s*=\s*["\']?[^"\'\s>]+["\']?/i', '$1', $html);
-
-        // Remove height attributes from any tag
-        $html = preg_replace('/(<[^>]+)\s+height\s*=\s*["\']?[^"\'\s>]+["\']?/i', '$1', $html);
-
-        // Clean up empty style attributes and double spaces
-        $html = preg_replace('/\s+style\s*=\s*["\'][\s]*["\']/', '', $html);
-        $html = preg_replace('/\s+/', ' ', $html);
-
-        // Add border to table if missing (for visibility)
-        if (!preg_match('/border\s*=\s*["\']?[1-9]/i', $html)) {
-            $html = preg_replace('/<table/i', '<table border="1"', $html, 1);
-        }
-
-        // Force table to 100% width for PDF (do this LAST)
-        $html = preg_replace('/<table([^>]*)>/i', '<table$1 style="width:100%">', $html, 1);
-
-        return $html;
     }
 
     /**
