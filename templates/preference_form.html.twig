@@ -206,5 +206,37 @@
         });
 
         updateSelectionCount(formId);
+
+        function refreshCsrfToken(formId) {
+            fetch(window.location.href, { credentials: 'same-origin' })
+                .then(r => r.text())
+                .then(html => {
+                    try {
+                        const newTokenInput = new DOMParser()
+                            .parseFromString(html, 'text/html')
+                            .querySelector('input[name="_glpi_csrf_token"]');
+                        if (!newTokenInput) return;
+
+                        const currentTokenInput = document.querySelector(`#${formId} input[name="_glpi_csrf_token"]`);
+                        if (currentTokenInput) {
+                            currentTokenInput.value = newTokenInput.value;
+                        }
+                    } catch (e) {
+                        // Ignore errors silently
+                    }
+                })
+                .catch(() => {
+                    // Ignore errors silently
+                });
+        }
+
+        // Schedule a CSRF token refresh after form submission
+        const form = document.getElementById(formId);
+        if (form) {
+            form.addEventListener('submit', () => {
+                // Delay to allow server-side AJAX handlers to complete; full navigation will reload everything
+                setTimeout(() => refreshCsrfToken(formId), 800);
+            });
+        }
     });
 </script>

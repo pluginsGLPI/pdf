@@ -29,6 +29,7 @@
  *             http://www.gnu.org/licenses/agpl-3.0-standalone.html
  *  --------------------------------------------------------------------------
  */
+use Glpi\DBAL\QueryExpression;
 
 class PluginPdfItem_Device extends PluginPdfCommon
 {
@@ -69,15 +70,14 @@ class PluginPdfItem_Device extends PluginPdfCommon
             $linktable       = $dbu->getTableForItemType($itemtype);
             $fk              = $dbu->getForeignKeyFieldForTable($dbu->getTableForItemType($associated_type));
 
-            $select_fields = ['COUNT(*) AS NB', 'id', $fk];
-            if ($specif_fields !== []) {
-                $select_fields = array_merge($select_fields, $specif_fields);
-            }
-
+            $select_fields = [new QueryExpression('COUNT(*) AS NB'), 'id', $fk];
             // Construction of the GROUP BY clause
             $group_by = [$fk];
-            if ($specif_fields !== []) {
-                $group_by = array_merge($group_by, $specif_fields);
+            foreach ($specif_fields as $field) {
+                if ($DB->fieldExists($linktable, $field)) {
+                    $select_fields[] = $field;
+                    $group_by[]      = $field;
+                }
             }
 
             $query_params = [
