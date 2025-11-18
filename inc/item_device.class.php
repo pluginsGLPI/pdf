@@ -29,6 +29,7 @@
  *             http://www.gnu.org/licenses/agpl-3.0-standalone.html
  *  --------------------------------------------------------------------------
  */
+use Glpi\DBAL\QueryExpression;
 
 class PluginPdfItem_Device extends PluginPdfCommon
 {
