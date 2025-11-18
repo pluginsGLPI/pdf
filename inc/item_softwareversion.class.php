@@ -498,19 +498,12 @@ class PluginPdfItem_SoftwareVersion extends PluginPdfCommon
                 ],
                 'glpi_softwareversions' => [
                     'ON' => [
-                        'OR' => [
-                            [
-                                'glpi_softwarelicenses' => 'softwareversions_id_use',
-                                'glpi_softwareversions' => 'id',
-                            ],
-                            [
-                                'AND' => [
-                                    'glpi_softwarelicenses.softwareversions_id_use' => 0,
-                                    [
-                                        'glpi_softwarelicenses' => 'softwareversions_id_buy',
-                                        'glpi_softwareversions' => 'id',
-                                    ],
-                                ],
+                        'glpi_softwarelicenses' => 'softwareversions_id_use',
+                        'glpi_softwareversions' => 'id',
+                        [
+                            'OR' => [
+                                'glpi_softwarelicenses.softwareversions_id_use' => 0,
+                                'glpi_softwarelicenses.softwareversions_id_buy' => 'glpi_softwareversions.id',
                             ],
                         ],
                     ],
