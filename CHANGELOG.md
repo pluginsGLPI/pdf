@@ -5,9 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [UNRELEASED]
+
+### Fixed
+
+- Avoids a CSRF check error if print is clicked multiple times
+- Fixes some SQL errors during export
+
 ## [4.1.1] - 2025-10-30
 
-## Fixed
+### Fixed
 
 - Fix error message `Unknown '__s' function`
 
