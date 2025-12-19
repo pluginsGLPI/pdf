@@ -398,17 +398,13 @@ class PluginPdfSimplePDF
         // Remove table-layout:fixed style (prevents auto-sizing)
         $html = preg_replace('/table-layout\s*:\s*fixed\s*;?/i', '', $html);
 
-        // Remove ALL width styles from elements (including px, %, em, etc.)
-        $html = preg_replace('/\bwidth\s*:\s*[^;"\'>]+;?/i', '', $html);
+        // Remove width/height styles only from table elements (table, td, th, tr)
+        $html = preg_replace('/(<(?:table|td|th|tr)\b[^>]*)\s+style\s*=\s*["\']([^"\']*)\bwidth\s*:\s*[^;"\'>]+;?([^"\']*)["\']/', '$1 style="$2$3"', $html);
+        $html = preg_replace('/(<(?:table|td|th|tr)\b[^>]*)\s+style\s*=\s*["\']([^"\']*)\bheight\s*:\s*[^;"\'>]+;?([^"\']*)["\']/', '$1 style="$2$3"', $html);
 
-        // Remove ALL height styles from elements
-        $html = preg_replace('/\bheight\s*:\s*[^;"\'>]+;?/i', '', $html);
-
-        // Remove width attributes from any tag
-        $html = preg_replace('/(<[^>]+)\s+width\s*=\s*["\']?[^"\'\s>]+["\']?/i', '$1', $html);
-
-        // Remove height attributes from any tag
-        $html = preg_replace('/(<[^>]+)\s+height\s*=\s*["\']?[^"\'\s>]+["\']?/i', '$1', $html);
+        // Remove width/height attributes only from table elements (table, td, th, tr)
+        $html = preg_replace('/(<(?:table|td|th|tr)\b[^>]+)\s+width\s*=\s*["\']?[^"\'\s>]+["\']?/i', '$1', $html);
+        $html = preg_replace('/(<(?:table|td|th|tr)\b[^>]+)\s+height\s*=\s*["\']?[^"\'\s>]+["\']?/i', '$1', $html);
 
         // Clean up empty style attributes and double spaces
         $html = preg_replace('/\s+style\s*=\s*["\'][\s]*["\']/', '', $html);
