@@ -37,7 +37,7 @@
 
 chdir(dirname($_SERVER['SCRIPT_FILENAME']));
 
-for ($i = 1 ; $i < count($argv) ; $i++) {
+for ($i = 1 ; $i < count($argv ?? []) ; $i++) {
     //To be able to use = in search filters, enter \= instead in command line
     //Replace the \= by ° not to match the split function
     $arg   = str_replace('\=', '°', $argv[$i]);
