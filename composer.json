@@ -1,11 +1,13 @@
 {
     "require": {
         "php": ">=8.2",
-        "symfony/yaml": "^7.3",
-        "tecnickcom/tcpdf": "^6.4"
+        "symfony/yaml": "^7.3"
     },
     "require-dev": {
         "glpi-project/tools": "^0.7.4"
+    },
+    "provide": {
+        "tecnickcom/tcpdf": "*"
     },
     "config": {
         "optimize-autoloader": true,
