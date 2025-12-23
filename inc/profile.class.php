@@ -67,8 +67,7 @@ class PluginPdfProfile extends Profile
 
         $real_right = ProfileRight::getProfileRights($ID, ['plugin_pdf']);
         $checked    = 0;
-        if (isset($real_right)
-            && ($real_right['plugin_pdf'] == 1)) {
+        if ($real_right['plugin_pdf'] == 1) {
             $checked = 1;
         }
         echo "<table class='tab_cadre_fixe'>";

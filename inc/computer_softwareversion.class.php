@@ -311,7 +311,7 @@ class PluginPdfComputer_SoftwareVersion extends PluginPdfCommon
             'ORDER'      => 'completename'];
 
         foreach ($DB->request($sql) as $ID => $data) {
-            $nb = Item_SoftwareVersion::countForVersion($softwareversions_id, $ID);
+            $nb = Item_SoftwareVersion::countForVersion($softwareversions_id, (string) $ID);
             if ($nb > 0) {
                 $pdf->displayLine($data['completename'], $nb);
                 $tot += $nb;
