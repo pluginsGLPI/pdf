@@ -199,7 +199,7 @@ class PluginPdfChange extends PluginPdfCommon
         // Observer
         $users     = [];
         $listusers = '';
-        $watcher   = '<b><i>' . sprintf(__s('%1$s: %2$s') . '</i></b>', __s('Watcher'), $listusers);
+        $watcher   = '<b><i>' . sprintf(__s('%1$s: %2$s') . '</i></b>', __s('Observer'), $listusers);
         foreach ($job->getUsers(CommonITILActor::OBSERVER) as $d) {
             if ($d['users_id']) {
                 $tmp = Toolbox::stripTags($dbu->getUserName($d['users_id']));
@@ -220,7 +220,7 @@ class PluginPdfChange extends PluginPdfCommon
         $listgroups   = '';
         $watchergroup = '<b><i>' . sprintf(
             __s('%1$s: %2$s') . '</i></b>',
-            __s('Watcher group'),
+            __s('Observer group'),
             $listgroups,
         );
         foreach ($job->getGroups(CommonITILActor::OBSERVER) as $d) {
