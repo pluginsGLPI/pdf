@@ -32,36 +32,6 @@
 
 use Glpi\RichText\RichText;
 
-/**
- *  -------------------------------------------------------------------------
- *  LICENSE
- *
- *  This file is part of PDF plugin for GLPI.
- *
- *  PDF is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU Affero General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  PDF is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- *  GNU Affero General Public License for more details.
- *
- *  You should have received a copy of the GNU Affero General Public License
- *  along with Reports. If not, see <http://www.gnu.org/licenses/>.
- *
- * @author    Nelly Mahu-Lasson, Remi Collet, Teclib
- * @copyright Copyright (c) 2009-2022 PDF plugin team
- * @license   AGPL License 3.0 or (at your option) any later version
- * @link      https://github.com/pluginsGLPI/pdf/
- * @link      http://www.glpi-project.org/
- * @package   pdf
- * @since     2009
- *             http://www.gnu.org/licenses/agpl-3.0-standalone.html
- *  --------------------------------------------------------------------------
- */
-
 //use TCPDF;
 
 define('K_PATH_IMAGES', '');
@@ -376,11 +346,29 @@ class PluginPdfSimplePDF
 
         $this->setColumnsSize(100);
         $text    = $name . ' ' . $content;
-        $content = RichText::getEnhancedHtml($text);
-        if (!preg_match("/<br\s?\/?>/", $content) && !preg_match('/<p>/', $content)) {
-            $content = nl2br($content);
+        $content = RichText::getEnhancedHtml($text, ['text_maxsize' => 0]);
+
+        // Split content by tables, keeping tables in the result
+        $segments = preg_split('/(<table\b[^>]*>.*?<\/table>)/is', $content, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
+
+        // Process segments and rebuild content
+        $formatted_content = '';
+        foreach ($segments as $segment) {
+            if (str_contains($segment, '<table')) {
+                // Clean up table HTML for PDF rendering
+                $segment = $this->cleanTableHtml($segment);
+                $formatted_content .= $segment;
+            } else {
+                // Apply nl2br only to text segments
+                if (!str_contains($segment, '<br') && !str_contains($segment, '<p>')) {
+                    $segment = nl2br($segment);
+                }
+                $formatted_content .= $segment;
+            }
         }
-        $this->displayInternal(240, 0.5, self::LEFT, $minline * 5, [$content]);
+
+        $this->displayInternal(240, 0.5, self::LEFT, $minline * 5, [$formatted_content]);
+
         /* Restore */
         [$this->cols, $this->colsx, $this->colsw, $this->align, ] = $save;
     }
@@ -393,6 +381,44 @@ class PluginPdfSimplePDF
     public function displaySpace($nb = 1)
     {
         $this->pdf->Ln(4 * $nb);
+    }
+
+    /**
+     * Clean table HTML for proper PDF rendering
+     * Removes problematic attributes and styles that cause tables to overflow
+     *
+     * @param string $html Table HTML code
+     * @return string Cleaned HTML
+     */
+    private function cleanTableHtml($html)
+    {
+        // Remove colgroup entirely (causes fixed widths)
+        $html = preg_replace('/<colgroup\b[^>]*>.*?<\/colgroup>/is', '', $html);
+
+        // Remove table-layout:fixed style (prevents auto-sizing)
+        $html = preg_replace('/table-layout\s*:\s*fixed\s*;?/i', '', $html);
+
+        // Remove width/height styles only from table elements (table, td, th, tr)
+        $html = preg_replace('/(<(?:table|td|th|tr)\b[^>]*)\s+style\s*=\s*["\']([^"\']*)\bwidth\s*:\s*[^;"\'>]+;?([^"\']*)["\']/', '$1 style="$2$3"', $html);
+        $html = preg_replace('/(<(?:table|td|th|tr)\b[^>]*)\s+style\s*=\s*["\']([^"\']*)\bheight\s*:\s*[^;"\'>]+;?([^"\']*)["\']/', '$1 style="$2$3"', $html);
+
+        // Remove width/height attributes only from table elements (table, td, th, tr)
+        $html = preg_replace('/(<(?:table|td|th|tr)\b[^>]+)\s+width\s*=\s*["\']?[^"\'\s>]+["\']?/i', '$1', $html);
+        $html = preg_replace('/(<(?:table|td|th|tr)\b[^>]+)\s+height\s*=\s*["\']?[^"\'\s>]+["\']?/i', '$1', $html);
+
+        // Clean up empty style attributes and double spaces
+        $html = preg_replace('/\s+style\s*=\s*["\'][\s]*["\']/', '', $html);
+        $html = preg_replace('/\s+/', ' ', $html);
+
+        // Add border to table if missing (for visibility)
+        if (!preg_match('/border\s*=\s*["\']?[1-9]/i', $html)) {
+            $html = preg_replace('/<table/i', '<table border="1"', $html, 1);
+        }
+
+        // Force table to 100% width for PDF (do this LAST)
+        $html = preg_replace('/<table([^>]*)>/i', '<table$1 style="width:100%">', $html, 1);
+
+        return $html;
     }
 
     /**

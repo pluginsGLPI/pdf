@@ -24,6 +24,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 - GLPI 11 compatibility
 
+### Fixed
+
+- Fixed table formatting and border in PDF
+- Fixed table cell size in PDF generation
+
 ## [4.0.2] - 2025-09-30
 
 - Fix missing images in exported Knowledge Base PDFs
