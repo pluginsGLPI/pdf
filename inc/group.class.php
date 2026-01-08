@@ -71,7 +71,7 @@ class PluginPdfGroup extends PluginPdfCommon
             ),
             '<b><i>' . sprintf(
                 __s('%1$s - %2$s'),
-                __s('Watcher') . '</i></b>',
+                _n('Observer', 'Observers', 1) . '</i></b>',
                 Dropdown::getYesNo($item->fields['is_watcher']),
             ),
             '<b><i>' . sprintf(
