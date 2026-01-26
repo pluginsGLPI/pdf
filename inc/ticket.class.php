@@ -598,7 +598,7 @@ class PluginPdfTicket extends PluginPdfCommon
             $onglets['_inforequester_'] = __s('Requester information', 'pdf');
         }
 
-        $onglets['Item_TicketModel$1'] = 'Éléments avec modèle ' . $onglets['Item_Ticket$1'];
+        $onglets['Item_TicketModel$1'] = __s('Elements with model') . $onglets['Item_Ticket$1'];
 
         return $onglets;
     }
