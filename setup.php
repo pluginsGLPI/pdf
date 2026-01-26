@@ -48,7 +48,7 @@ function plugin_init_pdf()
     $PLUGIN_HOOKS['csrf_compliant']['pdf'] = true;
 
     // manage autoload of tcppdf (glpi core now use mdpdf)
-    include_once(Plugin::getPhpDir('pdf') . '/vendor/autoload.php');
+    // include_once(Plugin::getPhpDir('pdf') . '/vendor/autoload.php');
 
     Plugin::registerClass('PluginPdfConfig', ['addtabon' => 'Config']);
     $PLUGIN_HOOKS['config_page']['pdf'] = 'front/config.form.php';
