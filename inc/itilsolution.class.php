@@ -71,17 +71,7 @@ class PluginPdfITILSolution extends PluginPdfCommon
                     $title = __s('Solution');
                 }
                 $sol = $row['content'];
-                $sol = preg_replace('#data:image/[^;]+;base64,#', '@', $sol);
 
-                preg_match_all('/<img [^>]*src=[\'"]([^\'"]*docid=([0-9]*))[^>]*>/', $sol, $res, PREG_SET_ORDER);
-
-                foreach ($res as $img) {
-                    $docimg = new Document();
-                    $docimg->getFromDB((int) $img[2]);
-
-                    $path = '<img src="file://' . GLPI_DOC_DIR . '/' . $docimg->fields['filepath'] . '"/>';
-                    $sol = str_replace($img[0], $path, $sol);
-                }
 
                 $text = $textapprove = '';
                 if ($row['status'] == 3) {

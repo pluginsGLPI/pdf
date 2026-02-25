@@ -38,6 +38,40 @@ abstract class PluginPdfCommon extends CommonGLPI
     public static $rightname = 'plugin_pdf';
 
     /**
+     * Process images for PDF export
+     *
+     * Converts document references to file paths that TCPDF can display
+     * Adapted from GLPI 10 code, compatible with GLPI 11
+     *
+     * @param string $content HTML content containing image references
+     * @return string Processed HTML content with proper image paths
+     */
+    public static function processImagesForPDF(string $content): string
+    {
+        // Decode HTML entities (simple replacement for GLPI 11 - no deprecated functions)
+        $content = html_entity_decode($content, ENT_QUOTES, 'UTF-8');
+
+        // Remove base64 encoded images
+        $content = preg_replace('#data:image/[^;]+;base64,#', '@', $content);
+
+        // Find all img tags with document IDs
+        preg_match_all('/<img [^>]*src=[\'"]([^\'"]*docid=([0-9]*))[^>]*>/', $content, $res, PREG_SET_ORDER);
+
+        foreach ($res as $img) {
+            $docimg = new Document();
+            $docimg->getFromDB((int) $img[2]);
+
+            if (isset($docimg->fields['filepath'])) {
+                $path = '<img src="file://' . GLPI_DOC_DIR . '/' . $docimg->fields['filepath'] . '"/>';
+                $content = str_replace($img[0], $path, $content);
+            }
+        }
+
+        return $content;
+    }
+
+
+    /**
      * Constructor, should intialize $this->obj property
     **/
     public function __construct(?CommonGLPI $obj = null)

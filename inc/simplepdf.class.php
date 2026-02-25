@@ -345,8 +345,86 @@ class PluginPdfSimplePDF
         $save = [$this->cols, $this->colsx, $this->colsw, $this->align];
 
         $this->setColumnsSize(100);
+
+        // Process with RichText
         $text    = $name . ' ' . $content;
         $content = RichText::getEnhancedHtml($text, ['text_maxsize' => 0]);
+
+        // Decode HTML entities BEFORE searching for images
+        $content = html_entity_decode($content, ENT_QUOTES, 'UTF-8');
+
+        // Extract images and remove from HTML - TCPDF will render them separately
+        preg_match_all(
+            '/<img\b[^>]*src=["\']([^"\']*docid=(\d+)[^"\']*)["\'][^>]*>/i',
+            $content,
+            $matches,
+            PREG_SET_ORDER
+        );
+
+        $images_to_display = [];
+        if (!empty($matches)) {
+            $document = new Document();
+            foreach ($matches as $match) {
+                $full_img_tag = $match[0];
+                $original_url = $match[1];
+                $docid = (int) $match[2];
+
+                if ($document->getFromDB($docid) && isset($document->fields['filepath'])) {
+                    $file_path = GLPI_DOC_DIR . '/' . $document->fields['filepath'];
+                    if (file_exists($file_path)) {
+                        // Get actual image dimensions from file
+                        $img_info_actual = @getimagesize($file_path);
+                        $actual_width = 450;  // Default
+                        $actual_height = 300; // Default
+
+                        if ($img_info_actual !== false) {
+                            $actual_width = $img_info_actual[0];
+                            $actual_height = $img_info_actual[1];
+                        }
+
+                        // Extract width and height from the HTML img tag
+                        $html_width = null;
+                        $html_height = null;
+
+                        if (preg_match('/width=["\']?(\d+)["\']?/i', $full_img_tag, $w_match)) {
+                            $html_width = (int) $w_match[1];
+                        }
+                        if (preg_match('/height=["\']?(\d+)["\']?/i', $full_img_tag, $h_match)) {
+                            $html_height = (int) $h_match[1];
+                        }
+
+                        // Calculate display dimensions preserving aspect ratio
+                        $display_width = $html_width ?? $actual_width;
+                        $display_height = $html_height ?? $actual_height;
+
+                        // If only one dimension is specified, calculate the other to preserve ratio
+                        if ($html_width && !$html_height) {
+                            $display_height = (int) ($html_width * $actual_height / $actual_width);
+                        } elseif ($html_height && !$html_width) {
+                            $display_width = (int) ($html_height * $actual_width / $actual_height);
+                        }
+
+                        // Apply maximum width constraint (200 pixels max)
+                        $max_width = 200;
+                        if ($display_width > $max_width) {
+                            $ratio = $max_width / $display_width;
+                            $display_width = $max_width;
+                            $display_height = (int) ($display_height * $ratio);
+                        }
+
+                        // Store image info for later insertion
+                        $images_to_display[] = [
+                            'tag' => $full_img_tag,
+                            'path' => $file_path,
+                            'width' => $display_width,
+                            'height' => $display_height,
+                        ];
+                        // Remove the img tag from HTML - we'll add images separately
+                        $content = str_replace($full_img_tag, '', $content);
+                    }
+                }
+            }
+        }
 
         // Split content by tables, keeping tables in the result
         $segments = preg_split('/(<table\b[^>]*>.*?<\/table>)/is', $content, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
@@ -368,6 +446,13 @@ class PluginPdfSimplePDF
         }
 
         $this->displayInternal(240, 0.5, self::LEFT, $minline * 5, [$formatted_content]);
+
+        // Now add extracted images after the text with their original dimensions
+        foreach ($images_to_display as $img_info) {
+            if (file_exists($img_info['path'])) {
+                $this->addPngFromFile($img_info['path'], $img_info['width'], $img_info['height']);
+            }
+        }
 
         /* Restore */
         [$this->cols, $this->colsx, $this->colsw, $this->align, ] = $save;
@@ -422,27 +507,45 @@ class PluginPdfSimplePDF
     }
 
     /**
-     * Display an image
+     * Display an image - supports all formats (PNG, JPEG, GIF, etc)
      *
-     * @param $image String  path of the PNF file
-     * @param $dst_w Intefer Width in Pixels
+     * @param $image String  path of the image file
+     * @param $dst_w Integer Width in Pixels
      * @param $dst_h Integer Height in Pixels
     **/
     public function addPngFromFile($image, $dst_w, $dst_h)
     {
+        // Use absolute path for TCPDF
+        $image_path = $image;
+        if (!file_exists($image_path)) {
+            return; // Skip if file doesn't exist
+        }
+
+        // Use TCPDF's Image() method which supports all formats
         $w = $this->pdf->pixelsToUnits($dst_w);
         $h = $this->pdf->pixelsToUnits($dst_h);
 
-        if ($this->pdf->GetY() + $h - 20 > $this->height) { /* autopagebreak seems broken */
+        if ($this->pdf->GetY() + $h - 20 > $this->height) {
             $this->pdf->AddPage();
         }
+
+        // Image() handles JPEG, PNG, GIF, etc automatically
         $this->pdf->Image(
-            $image,
-            '',   // x
-            '',   // y
-            $w,   // $w
-            $h,   // $w
-            'PNG', // type
+            $image_path,  // file or URL
+            '',           // x
+            '',           // y
+            $w,           // width
+            $h,           // height
+            '',           // type (auto-detect)
+            '',           // link
+            'T',          // align
+            false,        // resizeimage
+            300,          // dpi
+            '',           // palignment
+            false,        // ismask
+            false,        // imgmask
+            0,            // border
+            false         // fitbox
         );
 
         $this->pdf->SetY($this->pdf->GetY() + $h + 2);
