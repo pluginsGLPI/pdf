@@ -360,7 +360,7 @@ class PluginPdfSimplePDF
         );
 
         $images_to_display = [];
-        if (!empty($matches)) {
+        if ($matches !== []) {
             $document = new Document();
             foreach ($matches as $match) {
                 $full_img_tag = $match[0];
