@@ -345,8 +345,6 @@ class PluginPdfSimplePDF
         $save = [$this->cols, $this->colsx, $this->colsw, $this->align];
 
         $this->setColumnsSize(100);
-
-        // Process with RichText
         $text    = $name . ' ' . $content;
         $content = RichText::getEnhancedHtml($text, ['text_maxsize' => 0]);
 
@@ -507,7 +505,6 @@ class PluginPdfSimplePDF
     }
 
     /**
-     * Display an image - supports all formats (PNG, JPEG, GIF, etc)
      *
      * @param $image String  path of the image file
      * @param $dst_w Integer Width in Pixels
@@ -529,7 +526,7 @@ class PluginPdfSimplePDF
             $this->pdf->AddPage();
         }
 
-        // Image() handles JPEG, PNG, GIF, etc automatically
+        // Image() handles JPEG, PNG, etc automatically
         $this->pdf->Image(
             $image_path,  // file or URL
             '',           // x
@@ -539,13 +536,6 @@ class PluginPdfSimplePDF
             '',           // type (auto-detect)
             '',           // link
             'T',          // align
-            false,        // resizeimage
-            300,          // dpi
-            '',           // palignment
-            false,        // ismask
-            false,        // imgmask
-            0,            // border
-            false,         // fitbox
         );
 
         $this->pdf->SetY($this->pdf->GetY() + $h + 2);
