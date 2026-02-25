@@ -358,7 +358,7 @@ class PluginPdfSimplePDF
             '/<img\b[^>]*src=["\']([^"\']*docid=(\d+)[^"\']*)["\'][^>]*>/i',
             $content,
             $matches,
-            PREG_SET_ORDER
+            PREG_SET_ORDER,
         );
 
         $images_to_display = [];
@@ -545,7 +545,7 @@ class PluginPdfSimplePDF
             false,        // ismask
             false,        // imgmask
             0,            // border
-            false         // fitbox
+            false,         // fitbox
         );
 
         $this->pdf->SetY($this->pdf->GetY() + $h + 2);
