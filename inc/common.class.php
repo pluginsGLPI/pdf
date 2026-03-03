@@ -30,7 +30,7 @@
  *  --------------------------------------------------------------------------
  */
 
-abstract class PluginPdfCommon extends CommonGLPI
+abstract class PluginPdfCommon extends CommonDBTM
 {
     protected $obj = null;
     protected $pdf = null;
