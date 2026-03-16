@@ -31,6 +31,7 @@
        </long>
    </description>
    <homepage>https://github.com/pluginsGLPI/pdf</homepage>
+   <readme>https://help.glpi-project.org/doc-plugins/pdf</readme>
    <download>https://github.com/pluginsGLPI/pdf/releases</download>
    <authors>
       <author>Teclib</author>
