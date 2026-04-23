@@ -5,10 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
+## [UNRELEASED]
 
 ### Fixed
 
+- Fix image (field : description) in to pdf
 - Fix massive action PDF export redirecting to item list instead of generating the PDF
 
 ## [4.1.2] - 2026-01-08

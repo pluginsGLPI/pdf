@@ -74,22 +74,7 @@ class PluginPdfKnowbaseItem extends PluginPdfCommon
         = Toolbox::stripTags(html_entity_decode($item->getField('name')));
 
         $answer = $item->getField('answer');
-        $answer = preg_replace('#data:image/[^;]+;base64,#', '@', $answer);
 
-        preg_match_all('/<img [^>]*src=[\'"]([^\'"]*docid=([0-9]*))[^>]*>/', $answer, $res, PREG_SET_ORDER);
-
-        foreach ($res as $img) {
-            $docimg = new Document();
-            $docimg->getFromDB((int) $img[2]);
-            $width = null;
-
-            if (preg_match('/\bwidth=["\']?(\d+)/i', $img[0], $match_width)) {
-                $width = $match_width[1];
-            }
-
-            $path    = '<img src="file://' . GLPI_DOC_DIR . '/' . $docimg->fields['filepath'] . '" width="' . $width . '"/>';
-            $answer = str_replace($img[0], $path, $answer);
-        }
 
         $pdf->setColumnsSize(100);
 
