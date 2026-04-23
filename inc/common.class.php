@@ -615,8 +615,8 @@ abstract class PluginPdfCommon extends CommonGLPI
                 }
                 $_SESSION['plugin_pdf']['type']   = $item->getType();
                 $_SESSION['plugin_pdf']['tab_id'] = serialize($tab_id);
-                echo "<script type='text/javascript'>
-                      location.href='" . $CFG_GLPI['root_doc'] . "/plugins/pdf/front/export.massive.php'</script>";
+                $ma->itemDone($item->getType(), $ids, MassiveAction::ACTION_OK);
+                $ma->setRedirect($CFG_GLPI['root_doc'] . '/plugins/pdf/front/export.massive.php');
                 break;
         }
     }
