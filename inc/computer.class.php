@@ -86,16 +86,11 @@ class PluginPdfComputer extends PluginPdfCommon
         );
 
         $pdf->displayLine(
-            '<b><i>' . sprintf(
-                __('%1$s: %2$s'),
-                __('Group') . '</i></b>',
-                Dropdown::getDropdownName(
-                    'glpi_groups',
-                    $computer->fields['groups_id'],
-                ),
-            ),
-            '<b><i>' . sprintf(__('%1$s: %2$s'), __('UUID') . '</i></b>', $computer->fields['uuid']),
+            self::get_group_column($computer),
+            self::get_group_column($computer, 'groups_id_tech', __('Group in charge of the hardware')),
         );
+
+        $pdf->displayLine(self::get_label_value(__('UUID'), $computer->fields['uuid']));
 
         $pdf->displayLine(
             '<b><i>' . sprintf(

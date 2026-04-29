@@ -63,17 +63,10 @@ class PluginPdfPhone extends PluginPdfCommon
         PluginPdfCommon::mainLine($pdf, $item, 'user-management');
 
 
-        $pdf->displayLine(
-            '<b><i>' . sprintf(
-                __s('%1$s: %2$s'),
-                __s('Group') . '</i></b>',
-                Dropdown::getDropdownName('glpi_groups', $item->fields['groups_id']),
-            ),
-            '<b><i>' . sprintf(
-                __s('%1$s: %2$s'),
-                __s('UUID') . '</i></b>',
-                $item->fields['uuid'],
-            ),
+        self::display_group_line(
+            $pdf,
+            $item,
+            self::get_label_value(__s('UUID'), $item->fields['uuid']),
         );
 
         $pdf->displayLine(

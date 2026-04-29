@@ -37,6 +37,40 @@ abstract class PluginPdfCommon extends CommonGLPI
 
     public static $rightname = 'plugin_pdf';
 
+    protected static function get_label_value(string $label, mixed $value): string
+    {
+        return '<b><i>' . sprintf(__s('%1$s: %2$s'), $label . '</i></b>', $value);
+    }
+
+    protected static function get_dropdown_values(string $table, mixed $values): string
+    {
+        if (!is_array($values)) {
+            return Toolbox::stripTags(Dropdown::getDropdownName($table, $values));
+        }
+
+        $names = array_filter(array_map(
+            static fn($value) => Toolbox::stripTags(Dropdown::getDropdownName($table, $value)),
+            $values,
+        ));
+
+        return implode(', ', $names);
+    }
+
+    protected static function get_group_value(CommonGLPI $item, string $field = 'groups_id'): string
+    {
+        return self::get_dropdown_values('glpi_groups', $item->fields[$field] ?? []);
+    }
+
+    protected static function get_group_column(CommonGLPI $item, string $field = 'groups_id', ?string $label = null): string
+    {
+        return self::get_label_value($label ?? __s('Group'), self::get_group_value($item, $field));
+    }
+
+    protected static function display_group_line(PluginPdfSimplePDF $pdf, CommonGLPI $item, string $right_column): void
+    {
+        $pdf->displayLine(self::get_group_column($item), $right_column);
+    }
+
     /**
      * Constructor, should intialize $this->obj property
     **/
@@ -506,17 +540,9 @@ abstract class PluginPdfCommon extends CommonGLPI
                 );
             case 'group-model':
                 return $pdf->displayLine(
-                    '<b><i>' . sprintf(
-                        __s('%1$s: %2$s'),
-                        __s('Group in charge of the hardware') . '</i></b>',
-                        Dropdown::getDropdownName(
-                            'glpi_groups',
-                            $item->fields['groups_id_tech'],
-                        ),
-                    ),
-                    '<b><i>' . sprintf(
-                        __s('%1$s: %2$s'),
-                        __s('Model') . '</i></b>',
+                    self::get_group_column($item, 'groups_id_tech', __s('Group in charge of the hardware')),
+                    self::get_label_value(
+                        __s('Model'),
                         Toolbox::stripTags(Dropdown::getDropdownName(
                             'glpi_' . $type . 'models',
                             $item->fields[$type . 'models_id'],

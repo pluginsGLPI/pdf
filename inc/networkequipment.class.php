@@ -83,15 +83,10 @@ class PluginPdfNetworkEquipment extends PluginPdfCommon
         );
 
         $pdf->displayLine(
-            '<b><i>' . sprintf(
-                __s('%1$s: %2$s'),
-                __s('Group') . '</i></b>',
-                Dropdown::getDropdownName('glpi_groups', $item->fields['groups_id']),
-            ),
+            self::get_group_column($item),
             '<b><i>' . __s('The MAC address and the IP of the equipment are included in an aggregated network port'),
-            '<b><i>' . sprintf(
-                __s('%1$s: %2$s'),
-                sprintf(__s('%1$s (%2$s)'), __s('Memory'), __s('Mio')) . '</i></b>',
+            self::get_label_value(
+                sprintf(__s('%1$s (%2$s)'), __s('Memory'), __s('Mio')),
                 $item->fields['ram'],
             ),
         );

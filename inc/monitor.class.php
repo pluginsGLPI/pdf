@@ -60,17 +60,10 @@ class PluginPdfMonitor extends PluginPdfCommon
         PluginPdfCommon::mainLine($pdf, $item, 'contact-otherserial');
         PluginPdfCommon::mainLine($pdf, $item, 'user-management');
 
-        $pdf->displayLine(
-            '<b><i>' . sprintf(
-                __s('%1$s: %2$s'),
-                __s('Group') . '</i></b>',
-                Dropdown::getDropdownName('glpi_groups', $item->fields['groups_id']),
-            ),
-            '<b><i>' . sprintf(
-                __s('%1$s: %2$s'),
-                __s('Size') . '</i></b>',
-                sprintf(__s('%1$s %2$s'), $item->fields['size'], '"'),
-            ),
+        self::display_group_line(
+            $pdf,
+            $item,
+            self::get_label_value(__s('Size'), sprintf(__s('%1$s %2$s'), $item->fields['size'], '"')),
         );
 
         $opts = ['have_micro'  => __s('Microphone'),

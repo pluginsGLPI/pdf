@@ -90,28 +90,14 @@ class PluginPdfSoftware extends PluginPdfCommon
         );
 
         $pdf->displayLine(
-            '<b><i>' . sprintf(
-                __s('%1$s: %2$s'),
-                __s('Group in charge of the hardware') . '</i></b>',
-                Dropdown::getDropdownName(
-                    'glpi_groups',
-                    $software->fields['groups_id_tech'],
-                ),
-            ),
-            '<b><i>' . sprintf(
-                __s('%1$s: %2$s'),
-                __s('User') . '</i></b>',
+            self::get_group_column($software, 'groups_id_tech', __s('Group in charge of the hardware')),
+            self::get_label_value(
+                __s('User'),
                 $dbu->getUserName($software->fields['users_id']),
             ),
         );
 
-        $pdf->displayLine(
-            '<b><i>' . sprintf(
-                __s('%1$s: %2$s'),
-                __s('Group') . '</i></b>',
-                Dropdown::getDropdownName('glpi_groups', $software->fields['groups_id']),
-            ),
-        );
+        $pdf->displayLine(self::get_group_column($software));
 
         $pdf->displayLine(
             '<b><i>' . sprintf(

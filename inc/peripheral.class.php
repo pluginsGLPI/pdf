@@ -62,13 +62,10 @@ class PluginPdfPeripheral extends PluginPdfCommon
         PluginPdfCommon::mainLine($pdf, $item, 'contact-otherserial');
         PluginPdfCommon::mainLine($pdf, $item, 'user-management');
 
-        $pdf->displayLine(
-            '<b><i>' . sprintf(
-                __s('%1$s: %2$s'),
-                __s('Group') . '</i></b>',
-                Dropdown::getDropdownName('glpi_groups', $item->fields['groups_id']),
-            ),
-            '<b><i>' . sprintf(__s('%1$s: %2$s'), __s('Brand') . '</i></b>', $item->fields['brand']),
+        self::display_group_line(
+            $pdf,
+            $item,
+            self::get_label_value(__s('Brand'), $item->fields['brand']),
         );
 
         $pdf->setColumnsSize(100);
