@@ -37,40 +37,6 @@ abstract class PluginPdfCommon extends CommonGLPI
 
     public static $rightname = 'plugin_pdf';
 
-    protected static function get_label_value(string $label, mixed $value): string
-    {
-        return '<b><i>' . sprintf(__s('%1$s: %2$s'), $label . '</i></b>', $value);
-    }
-
-    protected static function get_dropdown_values(string $table, mixed $values): string
-    {
-        if (!is_array($values)) {
-            return Toolbox::stripTags(Dropdown::getDropdownName($table, $values));
-        }
-
-        $names = array_filter(array_map(
-            static fn($value) => Toolbox::stripTags(Dropdown::getDropdownName($table, $value)),
-            $values,
-        ));
-
-        return implode(', ', $names);
-    }
-
-    protected static function get_group_value(CommonGLPI $item, string $field = 'groups_id'): string
-    {
-        return self::get_dropdown_values('glpi_groups', $item->fields[$field] ?? []);
-    }
-
-    protected static function get_group_column(CommonGLPI $item, string $field = 'groups_id', ?string $label = null): string
-    {
-        return self::get_label_value($label ?? __s('Group'), self::get_group_value($item, $field));
-    }
-
-    protected static function display_group_line(PluginPdfSimplePDF $pdf, CommonGLPI $item, string $right_column): void
-    {
-        $pdf->displayLine(self::get_group_column($item), $right_column);
-    }
-
     /**
      * Constructor, should intialize $this->obj property
     **/
@@ -539,10 +505,35 @@ abstract class PluginPdfCommon extends CommonGLPI
                     ),
                 );
             case 'group-model':
+                $group_tech = Dropdown::getDropdownName(
+                    'glpi_groups',
+                    $item->fields['groups_id_tech'],
+                );
+                if (Toolbox::hasTrait($item::class, \Glpi\Features\AssignableItem::class)) {
+                    $group_item = new Group_Item();
+                    $groups = $group_item->getItemsAssociatedTo($item::class, (int) $item->fields['id']);
+                    $group_ids = [];
+                    foreach ($groups as $group) {
+                        if ((int) $group->fields['type'] === Group_Item::GROUP_TYPE_TECH) {
+                            $group_ids[] = (int) $group->fields['groups_id'];
+                        }
+                    }
+                    $group_names = array_filter(array_map(
+                        static fn($group_id) => Toolbox::stripTags(Dropdown::getDropdownName('glpi_groups', $group_id)),
+                        $group_ids,
+                    ));
+                    $group_tech = implode(', ', $group_names);
+                }
+
                 return $pdf->displayLine(
-                    self::get_group_column($item, 'groups_id_tech', __s('Group in charge of the hardware')),
-                    self::get_label_value(
-                        __s('Model'),
+                    '<b><i>' . sprintf(
+                        __s('%1$s: %2$s'),
+                        __s('Group in charge of the hardware') . '</i></b>',
+                        $group_tech,
+                    ),
+                    '<b><i>' . sprintf(
+                        __s('%1$s: %2$s'),
+                        __s('Model') . '</i></b>',
                         Toolbox::stripTags(Dropdown::getDropdownName(
                             'glpi_' . $type . 'models',
                             $item->fields[$type . 'models_id'],

@@ -89,15 +89,53 @@ class PluginPdfSoftware extends PluginPdfCommon
             ),
         );
 
+        $group = Dropdown::getDropdownName('glpi_groups', $software->fields['groups_id']);
+        $group_tech = Dropdown::getDropdownName('glpi_groups', $software->fields['groups_id_tech']);
+        if (Toolbox::hasTrait($software::class, \Glpi\Features\AssignableItem::class)) {
+            $group_item = new Group_Item();
+            $groups = $group_item->getItemsAssociatedTo($software::class, (int) $software->fields['id']);
+
+            $group_ids = [];
+            $group_tech_ids = [];
+            foreach ($groups as $group_item_link) {
+                if ((int) $group_item_link->fields['type'] === Group_Item::GROUP_TYPE_NORMAL) {
+                    $group_ids[] = (int) $group_item_link->fields['groups_id'];
+                }
+                if ((int) $group_item_link->fields['type'] === Group_Item::GROUP_TYPE_TECH) {
+                    $group_tech_ids[] = (int) $group_item_link->fields['groups_id'];
+                }
+            }
+
+            $group = implode(', ', array_filter(array_map(
+                static fn($group_id) => Toolbox::stripTags(Dropdown::getDropdownName('glpi_groups', $group_id)),
+                $group_ids,
+            )));
+            $group_tech = implode(', ', array_filter(array_map(
+                static fn($group_id) => Toolbox::stripTags(Dropdown::getDropdownName('glpi_groups', $group_id)),
+                $group_tech_ids,
+            )));
+        }
+
         $pdf->displayLine(
-            self::get_group_column($software, 'groups_id_tech', __s('Group in charge of the hardware')),
-            self::get_label_value(
-                __s('User'),
+            '<b><i>' . sprintf(
+                __s('%1$s: %2$s'),
+                __s('Group in charge of the hardware') . '</i></b>',
+                $group_tech,
+            ),
+            '<b><i>' . sprintf(
+                __s('%1$s: %2$s'),
+                __s('User') . '</i></b>',
                 $dbu->getUserName($software->fields['users_id']),
             ),
         );
 
-        $pdf->displayLine(self::get_group_column($software));
+        $pdf->displayLine(
+            '<b><i>' . sprintf(
+                __s('%1$s: %2$s'),
+                __s('Group') . '</i></b>',
+                $group,
+            ),
+        );
 
         $pdf->displayLine(
             '<b><i>' . sprintf(

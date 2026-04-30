@@ -85,12 +85,53 @@ class PluginPdfComputer extends PluginPdfCommon
             ),
         );
 
+        $group = Dropdown::getDropdownName('glpi_groups', $computer->fields['groups_id']);
+        $group_tech = Dropdown::getDropdownName('glpi_groups', $computer->fields['groups_id_tech']);
+        if (Toolbox::hasTrait($computer::class, \Glpi\Features\AssignableItem::class)) {
+            $group_item = new Group_Item();
+            $groups = $group_item->getItemsAssociatedTo($computer::class, (int) $computer->fields['id']);
+
+            $group_ids = [];
+            $group_tech_ids = [];
+            foreach ($groups as $group_item_link) {
+                if ((int) $group_item_link->fields['type'] === Group_Item::GROUP_TYPE_NORMAL) {
+                    $group_ids[] = (int) $group_item_link->fields['groups_id'];
+                }
+                if ((int) $group_item_link->fields['type'] === Group_Item::GROUP_TYPE_TECH) {
+                    $group_tech_ids[] = (int) $group_item_link->fields['groups_id'];
+                }
+            }
+
+            $group = implode(', ', array_filter(array_map(
+                static fn($group_id) => Toolbox::stripTags(Dropdown::getDropdownName('glpi_groups', $group_id)),
+                $group_ids,
+            )));
+            $group_tech = implode(', ', array_filter(array_map(
+                static fn($group_id) => Toolbox::stripTags(Dropdown::getDropdownName('glpi_groups', $group_id)),
+                $group_tech_ids,
+            )));
+        }
+
         $pdf->displayLine(
-            self::get_group_column($computer),
-            self::get_group_column($computer, 'groups_id_tech', __('Group in charge of the hardware')),
+            '<b><i>' . sprintf(
+                __('%1$s: %2$s'),
+                __('Group') . '</i></b>',
+                $group,
+            ),
+            '<b><i>' . sprintf(
+                __('%1$s: %2$s'),
+                __('Group in charge of the hardware') . '</i></b>',
+                $group_tech,
+            ),
         );
 
-        $pdf->displayLine(self::get_label_value(__('UUID'), $computer->fields['uuid']));
+        $pdf->displayLine(
+            '<b><i>' . sprintf(
+                __('%1$s: %2$s'),
+                __('UUID') . '</i></b>',
+                $computer->fields['uuid'],
+            ),
+        );
 
         $pdf->displayLine(
             '<b><i>' . sprintf(

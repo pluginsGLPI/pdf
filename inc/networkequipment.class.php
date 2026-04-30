@@ -82,11 +82,30 @@ class PluginPdfNetworkEquipment extends PluginPdfCommon
             ),
         );
 
+        $group = Dropdown::getDropdownName('glpi_groups', $item->fields['groups_id']);
+        if (Toolbox::hasTrait($item::class, \Glpi\Features\AssignableItem::class)) {
+            $group_item = new Group_Item();
+            $groups = $group_item->getItemsAssociatedTo($item::class, (int) $item->fields['id']);
+
+            $group_ids = [];
+            foreach ($groups as $group_item_link) {
+                if ((int) $group_item_link->fields['type'] === Group_Item::GROUP_TYPE_NORMAL) {
+                    $group_ids[] = (int) $group_item_link->fields['groups_id'];
+                }
+            }
+
+            $group = implode(', ', array_filter(array_map(
+                static fn($group_id) => Toolbox::stripTags(Dropdown::getDropdownName('glpi_groups', $group_id)),
+                $group_ids,
+            )));
+        }
+
         $pdf->displayLine(
-            self::get_group_column($item),
+            '<b><i>' . sprintf(__s('%1$s: %2$s'), __s('Group') . '</i></b>', $group),
             '<b><i>' . __s('The MAC address and the IP of the equipment are included in an aggregated network port'),
-            self::get_label_value(
-                sprintf(__s('%1$s (%2$s)'), __s('Memory'), __s('Mio')),
+            '<b><i>' . sprintf(
+                __s('%1$s: %2$s'),
+                sprintf(__s('%1$s (%2$s)'), __s('Memory'), __s('Mio')) . '</i></b>',
                 $item->fields['ram'],
             ),
         );
