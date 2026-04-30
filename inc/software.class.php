@@ -30,6 +30,8 @@
  *  --------------------------------------------------------------------------
  */
 
+use Glpi\Features\AssignableItem;
+
 class PluginPdfSoftware extends PluginPdfCommon
 {
     public static $rightname = 'plugin_pdf';
@@ -91,7 +93,7 @@ class PluginPdfSoftware extends PluginPdfCommon
 
         $group = Dropdown::getDropdownName('glpi_groups', $software->fields['groups_id']);
         $group_tech = Dropdown::getDropdownName('glpi_groups', $software->fields['groups_id_tech']);
-        if (Toolbox::hasTrait($software::class, \Glpi\Features\AssignableItem::class)) {
+        if (Toolbox::hasTrait($software::class, AssignableItem::class)) {
             $group_item = new Group_Item();
             $groups = $group_item->getItemsAssociatedTo($software::class, (int) $software->fields['id']);
 

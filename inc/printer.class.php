@@ -30,6 +30,8 @@
  *  --------------------------------------------------------------------------
  */
 
+use Glpi\Features\AssignableItem;
+
 class PluginPdfPrinter extends PluginPdfCommon
 {
     public static $rightname = 'plugin_pdf';
@@ -96,7 +98,7 @@ class PluginPdfPrinter extends PluginPdfCommon
         );
 
         $group = Dropdown::getDropdownName('glpi_groups', $printer->fields['groups_id']);
-        if (Toolbox::hasTrait($printer::class, \Glpi\Features\AssignableItem::class)) {
+        if (Toolbox::hasTrait($printer::class, AssignableItem::class)) {
             $group_item = new Group_Item();
             $groups = $group_item->getItemsAssociatedTo($printer::class, (int) $printer->fields['id']);
 

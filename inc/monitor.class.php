@@ -30,6 +30,8 @@
  *  --------------------------------------------------------------------------
  */
 
+use Glpi\Features\AssignableItem;
+
 class PluginPdfMonitor extends PluginPdfCommon
 {
     public static $rightname = 'plugin_pdf';
@@ -61,7 +63,7 @@ class PluginPdfMonitor extends PluginPdfCommon
         PluginPdfCommon::mainLine($pdf, $item, 'user-management');
 
         $group = Dropdown::getDropdownName('glpi_groups', $item->fields['groups_id']);
-        if (Toolbox::hasTrait($item::class, \Glpi\Features\AssignableItem::class)) {
+        if (Toolbox::hasTrait($item::class, AssignableItem::class)) {
             $group_item = new Group_Item();
             $groups = $group_item->getItemsAssociatedTo($item::class, (int) $item->fields['id']);
 
