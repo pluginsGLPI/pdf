@@ -30,8 +30,6 @@
  *  --------------------------------------------------------------------------
  */
 
-use Glpi\Features\AssignableItem;
-
 class PluginPdfComputer extends PluginPdfCommon
 {
     public static $rightname = 'plugin_pdf';
@@ -87,43 +85,16 @@ class PluginPdfComputer extends PluginPdfCommon
             ),
         );
 
-        $group = Dropdown::getDropdownName('glpi_groups', $computer->fields['groups_id']);
-        $group_tech = Dropdown::getDropdownName('glpi_groups', $computer->fields['groups_id_tech']);
-        if (Toolbox::hasTrait($computer::class, AssignableItem::class)) {
-            $group_item = new Group_Item();
-            $groups = $group_item->getItemsAssociatedTo($computer::class, (int) $computer->fields['id']);
-
-            $group_ids = [];
-            $group_tech_ids = [];
-            foreach ($groups as $group_item_link) {
-                if ((int) $group_item_link->fields['type'] === Group_Item::GROUP_TYPE_NORMAL) {
-                    $group_ids[] = (int) $group_item_link->fields['groups_id'];
-                }
-                if ((int) $group_item_link->fields['type'] === Group_Item::GROUP_TYPE_TECH) {
-                    $group_tech_ids[] = (int) $group_item_link->fields['groups_id'];
-                }
-            }
-
-            $group = implode(', ', array_filter(array_map(
-                static fn($group_id) => Toolbox::stripTags(Dropdown::getDropdownName('glpi_groups', $group_id)),
-                $group_ids,
-            )));
-            $group_tech = implode(', ', array_filter(array_map(
-                static fn($group_id) => Toolbox::stripTags(Dropdown::getDropdownName('glpi_groups', $group_id)),
-                $group_tech_ids,
-            )));
-        }
-
         $pdf->displayLine(
             '<b><i>' . sprintf(
                 __('%1$s: %2$s'),
                 __('Group') . '</i></b>',
-                $group,
+                self::getGroupName($computer),
             ),
             '<b><i>' . sprintf(
                 __('%1$s: %2$s'),
                 __('Group in charge of the hardware') . '</i></b>',
-                $group_tech,
+                self::getGroupName($computer, Group_Item::GROUP_TYPE_TECH),
             ),
         );
 

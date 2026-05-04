@@ -30,8 +30,6 @@
  *  --------------------------------------------------------------------------
  */
 
-use Glpi\Features\AssignableItem;
-
 class PluginPdfPrinter extends PluginPdfCommon
 {
     public static $rightname = 'plugin_pdf';
@@ -97,26 +95,8 @@ class PluginPdfPrinter extends PluginPdfCommon
             ),
         );
 
-        $group = Dropdown::getDropdownName('glpi_groups', $printer->fields['groups_id']);
-        if (Toolbox::hasTrait($printer::class, AssignableItem::class)) {
-            $group_item = new Group_Item();
-            $groups = $group_item->getItemsAssociatedTo($printer::class, (int) $printer->fields['id']);
-
-            $group_ids = [];
-            foreach ($groups as $group_item_link) {
-                if ((int) $group_item_link->fields['type'] === Group_Item::GROUP_TYPE_NORMAL) {
-                    $group_ids[] = (int) $group_item_link->fields['groups_id'];
-                }
-            }
-
-            $group = implode(', ', array_filter(array_map(
-                static fn($group_id) => Toolbox::stripTags(Dropdown::getDropdownName('glpi_groups', $group_id)),
-                $group_ids,
-            )));
-        }
-
         $pdf->displayLine(
-            '<b><i>' . sprintf(__s('%1$s: %2$s'), __s('Group') . '</i></b>', $group),
+            '<b><i>' . sprintf(__s('%1$s: %2$s'), __s('Group') . '</i></b>', self::getGroupName($printer)),
             '<b><i>' . sprintf(__s('%1$s: %2$s'), __s('UUID') . '</i></b>', $printer->fields['uuid']),
         );
 

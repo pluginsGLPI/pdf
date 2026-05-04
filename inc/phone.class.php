@@ -30,8 +30,6 @@
  *  --------------------------------------------------------------------------
  */
 
-use Glpi\Features\AssignableItem;
-
 class PluginPdfPhone extends PluginPdfCommon
 {
     public static $rightname = 'plugin_pdf';
@@ -65,26 +63,8 @@ class PluginPdfPhone extends PluginPdfCommon
         PluginPdfCommon::mainLine($pdf, $item, 'user-management');
 
 
-        $group = Dropdown::getDropdownName('glpi_groups', $item->fields['groups_id']);
-        if (Toolbox::hasTrait($item::class, AssignableItem::class)) {
-            $group_item = new Group_Item();
-            $groups = $group_item->getItemsAssociatedTo($item::class, (int) $item->fields['id']);
-
-            $group_ids = [];
-            foreach ($groups as $group_item_link) {
-                if ((int) $group_item_link->fields['type'] === Group_Item::GROUP_TYPE_NORMAL) {
-                    $group_ids[] = (int) $group_item_link->fields['groups_id'];
-                }
-            }
-
-            $group = implode(', ', array_filter(array_map(
-                static fn($group_id) => Toolbox::stripTags(Dropdown::getDropdownName('glpi_groups', $group_id)),
-                $group_ids,
-            )));
-        }
-
         $pdf->displayLine(
-            '<b><i>' . sprintf(__s('%1$s: %2$s'), __s('Group') . '</i></b>', $group),
+            '<b><i>' . sprintf(__s('%1$s: %2$s'), __s('Group') . '</i></b>', self::getGroupName($item)),
             '<b><i>' . sprintf(__s('%1$s: %2$s'), __s('UUID') . '</i></b>', $item->fields['uuid']),
         );
 
