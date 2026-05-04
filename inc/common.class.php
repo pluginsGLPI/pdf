@@ -39,6 +39,9 @@ abstract class PluginPdfCommon extends CommonGLPI
 
     public static $rightname = 'plugin_pdf';
 
+    /**
+     * @phpstan-suppress property.notFound
+     */
     protected static function getGroupName(CommonGLPI $item, int $group_type = Group_Item::GROUP_TYPE_NORMAL): string
     {
         $field = $group_type === Group_Item::GROUP_TYPE_TECH ? 'groups_id_tech' : 'groups_id';
