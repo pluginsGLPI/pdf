@@ -30,8 +30,6 @@
  *  --------------------------------------------------------------------------
  */
 
-use Glpi\Features\AssignableItem;
-
 abstract class PluginPdfCommon extends CommonGLPI
 {
     protected $obj = null;
@@ -43,19 +41,7 @@ abstract class PluginPdfCommon extends CommonGLPI
     {
         $field = $group_type === Group_Item::GROUP_TYPE_TECH ? 'groups_id_tech' : 'groups_id';
 
-        if (!Toolbox::hasTrait($item::class, AssignableItem::class)) {
-            return Toolbox::stripTags(Dropdown::getDropdownName('glpi_groups', $item->fields[$field]));
-        }
-
-        $group_item = new Group_Item();
-        $groups = $group_item->getItemsAssociatedTo($item::class, (int) $item->fields['id']);
-
-        $group_ids = [];
-        foreach ($groups as $group) {
-            if ((int) $group->fields['type'] === $group_type) {
-                $group_ids[] = (int) $group->fields['groups_id'];
-            }
-        }
+        $group_ids = (array) ($item->fields[$field] ?? 0);
 
         return implode(', ', array_filter(array_map(
             static fn($group_id) => Toolbox::stripTags(Dropdown::getDropdownName('glpi_groups', $group_id)),
