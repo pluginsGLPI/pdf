@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 - Fixed table formatting and border in PDF
 - Fixed table cell size in PDF generation
+- Fixed Change analysis and plan fields rendering as raw HTML in PDF
 
 ## [4.0.2] - 2025-09-30
 
