@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 - Fixed table formatting and border in PDF
 - Fixed table cell size in PDF generation
+- Fixed PDF crash when exporting Problems with linked items lacking serial/inventory fields
+- Fixed PHP warnings flood when exporting Changes with linked items lacking serial/inventory fields
 
 ## [4.0.2] - 2025-09-30
 
