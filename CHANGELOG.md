@@ -11,6 +11,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 - Fixed table formatting and border in PDF
 - Fixed table cell size in PDF generation
+- Fixed approval comments rendering as raw HTML in PDF
+- Fixed PDF crash when exporting Problems with linked items lacking serial/inventory fields
+- Fixed PHP warnings flood when exporting Changes with linked items lacking serial/inventory fields
+- Fixed Change and Problem description exported as a single unstructured text block
+- Fixed Change analysis and plan fields rendering as raw HTML in PDF
 
 ## [4.0.2] - 2025-09-30
 
