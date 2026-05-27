@@ -81,7 +81,7 @@ class PluginPdfTicketValidation extends PluginPdfCommon
                     Html::convDateTime($row['validation_date']),
                     $dbu->getUserName($row['users_id_validate']),
                 );
-                $tmp = trim($row['comment_submission']);
+                $tmp = trim(html_entity_decode($row['comment_submission'] ?? '', ENT_QUOTES, 'UTF-8'));
                 $pdf->displayText('<b><i>' . sprintf(
                     __('%1$s: %2$s'),
                     __('Request comments') . '</i></b>',
@@ -89,7 +89,7 @@ class PluginPdfTicketValidation extends PluginPdfCommon
                 ), (empty($tmp) ? __('None') : $tmp), 1);
 
                 if ($row['validation_date']) {
-                    $tmp = trim($row['comment_validation']);
+                    $tmp = trim(html_entity_decode($row['comment_validation'] ?? '', ENT_QUOTES, 'UTF-8'));
                     $pdf->displayText(
                         '<b><i>' . sprintf(
                             __('%1$s: %2$s'),
