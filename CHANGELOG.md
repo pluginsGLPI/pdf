@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Fixed PHP warnings flood when exporting Changes with linked items lacking serial/inventory fields
 - Fixed Change and Problem description exported as a single unstructured text block
 - Fixed Change analysis and plan fields rendering as raw HTML in PDF
+- Fixed rich text content rendered as visible HTML tags and unformatted text in PDF exports
 
 ## [4.0.2] - 2025-09-30
 
