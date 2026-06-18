@@ -71,6 +71,35 @@ class PluginPdfItem_SoftwareVersion extends PluginPdfCommon
         $this->obj = ($obj ?: new Item_SoftwareVersion());
     }
 
+    public static function pdfMain(PluginPdfSimplePDF $pdf, Item_SoftwareVersion $item_SoftwareVersion)
+    {
+        $ID = $item_SoftwareVersion->getField('id');
+
+        $version = new SoftwareVersion();
+        $version->getFromDB($item_SoftwareVersion->fields['softwareversions_id']);
+
+        $software = new Software();
+        $software->getFromDB($version->fields['softwares_id']);
+
+        $itemtype = $item_SoftwareVersion->fields['itemtype'];
+        $linkeditem = new $itemtype();
+        $itemname = $linkeditem->getFromDB($item_SoftwareVersion->fields['items_id']) ? $linkeditem->getName() : '(' . $item_SoftwareVersion->fields['items_id'] . ')';
+
+        $pdf->setColumnsSize(100);
+        $pdf->displayTitle('<b><i>' . sprintf(__s('%1$s: %2$s'), __s('ID') . '</i>', $ID . '</b>'));
+
+        $pdf->setColumnsSize(50, 50);
+        $pdf->displayLine(
+            '<b><i>' . sprintf(__s('%1$s: %2$s'), _sn('Software', 'Software', 1) . '</i></b>', $software->fields['name']),
+            '<b><i>' . sprintf(__s('%1$s: %2$s'), _n('Version', 'Versions', 1) . '</i></b>', $version->fields['name']),
+        );
+        $pdf->displayLine(
+            '<b><i>' . sprintf(__s('%1$s: %2$s'), _n('Associated element', 'Associated elements', 1) . '</i></b>', $itemname),
+            '<b><i>' . sprintf(__s('%1$s: %2$s'), __s('Installation date') . '</i></b>', Html::convDate($item_SoftwareVersion->fields['date_install'])),
+        );
+        $pdf->displaySpace();
+    }
+
     public static function pdfForSoftware(PluginPdfSimplePDF $pdf, CommonDBTM $item)
     {
         /** @var array $CFG_GLPI */
