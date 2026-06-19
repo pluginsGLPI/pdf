@@ -76,12 +76,18 @@ class PluginPdfItem_SoftwareVersion extends PluginPdfCommon
         $ID = $item_SoftwareVersion->getField('id');
 
         $version = new SoftwareVersion();
-        $version->getFromDB($item_SoftwareVersion->fields['softwareversions_id']);
-
+        if (!$version->getFromDB($item_SoftwareVersion->fields['softwareversions_id'])) {
+            return;
+        }
         $software = new Software();
-        $software->getFromDB($version->fields['softwares_id']);
+        if (!$software->getFromDB($version->fields['softwares_id'])) {
+            return;
+        }
 
         $itemtype = $item_SoftwareVersion->fields['itemtype'];
+        if (!class_exists($itemtype)) {
+            return;
+        }
         $linkeditem = new $itemtype();
         $itemname = $linkeditem->getFromDB($item_SoftwareVersion->fields['items_id']) ? $linkeditem->getName() : '(' . $item_SoftwareVersion->fields['items_id'] . ')';
 
