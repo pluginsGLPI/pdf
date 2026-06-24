@@ -32,32 +32,35 @@
 
 include_once(__DIR__ . '/../../../inc/includes.php');
 
-Session::checkLoginUser();
-
-/** @var DBmysql $DB */
-global $DB;
+Session::checkRight('plugin_pdf', READ);
 
 //Save user preferences
 if (isset($_POST['plugin_pdf_user_preferences_save'])
     && isset($_POST['plugin_pdf_inventory_type'])) {
-    $DB->doQuery("DELETE
-               FROM `glpi_plugin_pdf_preferences`
-               WHERE `users_id` ='" . $_SESSION['glpiID'] . "'
-                     AND `itemtype`='" . $_POST['plugin_pdf_inventory_type'] . "'");
+    $itemtype = (string) $_POST['plugin_pdf_inventory_type'];
+    $users_id = (int) $_SESSION['glpiID'];
+
+    $pref = new PluginPdfPreference();
+    $pref->deleteByCriteria([
+        'users_id' => $users_id,
+        'itemtype' => $itemtype,
+    ], force: true);
 
     if (isset($_POST['item'])) {
         foreach ($_POST['item'] as $key => $val) {
-            $DB->doQuery("INSERT INTO `glpi_plugin_pdf_preferences`
-                            (`id` ,`users_id` ,`itemtype` ,`tabref`)
-                     VALUES (NULL , '" . $_SESSION['glpiID'] . "',
-                             '" . $_POST['plugin_pdf_inventory_type'] . "', '$key')");
+            $pref->add([
+                'users_id' => $users_id,
+                'itemtype' => $itemtype,
+                'tabref'   => $key,
+            ]);
         }
     }
     if (isset($_POST['page']) && $_POST['page']) {
-        $DB->doQuery("INSERT INTO `glpi_plugin_pdf_preferences`
-                         (`id` ,`users_id` ,`itemtype` ,`tabref`)
-                  VALUES (NULL , '" . $_SESSION['glpiID'] . "',
-                          '" . $_POST['plugin_pdf_inventory_type'] . "', 'landscape')");
+        $pref->add([
+            'users_id' => $users_id,
+            'itemtype' => $itemtype,
+            'tabref'   => 'landscape',
+        ]);
     }
     Html::back();
 } else {
