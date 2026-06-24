@@ -94,6 +94,7 @@ function plugin_init_pdf()
     $PLUGIN_HOOKS['plugin_pdf']['Printer']          = 'PluginPdfPrinter';
     $PLUGIN_HOOKS['plugin_pdf']['Problem']          = 'PluginPdfProblem';
     $PLUGIN_HOOKS['plugin_pdf']['Software']         = 'PluginPdfSoftware';
+    $PLUGIN_HOOKS['plugin_pdf']['Item_SoftwareVersion'] = 'PluginPdfItem_SoftwareVersion';
     $PLUGIN_HOOKS['plugin_pdf']['SoftwareLicense']  = 'PluginPdfSoftwareLicense';
     $PLUGIN_HOOKS['plugin_pdf']['SoftwareVersion']  = 'PluginPdfSoftwareVersion';
     $PLUGIN_HOOKS['plugin_pdf']['Ticket']           = 'PluginPdfTicket';
