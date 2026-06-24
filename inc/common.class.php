@@ -37,6 +37,18 @@ abstract class PluginPdfCommon extends CommonGLPI
 
     public static $rightname = 'plugin_pdf';
 
+    protected static function getGroupName(CommonDBTM $item, int $group_type = Group_Item::GROUP_TYPE_NORMAL): string
+    {
+        $field = $group_type === Group_Item::GROUP_TYPE_TECH ? 'groups_id_tech' : 'groups_id';
+
+        $group_ids = (array) ($item->fields[$field] ?? 0);
+
+        return implode(', ', array_filter(array_map(
+            static fn($group_id) => Toolbox::stripTags(Dropdown::getDropdownName('glpi_groups', $group_id)),
+            $group_ids,
+        )));
+    }
+
     /**
      * Constructor, should intialize $this->obj property
     **/
@@ -509,10 +521,7 @@ abstract class PluginPdfCommon extends CommonGLPI
                     '<b><i>' . sprintf(
                         __s('%1$s: %2$s'),
                         __s('Group in charge of the hardware') . '</i></b>',
-                        Dropdown::getDropdownName(
-                            'glpi_groups',
-                            $item->fields['groups_id_tech'],
-                        ),
+                        self::getGroupName($item, Group_Item::GROUP_TYPE_TECH),
                     ),
                     '<b><i>' . sprintf(
                         __s('%1$s: %2$s'),
