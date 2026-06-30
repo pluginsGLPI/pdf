@@ -92,10 +92,10 @@ class PluginPdfChangeValidation extends PluginPdfCommon
                     TicketValidation::getStatus($row['status']),
                     Html::convDateTime($row['submission_date']),
                     $dbu->getUserName($row['users_id']),
-                    trim($row['comment_submission']),
+                    trim(html_entity_decode($row['comment_submission'] ?? '', ENT_QUOTES, 'UTF-8')),
                     Html::convDateTime($row['validation_date']),
                     $dbu->getUserName($row['users_id_validate']),
-                    trim($row['comment_validation']),
+                    trim(html_entity_decode($row['comment_validation'] ?? '', ENT_QUOTES, 'UTF-8')),
                 );
             }
         }

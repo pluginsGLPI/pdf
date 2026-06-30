@@ -344,11 +344,12 @@ class PluginPdfSimplePDF
         $save = [$this->cols, $this->colsx, $this->colsw, $this->align];
 
         $this->setColumnsSize(100);
-        $text    = $name . ' ' . $content;
-        $content = Glpi\RichText\RichText::getEnhancedHtml($text, ['text_maxsize' => 0]);
+        // Decode $content alone: mixing literal HTML from $name breaks isHtmlEncoded(), leaving GLPI entities (&#60;) un-decoded and visible as text in TCPDF.
+        $decoded = Glpi\RichText\RichText::getEnhancedHtml($content ?? '', ['text_maxsize' => 0]);
+        $text    = preg_replace('/<script\b[^>]*>.*?<\/script>/is', '', $name . ' ' . $decoded);
 
         // Split content by tables, keeping tables in the result
-        $segments = preg_split('/(<table\b[^>]*>.*?<\/table>)/is', $content, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
+        $segments = preg_split('/(<table\b[^>]*>.*?<\/table>)/is', $text, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
 
         // Process segments and rebuild content
         $formatted_content = '';
