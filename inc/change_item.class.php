@@ -91,8 +91,8 @@ class PluginPdfChange_Item extends PluginPdfCommon
 
                     $query = ['FIELDS' => [$itemtable . '.*', 'glpi_changes_items.id AS IDD',
                         'glpi_entities.id AS entity'],
-                        'FROM'      => 'glpi_changes_items',
-                        'LEFT JOIN' => [$itemtable => ['FKEY' => [$itemtable => 'id',
+                        'FROM'       => 'glpi_changes_items',
+                        'INNER JOIN' => [$itemtable => ['FKEY' => [$itemtable => 'id',
                             'glpi_changes_items'                             => 'items_id'],
                             'glpi_changes_items.itemtype'   => $itemtype,
                             'glpi_changes_items.changes_id' => $instID]]];

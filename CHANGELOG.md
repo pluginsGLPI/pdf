@@ -17,6 +17,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Fixed Change and Problem description exported as a single unstructured text block
 - Fixed Change analysis and plan fields rendering as raw HTML in PDF
 - Fixed rich text content rendered as visible HTML tags and unformatted text in PDF exports
+- Fixed Change approval comments rendering as visible HTML entities in PDF exports
+- Fixed Changes linked items showing phantom empty entries for users with broad entity access
 
 ## [4.0.2] - 2025-09-30
 
