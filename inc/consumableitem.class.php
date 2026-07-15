@@ -84,10 +84,7 @@ class PluginPdfConsumableItem extends PluginPdfCommon
             '<b><i>' . sprintf(
                 __s('%1$s: %2$s'),
                 __s('Group in charge of the hardware') . '</i></b>',
-                Dropdown::getDropdownName(
-                    'glpi_groups',
-                    $consitem->fields['groups_id_tech'],
-                ),
+                PluginPdfCommon::getGroupDisplayName($consitem->fields['groups_id_tech'] ?? []),
             ),
         );
 

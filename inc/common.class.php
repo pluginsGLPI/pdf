@@ -420,6 +420,26 @@ abstract class PluginPdfCommon extends CommonGLPI
         }
     }
 
+    // This helper accepts both formats: the old one (int) and the new one (array).
+    //This is for compatibility with other item types that do not use the AssignableItem trait.
+    public static function getGroupDisplayName(array|int $group_ids, bool $strip_tags = false): string
+    {
+        if (!is_array($group_ids)) {
+            $group_ids = $group_ids > 0 ? [$group_ids] : [];
+        }
+        $group_ids = array_filter(array_map('intval', $group_ids), static fn($id) => $id > 0);
+        if (empty($group_ids)) {
+            return Dropdown::getDropdownName('glpi_groups', 0);
+        }
+        $names = array_map(
+            static fn($id) => $strip_tags
+                ? Toolbox::stripTags(Dropdown::getDropdownName('glpi_groups', $id))
+                : Dropdown::getDropdownName('glpi_groups', $id),
+            $group_ids,
+        );
+        return implode(', ', $names);
+    }
+
     public static function mainTitle(PluginPdfSimplePDF $pdf, $item)
     {
         $pdf->setColumnsSize(50, 50);
@@ -509,10 +529,7 @@ abstract class PluginPdfCommon extends CommonGLPI
                     '<b><i>' . sprintf(
                         __s('%1$s: %2$s'),
                         __s('Group in charge of the hardware') . '</i></b>',
-                        Dropdown::getDropdownName(
-                            'glpi_groups',
-                            $item->fields['groups_id_tech'],
-                        ),
+                        self::getGroupDisplayName($item->fields['groups_id_tech'] ?? []),
                     ),
                     '<b><i>' . sprintf(
                         __s('%1$s: %2$s'),

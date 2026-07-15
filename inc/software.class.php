@@ -93,10 +93,8 @@ class PluginPdfSoftware extends PluginPdfCommon
             '<b><i>' . sprintf(
                 __s('%1$s: %2$s'),
                 __s('Group in charge of the hardware') . '</i></b>',
-                Dropdown::getDropdownName(
-                    'glpi_groups',
-                    $software->fields['groups_id_tech'],
-                ),
+                PluginPdfCommon::getGroupDisplayName(
+                    $software->fields['groups_id_tech'] ?? []),
             ),
             '<b><i>' . sprintf(
                 __s('%1$s: %2$s'),
@@ -109,7 +107,7 @@ class PluginPdfSoftware extends PluginPdfCommon
             '<b><i>' . sprintf(
                 __s('%1$s: %2$s'),
                 __s('Group') . '</i></b>',
-                Dropdown::getDropdownName('glpi_groups', $software->fields['groups_id']),
+                PluginPdfCommon::getGroupDisplayName($software->fields['groups_id'] ?? []),
             ),
         );
 

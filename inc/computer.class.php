@@ -89,10 +89,7 @@ class PluginPdfComputer extends PluginPdfCommon
             '<b><i>' . sprintf(
                 __('%1$s: %2$s'),
                 __('Group') . '</i></b>',
-                Dropdown::getDropdownName(
-                    'glpi_groups',
-                    $computer->fields['groups_id'],
-                ),
+                PluginPdfCommon::getGroupDisplayName($computer->fields['groups_id'] ?? []),
             ),
             '<b><i>' . sprintf(__('%1$s: %2$s'), __('UUID') . '</i></b>', $computer->fields['uuid']),
         );
