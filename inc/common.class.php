@@ -59,7 +59,7 @@ abstract class PluginPdfCommon extends CommonGLPI
             $withtemplate = $options['withtemplate'];
         }
 
-        if (!is_numeric($itemtype) && ($obj = $dbu->getItemForItemtype($itemtype)) && (method_exists($itemtype, 'displayTabContentForPDF'))) {
+        if (($obj = $dbu->getItemForItemtype($itemtype)) && (method_exists($itemtype, 'displayTabContentForPDF'))) {
             $titles = $obj->getTabNameForItem($this->obj, $withtemplate);
             if (!is_array($titles)) {
                 $titles = [1 => $titles];
@@ -428,7 +428,7 @@ abstract class PluginPdfCommon extends CommonGLPI
             $group_ids = $group_ids > 0 ? [$group_ids] : [];
         }
         $group_ids = array_filter(array_map('intval', $group_ids), static fn($id) => $id > 0);
-        if (empty($group_ids)) {
+        if ($group_ids === []) {
             return Dropdown::getDropdownName('glpi_groups', 0);
         }
         $names = array_map(

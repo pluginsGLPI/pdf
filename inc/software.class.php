@@ -94,7 +94,8 @@ class PluginPdfSoftware extends PluginPdfCommon
                 __s('%1$s: %2$s'),
                 __s('Group in charge of the hardware') . '</i></b>',
                 PluginPdfCommon::getGroupDisplayName(
-                    $software->fields['groups_id_tech'] ?? []),
+                    $software->fields['groups_id_tech'] ?? [],
+                ),
             ),
             '<b><i>' . sprintf(
                 __s('%1$s: %2$s'),
