@@ -429,7 +429,8 @@ abstract class PluginPdfCommon extends CommonGLPI
         }
         $group_ids = array_filter(array_map('intval', $group_ids), static fn($id) => $id > 0);
         if ($group_ids === []) {
-            return Dropdown::getDropdownName('glpi_groups', 0);
+            $name = Dropdown::getDropdownName('glpi_groups', 0);
+            return $strip_tags ? Toolbox::stripTags($name) : $name;
         }
         $names = array_map(
             static fn($id) => $strip_tags
