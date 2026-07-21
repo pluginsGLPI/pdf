@@ -1,5 +1,7 @@
 <?php
 
+use Glpi\Features\AssignableItemInterface;
+
 /**
  *  -------------------------------------------------------------------------
  *  LICENSE
@@ -29,7 +31,6 @@
  *             http://www.gnu.org/licenses/agpl-3.0-standalone.html
  *  --------------------------------------------------------------------------
  */
-
 abstract class PluginPdfCommon extends CommonGLPI
 {
     protected $obj = null;
@@ -41,7 +42,7 @@ abstract class PluginPdfCommon extends CommonGLPI
     {
         $field = $group_type === Group_Item::GROUP_TYPE_TECH ? 'groups_id_tech' : 'groups_id';
 
-        if ($item instanceof \Glpi\Features\AssignableItemInterface) {
+        if ($item instanceof AssignableItemInterface) {
             // Many-to-many relation, stored in the glpi_groups_items pivot table
             global $DB;
             $it = $DB->request([
