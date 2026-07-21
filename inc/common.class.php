@@ -41,7 +41,23 @@ abstract class PluginPdfCommon extends CommonGLPI
     {
         $field = $group_type === Group_Item::GROUP_TYPE_TECH ? 'groups_id_tech' : 'groups_id';
 
-        $group_ids = (array) ($item->fields[$field] ?? 0);
+        if ($item instanceof \Glpi\Features\AssignableItemInterface) {
+            // Many-to-many relation, stored in the glpi_groups_items pivot table
+            global $DB;
+            $it = $DB->request([
+                'SELECT' => 'groups_id',
+                'FROM'   => Group_Item::getTable(),
+                'WHERE'  => [
+                    'itemtype' => $item::class,
+                    'items_id' => $item->getID(),
+                    'type'     => $group_type,
+                ],
+            ]);
+            $group_ids = array_column(iterator_to_array($it), 'groups_id');
+        } else {
+            // One-to-one relation, direct column on the item (e.g. glpi_itilcategories)
+            $group_ids = (array) ($item->fields[$field] ?? 0);
+        }
 
         return implode(', ', array_filter(array_map(
             static fn($group_id) => Toolbox::stripTags(Dropdown::getDropdownName('glpi_groups', $group_id)),
