@@ -1,7 +1,5 @@
 <?php
 
-use Glpi\Features\AssignableItemInterface;
-
 /**
  *  -------------------------------------------------------------------------
  *  LICENSE
@@ -31,6 +29,9 @@ use Glpi\Features\AssignableItemInterface;
  *             http://www.gnu.org/licenses/agpl-3.0-standalone.html
  *  --------------------------------------------------------------------------
  */
+
+use Glpi\Features\AssignableItemInterface;
+
 abstract class PluginPdfCommon extends CommonGLPI
 {
     protected $obj = null;
