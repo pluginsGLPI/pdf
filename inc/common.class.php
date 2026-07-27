@@ -59,6 +59,8 @@ abstract class PluginPdfCommon extends CommonGLPI
             $withtemplate = $options['withtemplate'];
         }
 
+        // $itemtype has no native type hint; PHPDoc-inferred class-string type isn't enforced at runtime
+        /** @phpstan-ignore-next-line function.impossibleType */
         if (!is_numeric($itemtype) && ($obj = $dbu->getItemForItemtype($itemtype)) && (method_exists($itemtype, 'displayTabContentForPDF'))) {
             $titles = $obj->getTabNameForItem($this->obj, $withtemplate);
             if (!is_array($titles)) {
