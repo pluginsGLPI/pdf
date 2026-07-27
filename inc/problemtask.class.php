@@ -124,7 +124,7 @@ class PluginPdfProblemTask extends PluginPdfCommon
                 );
                 $pdf->displayText(
                     '<b><i>' . sprintf(__s('%1$s: %2$s') . '</i></b>', __s('Description'), ''),
-                    Toolbox::stripTags($data['content']),
+                    $data['content'],
                     1,
                 );
             }
