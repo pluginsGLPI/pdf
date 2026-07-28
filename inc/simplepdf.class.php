@@ -152,6 +152,7 @@ class PluginPdfSimplePDF
     **/
     public function output($name = false)
     {
+        ob_clean();
         if (!$name) {
             return $this->pdf->Output('glpi.pdf', 'S');
         }
@@ -351,21 +352,19 @@ class PluginPdfSimplePDF
         // Decode HTML entities BEFORE searching for images
         $content = html_entity_decode($content, ENT_QUOTES, 'UTF-8');
 
-        // Extract images and remove from HTML - TCPDF will render them separately
         preg_match_all(
-            '/<img\b[^>]*src=["\']([^"\']*docid=(\d+)[^"\']*)["\'][^>]*>/i',
+            '/<a\b[^>]*>.*?(<img\b[^>]*src=["\']([^"\']*docid=(\d+)[^"\']*)["\'][^>]*>).*?<\/a>/is',
             $content,
             $matches,
             PREG_SET_ORDER,
         );
 
-        $images_to_display = [];
         if ($matches !== []) {
             $document = new Document();
             foreach ($matches as $match) {
-                $full_img_tag = $match[0];
-                $original_url = $match[1];
-                $docid = (int) $match[2];
+                $full_a_tag = $match[0];
+                $full_img_tag = $match[1];
+                $docid = (int) $match[3];
 
                 if ($document->getFromDB($docid) && isset($document->fields['filepath'])) {
                     $file_path = GLPI_DOC_DIR . '/' . $document->fields['filepath'];
@@ -410,15 +409,11 @@ class PluginPdfSimplePDF
                             $display_height = (int) ($display_height * $ratio);
                         }
 
-                        // Store image info for later insertion
-                        $images_to_display[] = [
-                            'tag' => $full_img_tag,
-                            'path' => $file_path,
-                            'width' => $display_width,
-                            'height' => $display_height,
-                        ];
-                        // Remove the img tag from HTML - we'll add images separately
-                        $content = str_replace($full_img_tag, '', $content);
+                        // Replace the original image by a properly resized one + remove the a tag
+                        if(file_exists($file_path)){
+                            $display_image_tag = '<img src="file://'. $file_path. '" width="' . $display_width . '" height="' . $display_height . '">';
+                            $content = str_replace($full_a_tag, $display_image_tag, $content);
+                        }
                     }
                 }
             }
@@ -444,13 +439,6 @@ class PluginPdfSimplePDF
         }
 
         $this->displayInternal(240, 0.5, self::LEFT, $minline * 5, [$formatted_content]);
-
-        // Now add extracted images after the text with their original dimensions
-        foreach ($images_to_display as $img_info) {
-            if (file_exists($img_info['path'])) {
-                $this->addPngFromFile($img_info['path'], $img_info['width'], $img_info['height']);
-            }
-        }
 
         /* Restore */
         [$this->cols, $this->colsx, $this->colsw, $this->align, ] = $save;

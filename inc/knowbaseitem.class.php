@@ -107,7 +107,7 @@ class PluginPdfKnowbaseItem extends PluginPdfCommon
         );
         $pdf->displayLine(
             $dbu->getUserName($item->fields['users_id']),
-            Html::convDateTime($item->fields['date']),
+            Html::convDateTime($item->fields['date_creation']),
             Html::convDateTime($item->fields['date_mod']),
             Dropdown::getYesNo($item->fields['is_faq']),
             $item->fields['view'],
