@@ -410,10 +410,8 @@ class PluginPdfSimplePDF
                         }
 
                         // Replace the original image by a properly resized one + remove the a tag
-                        if(file_exists($file_path)){
-                            $display_image_tag = '<img src="file://'. $file_path. '" width="' . $display_width . '" height="' . $display_height . '">';
-                            $content = str_replace($full_a_tag, $display_image_tag, $content);
-                        }
+                        $display_image_tag = '<img src="file://' . $file_path . '" width="' . $display_width . '" height="' . $display_height . '">';
+                        $content = str_replace($full_a_tag, $display_image_tag, $content);
                     }
                 }
             }
