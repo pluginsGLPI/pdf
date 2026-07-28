@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [Unreleased]
+
+### Fixed
+
+- Fix image rendering in Change/Problem descriptions and Problem task PDF exports
+
 ## [4.1.3] - 2026-06-24
 
 ### Fixed
