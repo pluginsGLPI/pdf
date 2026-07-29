@@ -152,7 +152,9 @@ class PluginPdfSimplePDF
     **/
     public function output($name = false)
     {
-        ob_clean();
+        if (ob_get_level() > 0) {
+            ob_clean();
+        }
         if (!$name) {
             return $this->pdf->Output('glpi.pdf', 'S');
         }
