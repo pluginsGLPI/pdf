@@ -182,8 +182,8 @@ class PluginPdfItem_Problem extends PluginPdfCommon
                                 Toolbox::stripTags(sprintf(__s('%1$s: %2$s'), $typename, $nb)),
                                 Toolbox::stripTags($name),
                                 Dropdown::getDropdownName('glpi_entities', $data['entity']),
-                                Toolbox::stripTags($data['serial']),
-                                Toolbox::stripTags($data['otherserial']),
+                                Toolbox::stripTags($data['serial'] ?? ''),
+                                Toolbox::stripTags($data['otherserial'] ?? ''),
                                 $nb,
                             );
                         } else {
@@ -191,8 +191,8 @@ class PluginPdfItem_Problem extends PluginPdfCommon
                                 '',
                                 Toolbox::stripTags($name),
                                 Dropdown::getDropdownName('glpi_entities', $data['entity']),
-                                Toolbox::stripTags($data['serial']),
-                                Toolbox::stripTags($data['otherserial']),
+                                Toolbox::stripTags($data['serial'] ?? ''),
+                                Toolbox::stripTags($data['otherserial'] ?? ''),
                                 $nb,
                             );
                         }
