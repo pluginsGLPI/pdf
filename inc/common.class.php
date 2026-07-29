@@ -59,7 +59,6 @@ abstract class PluginPdfCommon extends CommonGLPI
             $withtemplate = $options['withtemplate'];
         }
 
-        // @phpstan-ignore-next-line function.impossibleType - is_numeric() kept for parity with CommonGLPI::addStandardTab(), whose $itemtype PHPDoc type makes it always false
         if (!is_numeric($itemtype) && ($obj = $dbu->getItemForItemtype($itemtype)) && (method_exists($itemtype, 'displayTabContentForPDF'))) {
             $titles = $obj->getTabNameForItem($this->obj, $withtemplate);
             if (!is_array($titles)) {
