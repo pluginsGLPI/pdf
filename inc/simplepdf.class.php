@@ -357,7 +357,7 @@ class PluginPdfSimplePDF
         $content = html_entity_decode($content, ENT_QUOTES, 'UTF-8');
 
         preg_match_all(
-            '/<a\b[^>]*>.*?(<img\b[^>]*src=["\']([^"\']*docid=(\d+)[^"\']*)["\'][^>]*>).*?<\/a>/is',
+            '/<a\b[^>]*>\s*(<img\b[^>]*src=["\']([^"\']*docid=(\d+)[^"\']*)["\'][^>]*>)\s*<\/a>/i',
             $content,
             $matches,
             PREG_SET_ORDER,
