@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 
+- Fix images display in PDF: Make them display at their original position instead of at the end of the document.
 - Fixed approval comments rendering as raw HTML in PDF
 - Fixed PDF crash when exporting Problems with linked items lacking serial/inventory fields
 - Fixed Change and Problem description exported as a single unstructured text block
