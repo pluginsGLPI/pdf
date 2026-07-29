@@ -348,8 +348,10 @@ class PluginPdfSimplePDF
         $save = [$this->cols, $this->colsx, $this->colsw, $this->align];
 
         $this->setColumnsSize(100);
-        $text    = $name . ' ' . $content;
-        $content = RichText::getEnhancedHtml($text, ['text_maxsize' => 0]);
+
+        // Decode $content alone: mixing literal HTML from $name breaks isHtmlEncoded(), leaving GLPI entities (&#60;) un-decoded and visible as text in TCPDF.
+        $decoded = RichText::getEnhancedHtml($content ?? '', ['text_maxsize' => 0]);
+        $content = preg_replace('/<script\b[^>]*>.*?<\/script>/is', '', $name . ' ' . $decoded);
 
         // Decode HTML entities BEFORE searching for images
         $content = html_entity_decode($content, ENT_QUOTES, 'UTF-8');

@@ -310,19 +310,15 @@ class PluginPdfChange extends PluginPdfCommon
         $pdf->setColumnsSize(100);
         $pdf->displayTitle('<b>' . __s('Analysis') . '</b>');
 
-        $pdf->setColumnsSize(10, 90);
-
-        $pdf->displayText(sprintf(
-            __s('%1$s: %2$s'),
+        $pdf->displayText(
             '<b><i>' . __s('Impacts') . '</i></b>',
             $job->fields['impactcontent'],
-        ));
+        );
 
-        $pdf->displayText(sprintf(
-            __s('%1$s: %2$s'),
+        $pdf->displayText(
             '<b><i>' . __s('Control list') . '</i></b>',
             $job->fields['controlistcontent'],
-        ));
+        );
     }
 
     public static function pdfPlan(PluginPdfSimplePDF $pdf, Change $job)
@@ -330,25 +326,20 @@ class PluginPdfChange extends PluginPdfCommon
         $pdf->setColumnsSize(100);
         $pdf->displayTitle('<b>' . __s('Plans') . '</b>');
 
-        $pdf->setColumnsSize(10, 90);
-
-        $pdf->displayText(sprintf(
-            __s('%1$s: %2$s'),
+        $pdf->displayText(
             '<b><i>' . __s('Deployment plan') . '</i></b>',
             $job->fields['rolloutplancontent'],
-        ));
+        );
 
-        $pdf->displayText(sprintf(
-            __s('%1$s: %2$s'),
+        $pdf->displayText(
             '<b><i>' . __s('Backup plan') . '</i></b>',
             $job->fields['backoutplancontent'],
-        ));
+        );
 
-        $pdf->displayText(sprintf(
-            __s('%1$s: %2$s'),
+        $pdf->displayText(
             '<b><i>' . __s('Checklist') . '</i></b>',
             $job->fields['checklistcontent'],
-        ));
+        );
     }
 
     public static function pdfStat(PluginPdfSimplePDF $pdf, Change $job)
