@@ -299,7 +299,7 @@ class PluginPdfProblem extends PluginPdfCommon
 
         $pdf->displayText(
             '<b><i>' . sprintf(__('%1$s: %2$s'), __('Description') . '</i></b>', ''),
-            $job->fields['content'],
+            self::resolveContentImages($job->fields['content']),
             1,
         );
 
@@ -315,36 +315,20 @@ class PluginPdfProblem extends PluginPdfCommon
 
         $text = '';
         if ($job->fields['impactcontent']) {
-            $text = Toolbox::stripTags(Glpi\Toolbox\Sanitizer::unsanitize(
-                html_entity_decode(
-                    $job->getField('impactcontent'),
-                    ENT_QUOTES,
-                    'UTF-8',
-                ),
-            ));
+            $text = self::resolveContentImages($job->getField('impactcontent'));
         }
         $pdf->displayText('<b><i>' . sprintf(__('%1$s: %2$s'), __('Impacts') . '</i></b>', $text));
 
+        $text = '';
         if ($job->fields['causecontent']) {
-            $text = Toolbox::stripTags(Glpi\Toolbox\Sanitizer::unsanitize(
-                html_entity_decode(
-                    $job->getField('causecontent'),
-                    ENT_QUOTES,
-                    'UTF-8',
-                ),
-            ));
+            $text = self::resolveContentImages($job->getField('causecontent'));
         }
 
         $pdf->displayText('<b><i>' . sprintf(__('%1$s: %2$s'), __('Causes') . '</i></b>', $text));
 
+        $text = '';
         if ($job->fields['symptomcontent']) {
-            $text = Toolbox::stripTags(Glpi\Toolbox\Sanitizer::unsanitize(
-                html_entity_decode(
-                    $job->getField('symptomcontent'),
-                    ENT_QUOTES,
-                    'UTF-8',
-                ),
-            ));
+            $text = self::resolveContentImages($job->getField('symptomcontent'));
         }
 
         $pdf->displayText('<b><i>' . sprintf(__('%1$s: %2$s'), __('Symptoms') . '</i></b>', $text));

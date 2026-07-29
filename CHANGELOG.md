@@ -9,7 +9,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 
-- Fix image rendering in Problem task PDF exports
+- Fix image rendering in Change and Problem description/task PDF exports
+- Fix image rendering in Change analysis/plan, Problem analysis and Ticket/Change approval comments PDF exports
+- Fix Problem analysis (impacts/causes/symptoms) rendered as raw HTML in PDF exports
 
 ## [4.0.3] - 2026-06-30
 

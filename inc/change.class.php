@@ -299,7 +299,7 @@ class PluginPdfChange extends PluginPdfCommon
 
         $pdf->displayText(
             '<b><i>' . sprintf(__('%1$s: %2$s') . '</i></b>', __('Description'), ''),
-            $job->fields['content'],
+            self::resolveContentImages($job->fields['content']),
             1,
         );
 
@@ -313,12 +313,12 @@ class PluginPdfChange extends PluginPdfCommon
 
         $pdf->displayText(
             '<b><i>' . __('Impacts') . '</i></b>',
-            $job->fields['impactcontent'],
+            self::resolveContentImages($job->fields['impactcontent']),
         );
 
         $pdf->displayText(
             '<b><i>' . __('Control list') . '</i></b>',
-            $job->fields['controlistcontent'],
+            self::resolveContentImages($job->fields['controlistcontent']),
         );
     }
 
@@ -329,17 +329,17 @@ class PluginPdfChange extends PluginPdfCommon
 
         $pdf->displayText(
             '<b><i>' . __('Deployment plan') . '</i></b>',
-            $job->fields['rolloutplancontent'],
+            self::resolveContentImages($job->fields['rolloutplancontent']),
         );
 
         $pdf->displayText(
             '<b><i>' . __('Backup plan') . '</i></b>',
-            $job->fields['backoutplancontent'],
+            self::resolveContentImages($job->fields['backoutplancontent']),
         );
 
         $pdf->displayText(
             '<b><i>' . __('Checklist') . '</i></b>',
-            $job->fields['checklistcontent'],
+            self::resolveContentImages($job->fields['checklistcontent']),
         );
     }
 
