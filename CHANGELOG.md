@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Fixed rich text content rendered as visible HTML tags and unformatted text in PDF exports
 - Fixed Change approval comments rendering as visible HTML entities in PDF exports
 - Fixed Changes linked items showing phantom empty entries for users with broad entity access
+- Fix image rendering in Change/Problem descriptions and Problem task PDF exports
 
 ## [4.1.3] - 2026-06-24
 
