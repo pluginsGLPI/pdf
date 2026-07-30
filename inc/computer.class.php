@@ -93,14 +93,6 @@ class PluginPdfComputer extends PluginPdfCommon
             ),
             '<b><i>' . sprintf(
                 __('%1$s: %2$s'),
-                __('Group in charge of the hardware') . '</i></b>',
-                self::getGroupName($computer, Group_Item::GROUP_TYPE_TECH),
-            ),
-        );
-
-        $pdf->displayLine(
-            '<b><i>' . sprintf(
-                __('%1$s: %2$s'),
                 __('UUID') . '</i></b>',
                 $computer->fields['uuid'],
             ),
