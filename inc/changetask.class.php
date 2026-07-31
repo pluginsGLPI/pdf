@@ -121,7 +121,7 @@ class PluginPdfChangeTask extends PluginPdfCommon
                 );
                 $pdf->displayText(
                     '<b><i>' . sprintf(__('%1$s: %2$s') . '</i></b>', __('Description'), ''),
-                    $data['content'],
+                    self::resolveContentImages($data['content']),
                     1,
                 );
             }

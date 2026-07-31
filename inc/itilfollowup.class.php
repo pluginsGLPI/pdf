@@ -103,22 +103,9 @@ class PluginPdfItilFollowup extends PluginPdfCommon
                 );
 
 
-                $content = Glpi\Toolbox\Sanitizer::unsanitize(Html::entity_decode_deep($data['content']));
-                $content = preg_replace('#data:image/[^;]+;base64,#', '@', $content);
-
-                preg_match_all('/<img [^>]*src=[\'"]([^\'"]*docid=([0-9]*))[^>]*>/', $content, $res, PREG_SET_ORDER);
-
-                foreach ($res as $img) {
-                    $docimg = new Document();
-                    $docimg->getFromDB((int) $img[2]);
-
-                    $path    = '<img src="file://' . GLPI_DOC_DIR . '/' . $docimg->fields['filepath'] . '"/>';
-                    $content = str_replace($img[0], $path, $content);
-                }
-
                 $pdf->displayText(
                     '<b><i>' . sprintf(__('%1$s: %2$s') . '</i></b>', __('Description'), ''),
-                    $content,
+                    self::resolveContentImages($data['content']),
                     1,
                 );
             }

@@ -287,6 +287,31 @@ abstract class PluginPdfCommon extends CommonGLPI
     }
 
     /**
+     * Resolve inline images (docid-based src) to a local file:// path so TCPDF can load them.
+     *
+     * @param $content string raw HTML content (not yet unsanitized/decoded)
+     *
+     * @return string HTML content with resolved image paths
+    **/
+    protected static function resolveContentImages(string $content): string
+    {
+        $content = Glpi\Toolbox\Sanitizer::unsanitize(Html::entity_decode_deep($content));
+        $content = preg_replace('#data:image/[^;]+;base64,#', '@', $content);
+
+        preg_match_all('/<img [^>]*src=[\'"]([^\'"]*docid=([0-9]*))[^>]*>/', $content, $res, PREG_SET_ORDER);
+
+        foreach ($res as $img) {
+            $docimg = new Document();
+            $docimg->getFromDB((int) $img[2]);
+
+            $path    = '<img src="file://' . GLPI_DOC_DIR . '/' . $docimg->fields['filepath'] . '"/>';
+            $content = str_replace($img[0], $path, $content);
+        }
+
+        return $content;
+    }
+
+    /**
      * Read the object and create header for all pages
      *
      * No HTML supported in this function
