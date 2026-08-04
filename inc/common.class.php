@@ -30,6 +30,8 @@
  *  --------------------------------------------------------------------------
  */
 
+use Glpi\Asset\Asset_PeripheralAsset;
+
 abstract class PluginPdfCommon extends CommonGLPI
 {
     protected $obj = null;
@@ -180,7 +182,8 @@ abstract class PluginPdfCommon extends CommonGLPI
                     }
                     break;
 
-                case 'Ticket$1':
+                case 'Item_Ticket$1': // tab added on assets
+                case 'Ticket$1': // tab added on User, Group and SLA
                     if (Ticket::canView()) {
                         PluginPdfItem_Ticket::pdfForItem($pdf, $item);
                     }
@@ -230,8 +233,16 @@ abstract class PluginPdfCommon extends CommonGLPI
                     PluginPdfItem_Disk::pdfForItem($pdf, $item);
                     break;
 
-                case 'Computer_Item$1':
+                case Asset_PeripheralAsset::class . '$1':
                     PluginPdfComputer_Item::pdfForItem($pdf, $item);
+                    break;
+
+                case 'ItemAntivirus$1': // registered on Computer and Phone
+                    PluginPdfItemAntivirus::pdfForItem($pdf, $item);
+                    break;
+
+                case 'ItemVirtualMachine$1':
+                    PluginPdfItemVirtualMachine::pdfForItem($pdf, $item);
                     break;
 
                 case 'Item_SoftwareVersion$1':

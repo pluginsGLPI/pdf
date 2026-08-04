@@ -30,7 +30,7 @@
  *  --------------------------------------------------------------------------
  */
 
-class PluginPdfComputerAntivirus extends PluginPdfCommon
+class PluginPdfItemAntivirus extends PluginPdfCommon
 {
     public static $rightname = 'plugin_pdf';
 
@@ -39,15 +39,15 @@ class PluginPdfComputerAntivirus extends PluginPdfCommon
         $this->obj = ($obj ?: new ItemAntivirus());
     }
 
-    public static function pdfForComputer(PluginPdfSimplePDF $pdf, Computer $item)
+    public static function pdfForItem(PluginPdfSimplePDF $pdf, CommonDBTM $item)
     {
         /** @var DBmysql $DB */
         global $DB;
 
-        $ID = $item->getField('id');
-
-        $result = $DB->request(['FROM' => 'glpi_itemantiviruses'] + ['computers_id' => $ID,
-            'is_deleted'                                                   => 0]);
+        $result = $DB->request(['FROM' => 'glpi_itemantiviruses',
+            'WHERE'                    => ['itemtype' => $item->getType(),
+                'items_id'                            => $item->getID(),
+                'is_deleted'                          => 0]]);
         $number = count($result);
 
         $pdf->setColumnsSize(100);
@@ -74,7 +74,6 @@ class PluginPdfComputerAntivirus extends PluginPdfCommon
                 __s('Expiration date'),
             );
 
-            $antivirus = new ItemAntivirus();
             foreach ($result as $data) {
                 $pdf->displayLine(
                     $data['name'],

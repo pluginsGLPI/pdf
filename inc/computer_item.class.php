@@ -41,37 +41,33 @@ class PluginPdfComputer_Item extends PluginPdfCommon
         $this->obj = ($obj ?: new Asset_PeripheralAsset());
     }
 
-    public static function pdfForComputer(PluginPdfSimplePDF $pdf, Computer $comp)
+    public static function pdfForComputer(PluginPdfSimplePDF $pdf, CommonDBTM $comp)
     {
         /** @var DBmysql $DB */
-        global $DB;
+        /** @var array $CFG_GLPI */
+        global $DB, $CFG_GLPI;
 
         $dbu = new DbUtils();
 
         $ID = $comp->getField('id');
-
-        $items = ['Printer' => _sn('Printer', 'Printers', 2),
-            'Monitor'       => _sn('Monitor', 'Monitors', 2),
-            'Peripheral'    => _sn('Device', 'Devices', 2),
-            'Phone'         => _sn('Phone', 'Phones', 2)];
 
         $info = new Infocom();
 
         $pdf->setColumnsSize(100);
         $pdf->displayTitle('<b>' . __s('Direct connections') . '</b>');
 
-        foreach (array_keys($items) as $type) {
+        foreach ($CFG_GLPI['directconnect_types'] as $type) {
             $item = $dbu->getItemForItemtype($type);
-            if (!$item->canView()) {
+            if (!$item || !$item->canView()) {
                 continue;
             }
             $itemTable = $dbu->getTableForItemType($type);
             $query = [
                 'SELECT' => [
                     'glpi_assets_assets_peripheralassets.id AS assoc_id',
-                    'glpi_assets_assets_peripheralassets.computers_id AS assoc_computers_id',
-                    'glpi_assets_assets_peripheralassets.itemtype',
-                    'glpi_assets_assets_peripheralassets.items_id',
+                    'glpi_assets_assets_peripheralassets.items_id_asset AS assoc_items_id_asset',
+                    'glpi_assets_assets_peripheralassets.itemtype_peripheral',
+                    'glpi_assets_assets_peripheralassets.items_id_peripheral',
                     'glpi_assets_assets_peripheralassets.is_dynamic AS assoc_is_dynamic',
                 ],
                 'FROM' => 'glpi_assets_assets_peripheralassets',
@@ -79,13 +75,14 @@ class PluginPdfComputer_Item extends PluginPdfCommon
                     $itemTable => [
                         'FKEY' => [
                             $itemTable => 'id',
-                            'glpi_assets_assets_peripheralassets' => 'items_id',
+                            'glpi_assets_assets_peripheralassets' => 'items_id_peripheral',
                         ],
                     ],
                 ],
                 'WHERE' => [
-                    'computers_id' => $ID,
-                    'itemtype' => $type,
+                    'itemtype_asset' => $comp->getType(),
+                    'items_id_asset' => $ID,
+                    'itemtype_peripheral' => $type,
                     'glpi_assets_assets_peripheralassets.is_deleted' => 0,
                 ],
             ];
@@ -98,8 +95,7 @@ class PluginPdfComputer_Item extends PluginPdfCommon
             $resultnum = count($result);
             if ($resultnum > 0) {
                 foreach ($result as $row) {
-                    $tID    = $row['items_id'];
-                    $connID = $row['id'];
+                    $tID = $row['items_id_peripheral'];
                     $item->getFromDB($tID);
                     if (!$info->getFromDBforDevice($type, $tID)) {
                         $info->getEmpty();
@@ -177,6 +173,13 @@ class PluginPdfComputer_Item extends PluginPdfCommon
                     case 'Phone':
                         $pdf->displayLine(__s('No phone', 'pdf'));
                         break;
+
+                    default:
+                        $pdf->displayLine(sprintf(
+                            __s('%1$s: %2$s'),
+                            $item->getTypeName(1),
+                            __s('No item to display'),
+                        ));
                 }
             } // No row
         } // each type
@@ -188,18 +191,21 @@ class PluginPdfComputer_Item extends PluginPdfCommon
         /** @var DBmysql $DB */
         global $DB;
 
+        $dbu = new DbUtils();
+
         $ID   = $item->getField('id');
         $type = $item->getType();
 
         $info = new Infocom();
-        $comp = new Computer();
 
         $pdf->setColumnsSize(100);
         $title = '<b>' . __s('Direct connections') . '</b>';
 
         $result = $DB->request(
-            ['FROM' => 'glpi_assets_assets_peripheralassets'] + ['items_id'    => $ID,
-                'itemtype' => $type],
+            ['FROM' => 'glpi_assets_assets_peripheralassets',
+                'WHERE' => ['itemtype_peripheral' => $type,
+                    'items_id_peripheral'         => $ID,
+                    'is_deleted'           => 0]],
         );
         $resultnum = count($result);
 
@@ -209,10 +215,12 @@ class PluginPdfComputer_Item extends PluginPdfCommon
             $pdf->displayTitle($title);
 
             foreach ($result as $row) {
-                $tID    = $row['computers_id'];
-                $connID = $row['id'];
-                $comp->getFromDB($tID);
-                if (!$info->getFromDBforDevice('Computer', $tID)) {
+                $tID  = $row['items_id_asset'];
+                $comp = $dbu->getItemForItemtype($row['itemtype_asset']);
+                if (!$comp || !$comp->getFromDB($tID)) {
+                    continue;
+                }
+                if (!$info->getFromDBforDevice($row['itemtype_asset'], $tID)) {
                     $info->getEmpty();
                 }
 
@@ -251,7 +259,7 @@ class PluginPdfComputer_Item extends PluginPdfCommon
                         sprintf(
                             __s('%1$s: %2$s'),
                             '<b>' . __s('Inventory number') . '</b>',
-                            $item->getField('otherserial'),
+                            $comp->fields['otherserial'],
                         ),
                     );
                 }
@@ -269,13 +277,13 @@ class PluginPdfComputer_Item extends PluginPdfCommon
                 }
                 if ($line2 !== '' && $line2 !== '0') {
                     $pdf->displayText(
-                        '<b>' . sprintf(__s('%1$s: %2$s'), __s('Computer') . '</b>', ''),
+                        '<b>' . sprintf(__s('%1$s: %2$s'), $comp->getTypeName(1) . '</b>', ''),
                         $line1 . "\n" . $line2,
                         2,
                     );
                 } else {
                     $pdf->displayText(
-                        '<b>' . sprintf(__s('%1$s: %2$s'), __s('Computer') . '</b>', ''),
+                        '<b>' . sprintf(__s('%1$s: %2$s'), $comp->getTypeName(1) . '</b>', ''),
                         $line1,
                         1,
                     );

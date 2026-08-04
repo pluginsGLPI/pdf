@@ -30,7 +30,7 @@
  *  --------------------------------------------------------------------------
  */
 
-class PluginPdfComputerVirtualMachine extends PluginPdfCommon
+class PluginPdfItemVirtualMachine extends PluginPdfCommon
 {
     public static $rightname = 'plugin_pdf';
 
@@ -39,16 +39,18 @@ class PluginPdfComputerVirtualMachine extends PluginPdfCommon
         $this->obj = ($obj ?: new ItemVirtualMachine());
     }
 
-    public static function pdfForComputer(PluginPdfSimplePDF $pdf, Computer $item)
+    public static function pdfForItem(PluginPdfSimplePDF $pdf, CommonDBTM $item)
     {
         $dbu = new DbUtils();
 
         $ID = $item->getField('id');
 
-        // From ComputerVirtualMachine::showForComputer()
+        // From ItemVirtualMachine::showForAsset()
         $virtualmachines = $dbu->getAllDataFromTable(
             'glpi_itemvirtualmachines',
-            ['computers_id' => $ID],
+            ['WHERE' => ['itemtype' => $item->getType(),
+                'items_id'         => $ID],
+                'ORDER' => 'name'],
         );
         $pdf->setColumnsSize(100);
         $title = '<b>' . __s('List of virtualized environments') . '</b>';
@@ -56,7 +58,7 @@ class PluginPdfComputerVirtualMachine extends PluginPdfCommon
         $number = count($virtualmachines);
 
         if ($number === 0) {
-            $pdf->displayTitle('<b>' . __s('No virtualized environment associated with the computer') . '</b>');
+            $pdf->displayTitle(sprintf(__s('%1$s: %2$s'), $title, __s('No item to display')));
         } else {
             if ($number > $_SESSION['glpilist_limit']) {
                 $title = sprintf(__s('%1$s: %2$s'), $title, $_SESSION['glpilist_limit'] . ' / ' . $number);
@@ -80,10 +82,10 @@ class PluginPdfComputerVirtualMachine extends PluginPdfCommon
 
             foreach ($virtualmachines as $virtualmachine) {
                 $name = '';
-                if ($link_computer = ItemVirtualMachine::findVirtualMachine($virtualmachine)) {
-                    $computer = new Computer();
-                    if ($computer->getFromDB($link_computer)) {
-                        $name = $computer->getName();
+                if ($link_item = ItemVirtualMachine::findVirtualMachine($virtualmachine)) {
+                    $linked = $dbu->getItemForItemtype($virtualmachine['itemtype']);
+                    if ($linked && $linked->getFromDB($link_item)) {
+                        $name = $linked->getName();
                     }
                 }
                 $pdf->displayLine(
@@ -108,10 +110,11 @@ class PluginPdfComputerVirtualMachine extends PluginPdfCommon
             }
         }
 
-        // From ComputerVirtualMachine::showForVirtualMachine()
-        if ($item->fields['uuid']) {
+        // From ItemVirtualMachine::showForVirtualMachine()
+        // The exported item may itself be a guest: look for the host(s) declaring a virtual machine having its UUID.
+        if (!empty($item->fields['uuid'])) {
             $hosts = $dbu->getAllDataFromTable(
-                $item::getTable(),
+                'glpi_itemvirtualmachines',
                 ['RAW'
                  => ['LOWER(uuid)'
                      => ItemVirtualMachine::getUUIDRestrictCriteria($item->fields['uuid']),
@@ -121,21 +124,18 @@ class PluginPdfComputerVirtualMachine extends PluginPdfCommon
 
             if (count($hosts)) {
                 $pdf->setColumnsSize(100);
-                $pdf->displayTitle('<b>' . __s('List of virtualized environments') . '</b>');
+                $pdf->displayTitle('<b>' . __s('List of hosts') . '</b>');
 
                 $pdf->setColumnsSize(26, 37, 37);
-                $pdf->displayTitle(__s('Name'), __s('Operating system'), __s('Entity'));
+                $pdf->displayTitle(__s('Name'), __s('Serial number'), __s('Entity'));
 
-                $computer = new Computer();
                 foreach ($hosts as $host) {
-                    if ($computer->getFromDB($host['id'])) {
+                    $host_item = $dbu->getItemForItemtype($host['itemtype']);
+                    if ($host_item && $host_item->getFromDB($host['items_id'])) {
                         $pdf->displayLine(
-                            $computer->getName(),
-                            Toolbox::stripTags(Dropdown::getDropdownName(
-                                'glpi_operatingsystems',
-                                $computer->getField('operatingsystems_id'),
-                            )),
-                            Dropdown::getDropdownName('glpi_entities', $computer->getEntityID()),
+                            $host_item->getName(),
+                            Toolbox::stripTags((string) $host_item->getField('serial')),
+                            Dropdown::getDropdownName('glpi_entities', $host_item->getEntityID()),
                         );
                     }
                 }
