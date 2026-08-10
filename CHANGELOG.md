@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 
+- Fix PDF Generation involving a Network port with multiple IPs
 - Fix PDF export of tabs renamed in GLPI 11
 
 ## [4.1.4] - 2026-07-30
