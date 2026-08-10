@@ -151,7 +151,7 @@ class PluginPdfNetworkPort extends PluginPdfCommon
                                     'glpi_networknames' => 'id',
                                 ],
                                 [
-                                    'glpi_ipaddresses.entities_id'=> $_SESSION['glpiactive_entity'],
+                                    'glpi_ipaddresses.entities_id' => $_SESSION['glpiactive_entity'],
                                 ],
                             ],
                         ],
@@ -159,7 +159,7 @@ class PluginPdfNetworkPort extends PluginPdfCommon
                     ],
                 );
 
-                foreach($ips as $ip){
+                foreach ($ips as $ip) {
                     $ipname = '';
 
                     $ipname = $ip['name'];
