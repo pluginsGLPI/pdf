@@ -138,17 +138,32 @@ class PluginPdfNetworkPort extends PluginPdfCommon
                     $netport->fields['mac'],
                 ));
 
-                $sqlip = ['LEFT JOIN' => ['glpi_networknames'
-                                               => ['FKEY' => ['glpi_ipaddresses' => 'items_id',
-                                                   'glpi_networknames'           => 'id'],
-                                                   ['glpi_ipaddresses.entities_id'
-                                                         => $_SESSION['glpiactive_entity']]]],
-                    'WHERE' => ['glpi_networknames.items_id' => $netport->fields['id']]];
+                $ipAdress     = new IPAddress();
 
-                $ipname = '';
-                $ip     = new IPAddress();
-                if ($ip->getFromDBByRequest($sqlip)) {
-                    $ipname = $ip->fields['name'];
+                $ips = $DB->request(
+                    [
+                        'SELECT' => [$ipAdress->getTable() . '.*'],
+                        'FROM' => $ipAdress->getTable(),
+                        'LEFT JOIN' => [
+                            'glpi_networknames' => [
+                                'FKEY' => [
+                                    'glpi_ipaddresses' => 'items_id',
+                                    'glpi_networknames' => 'id',
+                                ],
+                                [
+                                    'glpi_ipaddresses.entities_id'=> $_SESSION['glpiactive_entity'],
+                                ],
+                            ],
+                        ],
+                        'WHERE' => ['glpi_networknames.items_id' => $netport->fields['id']],
+                    ],
+                );
+
+                foreach($ips as $ip){
+                    $ipname = '';
+
+                    $ipname = $ip['name'];
+                    $ipid = $ip['id'];
 
                     $pdf->displayLine('<b>' . sprintf(__s('%1$s: %2$s'), __s('ip') . '</b>', $ipname));
 
@@ -157,8 +172,8 @@ class PluginPdfNetworkPort extends PluginPdfCommon
                         'LEFT JOIN'  => ['glpi_ipnetworks'
                                         => ['FKEY' => ['glpi_ipaddresses_ipnetworks' => 'ipnetworks_id',
                                             'glpi_ipnetworks'                        => 'id']]],
-                        'WHERE' => ['glpi_ipaddresses_ipnetworks.ipaddresses_id' => $ip->getID()]
-                                       + $dbu->getEntitiesRestrictCriteria('glpi_ipnetworks')];
+                        'WHERE' => ['glpi_ipaddresses_ipnetworks.ipaddresses_id' => $ipid]
+                                    + $dbu->getEntitiesRestrictCriteria('glpi_ipnetworks')];
 
                     $res = $DB->request($sql);
                     foreach ($res as $row) {
