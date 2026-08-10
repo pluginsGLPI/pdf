@@ -160,8 +160,6 @@ class PluginPdfNetworkPort extends PluginPdfCommon
                 );
 
                 foreach ($ips as $ip) {
-                    $ipname = '';
-
                     $ipname = $ip['name'];
                     $ipid = $ip['id'];
 
