@@ -138,12 +138,12 @@ class PluginPdfNetworkPort extends PluginPdfCommon
                     $netport->fields['mac'],
                 ));
 
-                $ipAdress     = new IPAddress();
+                $ipAddress = new IPAddress();
 
                 $ips = $DB->request(
                     [
-                        'SELECT' => [$ipAdress->getTable() . '.*'],
-                        'FROM' => $ipAdress->getTable(),
+                        'SELECT' => [$ipAddress->getTable() . '.*'],
+                        'FROM' => $ipAddress->getTable(),
                         'LEFT JOIN' => [
                             'glpi_networknames' => [
                                 'FKEY' => [
