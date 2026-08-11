@@ -160,18 +160,14 @@ class PluginPdfNetworkPort extends PluginPdfCommon
                     ],
                 );
 
-                foreach ($ips as $ip) {
-                    $ipname = $ip['name'];
-                    $ipid = $ip['id'];
+$pdf->displayLine('<b>' . sprintf(__s('%1$s: %2$s'), __s('ip') . '</b>', $ip['name']));
 
-                    $pdf->displayLine('<b>' . sprintf(__s('%1$s: %2$s'), __s('ip') . '</b>', $ipname));
-
-                    $sql = ['SELECT' => 'glpi_ipaddresses_ipnetworks.ipnetworks_id',
-                        'FROM'       => 'glpi_ipaddresses_ipnetworks',
-                        'LEFT JOIN'  => ['glpi_ipnetworks'
-                                        => ['FKEY' => ['glpi_ipaddresses_ipnetworks' => 'ipnetworks_id',
-                                            'glpi_ipnetworks'                        => 'id']]],
-                        'WHERE' => ['glpi_ipaddresses_ipnetworks.ipaddresses_id' => $ipid]
+$sql = ['SELECT' => 'glpi_ipaddresses_ipnetworks.ipnetworks_id',
+'FROM'       => 'glpi_ipaddresses_ipnetworks',
+'LEFT JOIN'  => ['glpi_ipnetworks'
+=> ['FKEY' => ['glpi_ipaddresses_ipnetworks' => 'ipnetworks_id',
+'glpi_ipnetworks'                        => 'id']]],
+                        'WHERE' => ['glpi_ipaddresses_ipnetworks.ipaddresses_id' => $ip['id']]
                                     + $dbu->getEntitiesRestrictCriteria('glpi_ipnetworks')];
 
                     $res = $DB->request($sql);
