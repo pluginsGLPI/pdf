@@ -153,7 +153,10 @@ class PluginPdfNetworkPort extends PluginPdfCommon
                                 ],
                             ],
                         ],
-                        'WHERE' => ['glpi_networknames.items_id' => $netport->fields['id']],
+                        'WHERE' => [
+                            'glpi_networknames.items_id' => $netport->fields['id'],
+                            'glpi_networknames.itemtype' => NetworkPort::class,
+                        ],
                     ],
                 );
 
