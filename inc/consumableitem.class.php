@@ -32,7 +32,7 @@
 
 class PluginPdfConsumableItem extends PluginPdfCommon
 {
-    public static $rightname = 'plugin_pdf';
+    public static string $rightname = 'plugin_pdf';
 
     public function __construct(?CommonGLPI $obj = null)
     {
@@ -165,7 +165,7 @@ class PluginPdfConsumableItem extends PluginPdfCommon
                 'ORDER' => $order],
         );
 
-        if (!$number) {
+        if ($number === 0) {
             $pdf->setColumnsSize(100);
             $pdf->displayTitle(__s('No consumable'));
         } else {
