@@ -15,6 +15,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [4.1.5] - 2026-09-01
 
+### Added
+
+- GLPI 12 compatibility
+
 ### Fixed
 
 - Fix PDF Generation involving a Network port with multiple IPs

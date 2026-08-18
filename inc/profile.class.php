@@ -32,7 +32,7 @@
 
 class PluginPdfProfile extends Profile
 {
-    public static $rightname = 'profile';
+    public static string $rightname = 'profile';
 
     public static function getTypeName($nb = 0)
     {
@@ -127,11 +127,11 @@ class PluginPdfProfile extends Profile
                     'name'                                     => $right]);
             }
 
-            if (!$dbu->countElementsInTable(
+            if ($dbu->countElementsInTable(
                 'glpi_profilerights',
                 ['profiles_id' => $profiles_id,
                     'name'     => $right],
-            )) {
+            ) === 0) {
                 $myright['profiles_id'] = $profiles_id;
                 $myright['name']        = $right;
                 $myright['rights']      = $value;
