@@ -65,7 +65,7 @@ use Glpi\Application\View\TemplateRenderer;
 class PluginPdfConfig extends CommonDBTM
 {
     private static $_instance = null;
-    public static $rightname  = 'config';
+    public static string $rightname  = 'config';
 
     public static function canCreate(): bool
     {

@@ -33,7 +33,7 @@ use Glpi\DBAL\QueryExpression;
 
 class PluginPdfItem_Device extends PluginPdfCommon
 {
-    public static $rightname = 'plugin_pdf';
+    public static string $rightname = 'plugin_pdf';
 
     public function __construct(?CommonGLPI $obj = null)
     {
