@@ -246,7 +246,6 @@ class PluginPdfComputer_SoftwareVersion extends PluginPdfCommon
                         $tmp[] = $licname;
                     }
                 }
-                $linkUser = User::canView();
                 $pdf->displayLine(
                     $data['version'],
                     $compname,
@@ -255,13 +254,14 @@ class PluginPdfComputer_SoftwareVersion extends PluginPdfCommon
                     $data['location'],
                     $data['state'],
                     $data['groupe'],
-                    formatUserName(
-                        $data['userid'],
-                        $data['username'],
-                        $data['userrealname'],
-                        $data['userfirstname'],
-                        $linkUser ? 1 : 0,
-                    ),
+                    ($data['userid'] === null
+                        ? ''
+                        : formatUserName(
+                            (int) $data['userid'],
+                            $data['username'],
+                            $data['userrealname'],
+                            $data['userfirstname'],
+                        )),
                     implode(', ', $tmp),
                     Html::convDate($data['date_install']),
                 );
@@ -307,7 +307,10 @@ class PluginPdfComputer_SoftwareVersion extends PluginPdfCommon
         }
         $sql = ['SELECT' => ['id', 'completename'],
             'FROM'       => 'glpi_entities',
-            'WHERE'      => $dbu->getEntitiesRestrictRequest('glpi_entities'),
+            // getEntitiesRestrictRequest() returns a raw SQL string; feeding it to the
+            // array query builder produced "WHERE glpi_entities ( 1 )" and a MySQL
+            // error 1305. The criteria variant returns the array the builder expects.
+            'WHERE'      => $dbu->getEntitiesRestrictCriteria('glpi_entities'),
             'ORDER'      => 'completename'];
 
         foreach ($DB->request($sql) as $ID => $data) {

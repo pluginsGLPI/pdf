@@ -10,6 +10,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 
 - Fix PDF export of tabs renamed in GLPI 11
+- Prevent PDF exports from failing when a network port has no instantiation type
+  or has multiple IP addresses.
+- Prevent software and software-version PDF exports from failing when an
+  installation has no associated user.
+- Use entity restriction criteria compatible with the GLPI query builder when
+  exporting software versions.
 
 ## [4.1.4] - 2026-07-30
 

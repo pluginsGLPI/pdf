@@ -73,8 +73,15 @@ class PluginPdfNetworkPort extends PluginPdfCommon
             foreach ($result as $devid) {
                 $netport = new NetworkPort();
                 $netport->getfromDB(current($devid));
-                $instantiation_type = $netport->fields['instantiation_type'];
-                $instname           = call_user_func([$instantiation_type, 'getTypeName']);
+                // Ports created by the inventory may carry no instantiation type at
+                // all; call_user_func(['', 'getTypeName']) then raised a TypeError and
+                // aborted the whole document.
+                $instantiation_type = $netport->fields['instantiation_type'] ?? '';
+                if (!empty($instantiation_type) && is_a($instantiation_type, CommonDBTM::class, true)) {
+                    $instname = call_user_func([$instantiation_type, 'getTypeName']);
+                } else {
+                    $instname = NetworkPort::getTypeName(1);
+                }
                 $pdf->displayTitle('<b>' . $instname . '</b>');
 
                 $pdf->displayLine('<b>' . sprintf(
@@ -138,26 +145,35 @@ class PluginPdfNetworkPort extends PluginPdfCommon
                     $netport->fields['mac'],
                 ));
 
-                $sqlip = ['LEFT JOIN' => ['glpi_networknames'
-                                               => ['FKEY' => ['glpi_ipaddresses' => 'items_id',
-                                                   'glpi_networknames'           => 'id'],
-                                                   ['glpi_ipaddresses.entities_id'
-                                                         => $_SESSION['glpiactive_entity']]]],
-                    'WHERE' => ['glpi_networknames.items_id' => $netport->fields['id']]];
+                // A network port usually carries several addresses (IPv4 + IPv6).
+                // IPAddress::getFromDBByRequest() expects a single result and throws
+                // a TooManyResultsException as soon as there are two, which aborted
+                // the whole PDF. Iterate over every address instead.
+                $sqlip = ['SELECT' => ['glpi_ipaddresses.id AS id',
+                    'glpi_ipaddresses.name AS name'],
+                    'FROM'      => 'glpi_ipaddresses',
+                    'LEFT JOIN' => ['glpi_networknames'
+                                          => ['FKEY' => ['glpi_ipaddresses' => 'items_id',
+                                              'glpi_networknames'           => 'id']]],
+                    'WHERE' => ['glpi_networknames.items_id'  => $netport->fields['id'],
+                        'glpi_ipaddresses.itemtype'           => 'NetworkName',
+                        'glpi_ipaddresses.is_deleted'         => 0]
+                                  + $dbu->getEntitiesRestrictCriteria('glpi_ipaddresses'),
+                    'ORDER' => 'glpi_ipaddresses.name'];
 
-                $ipname = '';
-                $ip     = new IPAddress();
-                if ($ip->getFromDBByRequest($sqlip)) {
-                    $ipname = $ip->fields['name'];
-
-                    $pdf->displayLine('<b>' . sprintf(__s('%1$s: %2$s'), __s('ip') . '</b>', $ipname));
+                foreach ($DB->request($sqlip) as $ipdata) {
+                    $pdf->displayLine('<b>' . sprintf(
+                        __s('%1$s: %2$s'),
+                        __s('ip') . '</b>',
+                        $ipdata['name'],
+                    ));
 
                     $sql = ['SELECT' => 'glpi_ipaddresses_ipnetworks.ipnetworks_id',
                         'FROM'       => 'glpi_ipaddresses_ipnetworks',
                         'LEFT JOIN'  => ['glpi_ipnetworks'
                                         => ['FKEY' => ['glpi_ipaddresses_ipnetworks' => 'ipnetworks_id',
                                             'glpi_ipnetworks'                        => 'id']]],
-                        'WHERE' => ['glpi_ipaddresses_ipnetworks.ipaddresses_id' => $ip->getID()]
+                        'WHERE' => ['glpi_ipaddresses_ipnetworks.ipaddresses_id' => $ipdata['id']]
                                        + $dbu->getEntitiesRestrictCriteria('glpi_ipnetworks')];
 
                     $res = $DB->request($sql);
