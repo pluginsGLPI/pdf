@@ -59,7 +59,6 @@ class SimplePdfTest extends GLPITestCase
         $pdf = new PluginPdfSimplePDF();
 
         $method = new ReflectionMethod(PluginPdfSimplePDF::class, 'cleanTableHtml');
-        $method->setAccessible(true);
         $cleaned = $method->invoke($pdf, $html);
 
         // no duplicated attribute on <table>
