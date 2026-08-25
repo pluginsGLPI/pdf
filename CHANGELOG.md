@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 
 - Fix PDF export of tabs renamed in GLPI 11
+- Fix PDF export crash on tickets with tables containing nested-quote styles
 
 ## [4.1.4] - 2026-07-30
 
