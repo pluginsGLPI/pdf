@@ -473,12 +473,12 @@ class PluginPdfSimplePDF
         // which regex-based quote matching cannot handle reliably and ends up corrupting
         // the markup fed to TCPDF (causing crashes on malformed HTML).
         $dom = new DOMDocument();
-        libxml_use_internal_errors(true);
+        $libxml_previous_state = libxml_use_internal_errors(true);
         $dom->loadHTML(
             '<?xml encoding="utf-8" ?><div>' . $html . '</div>',
             LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD,
         );
-        libxml_clear_errors();
+        libxml_use_internal_errors($libxml_previous_state);
 
         $wrapper = $dom->getElementsByTagName('div')->item(0);
         if ($wrapper === null) {
@@ -486,9 +486,9 @@ class PluginPdfSimplePDF
             return $html;
         }
 
+        $xpath = new DOMXPath($dom);
         foreach (iterator_to_array($dom->getElementsByTagName('table')) as $table) {
             // Remove width/height (attributes and styles) on the table and its rows/cells
-            $xpath = new DOMXPath($dom);
             foreach ($xpath->query('.//td | .//th | .//tr | .', $table) as $node) {
                 if (!($node instanceof DOMElement)) {
                     continue;
@@ -538,7 +538,7 @@ class PluginPdfSimplePDF
         }
 
         $kept = [];
-        foreach (explode(';', $style) as $declaration) {
+        foreach (preg_split('/;(?![^(]*\))/', $style) as $declaration) {
             $declaration = trim($declaration);
             if ($declaration === '') {
                 continue;
