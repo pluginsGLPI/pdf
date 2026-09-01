@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 
+- Fix PDF Generation involving a Network port with multiple IPs
 - Fix PDF export of tabs renamed in GLPI 11
 - Fix embedded document images in PDF exports
 - Fix rich text HTML re-activated after sanitization when exporting embedded images to PDF
