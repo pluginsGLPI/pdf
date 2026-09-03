@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [4.1.5] - 2026-09-01
 
+### Added
+
+- GLPI 12 compatibility
+
 ### Fixed
 
 - Fix PDF export of tabs renamed in GLPI 11

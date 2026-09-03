@@ -32,7 +32,7 @@
 
 class PluginPdfProblem_Ticket extends PluginPdfCommon
 {
-    public static $rightname = 'plugin_pdf';
+    public static string $rightname = 'plugin_pdf';
 
     public function __construct(?CommonGLPI $obj = null)
     {
@@ -223,7 +223,7 @@ class PluginPdfProblem_Ticket extends PluginPdfCommon
                         $first = false;
                     }
                 }
-                if ($col) {
+                if ($col !== '' && $col !== '0') {
                     $texte = '<b><i>' . sprintf(__s('%1$s: %2$s'), __s('Requester') . '</i></b>', '');
                     $pdf->displayText($texte, $col, 1);
                 }
@@ -264,7 +264,7 @@ class PluginPdfProblem_Ticket extends PluginPdfCommon
                         $first = false;
                     }
                 }
-                if ($col) {
+                if ($col !== '' && $col !== '0') {
                     $texte = '<b><i>' . sprintf(__s('%1$s: %2$s') . '</i></b>', ('Assigned to'), '');
                     $pdf->displayText($texte, $col, 1);
                 }
@@ -448,7 +448,7 @@ class PluginPdfProblem_Ticket extends PluginPdfCommon
                         $first = false;
                     }
                 }
-                if ($col) {
+                if ($col !== '' && $col !== '0') {
                     $texte = '<b><i>' . sprintf(__s('%1$s: %2$s'), __s('Requester') . '</i></b>', '');
                     $pdf->displayText($texte, $col, 1);
                 }
@@ -489,7 +489,7 @@ class PluginPdfProblem_Ticket extends PluginPdfCommon
                         $first = false;
                     }
                 }
-                if ($col) {
+                if ($col !== '' && $col !== '0') {
                     $texte = '<b><i>' . sprintf(__s('%1$s: %2$s') . '</i></b>', __s('Assigned to'), '');
                     $pdf->displayText($texte, $col, 1);
                 }

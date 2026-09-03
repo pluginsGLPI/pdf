@@ -34,7 +34,7 @@ use Glpi\Application\View\TemplateRenderer;
 
 class PluginPdfPreference extends CommonDBTM
 {
-    public static $rightname = 'plugin_pdf';
+    public static string $rightname = 'plugin_pdf';
 
     public static function getTypeName($nb = 0)
     {

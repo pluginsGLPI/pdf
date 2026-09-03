@@ -32,7 +32,7 @@
 
 class PluginPdfItem_Knowbaseitem extends PluginPdfCommon
 {
-    public static $rightname = 'plugin_pdf';
+    public static string $rightname = 'plugin_pdf';
 
     public function __construct(?CommonGLPI $obj = null)
     {
