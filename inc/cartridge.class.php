@@ -366,10 +366,7 @@ class PluginPdfCartridge extends PluginPdfCommon
                     - mktime(0, 0, 0, (int) $tmp_dbeg[1], (int) $tmp_dbeg[2], (int) $tmp_dbeg[0]);
                     $use_time += $use_time_tmp;
 
-                    // Get initial counter page
-                    if (!isset($pages[$printer])) {
-                        $pages[$printer] = $data['init_pages_counter'];
-                    }
+                    $pages[$printer] ??= $data['init_pages_counter'];
                     if ($pages[$printer] < $data['pages']) {
                         $pages_printed += $data['pages'] - $pages[$printer];
                         $nb_pages_printed++;
