@@ -353,8 +353,11 @@ class PluginPdfSimplePDF
         $decoded = RichText::getEnhancedHtml($content ?? '', ['text_maxsize' => 0]);
         $content = preg_replace('/<script\b[^>]*>.*?<\/script>/is', '', $name . ' ' . $decoded);
 
-        // Decode HTML entities BEFORE searching for images
+        // Decode HTML entities BEFORE searching for images, then re-sanitize: decoding can turn
+        // escaped markup left inert by the sanitizer (e.g. stored "&lt;img src=http://...&gt;")
+        // back into a live tag, so run it through the safelist again to strip anything reactivated.
         $content = html_entity_decode($content, ENT_QUOTES, 'UTF-8');
+        $content = RichText::getSafeHtml($content);
 
         preg_match_all(
             '/<a\b[^>]*>\s*(<img\b[^>]*src=["\']([^"\']*docid=(\d+)[^"\']*)["\'][^>]*>)\s*<\/a>/i',
@@ -370,7 +373,11 @@ class PluginPdfSimplePDF
                 $full_img_tag = $match[1];
                 $docid = (int) $match[3];
 
-                if ($document->getFromDB($docid) && isset($document->fields['filepath'])) {
+                if (
+                    $document->getFromDB($docid)
+                    && $document->canViewFile()
+                    && isset($document->fields['filepath'])
+                ) {
                     $file_path = GLPI_DOC_DIR . '/' . $document->fields['filepath'];
                     if (file_exists($file_path)) {
                         // Get actual image dimensions from file
