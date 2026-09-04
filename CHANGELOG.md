@@ -10,9 +10,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 
 - Fix PDF export of tabs renamed in GLPI 11
+- fix/tcpdf-nested-quotes-crash
+- Fix PDF export crash on tickets with tables containing nested-quote styles
 - Fix embedded document images in PDF exports
 - Fix rich text HTML re-activated after sanitization when exporting embedded images to PDF
 - Remove dead webservices hook registration
+
 
 ## [4.1.4] - 2026-07-30
 

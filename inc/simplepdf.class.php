@@ -475,30 +475,89 @@ class PluginPdfSimplePDF
         // Remove colgroup entirely (causes fixed widths)
         $html = preg_replace('/<colgroup\b[^>]*>.*?<\/colgroup>/is', '', $html);
 
-        // Remove table-layout:fixed style (prevents auto-sizing)
-        $html = preg_replace('/table-layout\s*:\s*fixed\s*;?/i', '', $html);
+        // Parse with DOMDocument rather than regexes: style/attribute values coming
+        // from pasted web content can contain nested quotes (e.g. style="...url('...')..."),
+        // which regex-based quote matching cannot handle reliably and ends up corrupting
+        // the markup fed to TCPDF (causing crashes on malformed HTML).
+        $dom = new DOMDocument();
+        $libxml_previous_state = libxml_use_internal_errors(true);
+        $dom->loadHTML(
+            '<?xml encoding="utf-8" ?><div>' . $html . '</div>',
+            LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD,
+        );
+        libxml_use_internal_errors($libxml_previous_state);
 
-        // Remove width/height styles only from table elements (table, td, th, tr)
-        $html = preg_replace('/(<(?:table|td|th|tr)\b[^>]*)\s+style\s*=\s*["\']([^"\']*)\bwidth\s*:\s*[^;"\'>]+;?([^"\']*)["\']/', '$1 style="$2$3"', $html);
-        $html = preg_replace('/(<(?:table|td|th|tr)\b[^>]*)\s+style\s*=\s*["\']([^"\']*)\bheight\s*:\s*[^;"\'>]+;?([^"\']*)["\']/', '$1 style="$2$3"', $html);
-
-        // Remove width/height attributes only from table elements (table, td, th, tr)
-        $html = preg_replace('/(<(?:table|td|th|tr)\b[^>]+)\s+width\s*=\s*["\']?[^"\'\s>]+["\']?/i', '$1', $html);
-        $html = preg_replace('/(<(?:table|td|th|tr)\b[^>]+)\s+height\s*=\s*["\']?[^"\'\s>]+["\']?/i', '$1', $html);
-
-        // Clean up empty style attributes and double spaces
-        $html = preg_replace('/\s+style\s*=\s*["\'][\s]*["\']/', '', $html);
-        $html = preg_replace('/\s+/', ' ', $html);
-
-        // Add border to table if missing (for visibility)
-        if (!preg_match('/border\s*=\s*["\']?[1-9]/i', $html)) {
-            $html = preg_replace('/<table/i', '<table border="1"', $html, 1);
+        $wrapper = $dom->getElementsByTagName('div')->item(0);
+        if ($wrapper === null) {
+            // Fallback: parsing failed unexpectedly, keep original content rather than losing it
+            return $html;
         }
 
-        // Force table to 100% width for PDF (do this LAST)
-        $html = preg_replace('/<table([^>]*)>/i', '<table$1 style="width:100%">', $html, 1);
+        $xpath = new DOMXPath($dom);
+        foreach (iterator_to_array($dom->getElementsByTagName('table')) as $table) {
+            // Remove width/height (attributes and styles) on the table and its rows/cells
+            foreach ($xpath->query('.//td | .//th | .//tr | .', $table) as $node) {
+                if (!($node instanceof DOMElement)) {
+                    continue;
+                }
 
-        return $html;
+                $node->removeAttribute('width');
+                $node->removeAttribute('height');
+
+                $style = $this->removeStyleProperties($node->getAttribute('style'), ['width', 'height', 'table-layout']);
+                if ($style === '') {
+                    $node->removeAttribute('style');
+                } else {
+                    $node->setAttribute('style', $style);
+                }
+            }
+
+            // Add border to table if missing (for visibility)
+            if (!$table->hasAttribute('border') || (int) $table->getAttribute('border') < 1) {
+                $table->setAttribute('border', '1');
+            }
+
+            // Force table to 100% width for PDF (do this LAST)
+            $style = trim($table->getAttribute('style') . ';width:100%;', ';');
+            $table->setAttribute('style', $style);
+        }
+
+        $output = '';
+        foreach (iterator_to_array($wrapper->childNodes) as $child) {
+            $output .= $dom->saveHTML($child);
+        }
+
+        return $output;
+    }
+
+    /**
+     * Remove the given CSS properties from an inline style declaration.
+     *
+     * @param $style      string    inline style attribute content
+     * @param $properties array     lowercase property names to strip
+     *
+     * @return string
+     **/
+    private function removeStyleProperties($style, array $properties)
+    {
+        if (trim($style) === '') {
+            return '';
+        }
+
+        $kept = [];
+        foreach (preg_split('/;(?![^(]*\))/', $style) as $declaration) {
+            $declaration = trim($declaration);
+            if ($declaration === '') {
+                continue;
+            }
+            $property = strtolower(trim(explode(':', $declaration, 2)[0]));
+            if (in_array($property, $properties, true)) {
+                continue;
+            }
+            $kept[] = $declaration;
+        }
+
+        return implode('; ', $kept);
     }
 
     /**
