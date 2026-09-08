@@ -161,35 +161,34 @@ class PluginPdfChange_Item extends PluginPdfCommon
 
         $dbu = new DbUtils();
 
-        $restrict = [];
+        $restrict = '';
         $order    = '';
 
         switch ($item->getType()) {
             case 'User':
-                $restrict = ['glpi_changes_users.users_id' => $item->getID()];
+                $restrict = "(`glpi_changes_users`.`users_id` = '" . $item->getID() . "')";
                 $order    = '`glpi_changes`.`date_mod` DESC';
                 break;
 
             case 'Supplier':
-                $restrict = ['glpi_changes_suppliers.suppliers_id' => $item->getID()];
+                $restrict = "(`glpi_changes_suppliers`.`suppliers_id` = '" . $item->getID() . "')";
                 $order    = '`glpi_changes`.`date_mod` DESC';
                 break;
 
             case 'Group':
                 if ($tree) {
-                    $restrict = ['glpi_changes_groups.groups_id' => $dbu->getSonsOf('glpi_groups', $item->getID())];
+                    $restrict = 'IN (' . implode(',', $dbu->getSonsOf('glpi_groups', $item->getID())) . ')';
                 } else {
-                    $restrict = ['glpi_changes_groups.groups_id' => $item->getID()];
+                    $restrict = "='" . $item->getID() . "'";
                 }
-                $restrict['glpi_changes_groups.type'] = CommonITILActor::REQUESTER;
+                $restrict = "(`glpi_changes_groups`.`groups_id` $restrict
+                            AND `glpi_changes_groups`.`type` = " . CommonITILActor::REQUESTER . ')';
                 $order = '`glpi_changes`.`date_mod` DESC';
                 break;
 
             default:
-                $restrict = [
-                    'glpi_changes_items.items_id' => $item->getID(),
-                    'glpi_changes_items.itemtype' => $item->getType(),
-                ];
+                $restrict = "(`items_id` = '" . $item->getID() . "'
+                            AND `itemtype` = '" . $item->getType() . "')";
                 $order = '`glpi_changes`.`date_mod` DESC';
                 break;
         }
@@ -226,7 +225,7 @@ class PluginPdfChange_Item extends PluginPdfCommon
             'DISTINCT' => true,
             'FROM' => 'glpi_changes',
             'LEFT JOIN' => $LEFT_JOIN,
-            'WHERE' => $restrict + $dbu->getEntitiesRestrictCriteria('glpi_changes'),
+            'WHERE' => [$restrict] + $dbu->getEntitiesRestrictCriteria('glpi_changes'),
             'ORDER' => $order,
             'LIMIT' => (int) $_SESSION['glpilist_limit'],
         ];
