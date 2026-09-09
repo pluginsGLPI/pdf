@@ -230,46 +230,54 @@ class PluginPdfItem_Ticket extends PluginPdfCommon
             return false;
         }
 
-        $restrict = '';
+        $restrict = [];
         $order    = '';
         switch ($item->getType()) {
             case 'User':
-                $restrict = "(`glpi_tickets_users`.`users_id` = '" . $item->getID() . "'
-                            AND `glpi_tickets_users`.`type` = " . CommonITILActor::REQUESTER . ')';
+                $restrict = [
+                    'glpi_tickets_users.users_id' => $item->getID(),
+                    'glpi_tickets_users.type' => CommonITILActor::REQUESTER,
+                ];
                 $order = '`glpi_tickets`.`time_to_resolve` DESC';
                 break;
 
             case 'SLA':
-                $restrict = "(`slas_id` = '" . $item->getID() . "')";
+                $restrict = ['slas_id' => $item->getID()];
                 $order    = '`glpi_tickets`.`time_to_resolve` DESC';
                 break;
 
             case 'Supplier':
-                $restrict = "(`glpi_suppliers_tickets`.`suppliers_id` = '" . $item->getID() . "'
-                           AND `glpi_suppliers_tickets`.`type` = " . CommonITILActor::ASSIGN . ')';
+                $restrict = [
+                    'glpi_suppliers_tickets.suppliers_id' => $item->getID(),
+                    'glpi_suppliers_tickets.type' => CommonITILActor::ASSIGN,
+                ];
                 $order = '`glpi_tickets`.`date_mod` DESC';
                 break;
 
             case 'Group':
                 if ($tree) {
-                    $restrict = 'IN (' . implode(',', $dbu->getSonsOf('glpi_groups', $item->getID())) . ')';
+                    $restrict = ['glpi_groups_tickets.groups_id' => $dbu->getSonsOf('glpi_groups', $item->getID())];
                 } else {
-                    $restrict = "='" . $item->getID() . "'";
+                    $restrict = ['glpi_groups_tickets.groups_id' => $item->getID()];
                 }
-                $restrict = "(`glpi_groups_tickets`.`groups_id` $restrict
-                            AND `glpi_groups_tickets`.`type` = " . CommonITILActor::REQUESTER . ')';
+                $restrict['glpi_groups_tickets.type'] = CommonITILActor::REQUESTER;
                 $order = '`glpi_tickets`.`date_mod` DESC';
                 break;
 
             default:
-                $restrict = "(`glpi_items_tickets`.`items_id` = '" . $item->getID() . "' " .
-                            " AND `glpi_items_tickets`.`itemtype` = '" . $item->getType() . "')";
+                $restrict = [
+                    'glpi_items_tickets.items_id' => $item->getID(),
+                    'glpi_items_tickets.itemtype' => $item->getType(),
+                ];
                 // you can only see your tickets
                 if (!Session::haveRight('ticket', Ticket::READALL)) {
-                    $restrict .= " AND (`glpi_tickets`.`users_id_recipient` = '" . Session::getLoginUserID() . "'
-                                   OR (`glpi_tickets_users`.`tickets_id` = '" . $item->getID() . "'
-                                       AND `glpi_tickets_users`.`users_id`
-                                            = '" . Session::getLoginUserID() . "'))";
+                    $restrict['OR'] = [
+                        'glpi_tickets.users_id_recipient' => Session::getLoginUserID(),
+                        [
+                            'glpi_tickets_users.tickets_id' => $item->getID(),
+                            'glpi_tickets_users.users_id' => Session::getLoginUserID(),
+                        ],
+                    ];
                 }
                 $order = '`glpi_tickets`.`date_mod` DESC';
         }
@@ -332,25 +340,12 @@ class PluginPdfItem_Ticket extends PluginPdfCommon
             ];
         }
 
-        $where_conditions = [];
-
-        if (str_contains($restrict, 'OR') || str_contains($restrict, 'AND')) {
-            $where_conditions[] = new QueryExpression($restrict);
-        } else {
-            $where_conditions[] = $restrict;
-        }
-
-        $entity_restrict = $dbu->getEntitiesRestrictRequest('', 'glpi_tickets');
-        if (!empty($entity_restrict)) {
-            $where_conditions[] = new QueryExpression($entity_restrict);
-        }
-
         $query_params = [
             'SELECT' => $select_fields,
             'DISTINCT' => true,
             'FROM' => 'glpi_tickets',
             'LEFT JOIN' => $left_joins,
-            'WHERE' => $where_conditions,
+            'WHERE' => $restrict + $dbu->getEntitiesRestrictCriteria('glpi_tickets'),
             'ORDER' => $order,
             'LIMIT' => intval($_SESSION['glpilist_limit']),
         ];
