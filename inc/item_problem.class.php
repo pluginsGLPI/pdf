@@ -155,8 +155,7 @@ class PluginPdfItem_Problem extends PluginPdfCommon
                     }
 
                     // Ajout de la restriction d'entités
-                    $entity_restrict = $dbu->getEntitiesRestrictRequest(
-                        '',
+                    $entity_restrict = $dbu->getEntitiesRestrictCriteria(
                         $itemtable,
                         '',
                         '',
@@ -212,32 +211,34 @@ class PluginPdfItem_Problem extends PluginPdfCommon
 
         $dbu = new DbUtils();
 
-        $restrict = '';
+        $restrict = [];
         $order    = '';
         switch ($item->getType()) {
             case 'User':
-                $restrict = "(`glpi_problems_users`.`users_id` = '" . $item->getID() . "')";
+                $restrict = ["glpi_problems_users.users_id" => $item->getID()];
                 $order    = '`glpi_problems`.`date_mod` DESC';
                 break;
 
             case 'Supplier':
-                $restrict = "(`glpi_problems_suppliers`.`suppliers_id` = '" . $item->getID() . "')";
+                $restrict = ["glpi_problems_suppliers.suppliers_id" => $item->getID()];
                 $order    = '`glpi_problems`.`date_mod` DESC';
                 break;
 
             case 'Group':
                 if ($tree) {
-                    $restrict = 'IN (' . implode(',', $dbu->getSonsOf('glpi_groups', $item->getID())) . ')';
+                    $restrict = ["glpi_groups_problems.groups_id" => $dbu->getSonsOf('glpi_groups', $item->getID())];
                 } else {
-                    $restrict = "='" . $item->getID() . "'";
+                    $restrict = ["glpi_groups_problems.groups_id" => $item->getID()];
                 }
-                $restrict = "(`glpi_groups_problems`.`groups_id` $restrict)";
+                //$restrict = "(`glpi_groups_problems`.`groups_id` $restrict)";
                 $order    = '`glpi_problems`.`date_mod` DESC';
                 break;
 
             default:
-                $restrict = "(`items_id` = '" . $item->getID() . "'
-                            AND `itemtype` = '" . $item->getType() . "')";
+                $restrict = [
+                    'glpi_items_problems.items_id' => $item->getID(),
+                    'glpi_items_problems.itemtype' => $item->getType(),
+                ];
                 $order = '`glpi_problems`.`date_mod` DESC';
                 break;
         }
@@ -294,25 +295,12 @@ class PluginPdfItem_Problem extends PluginPdfCommon
             ];
         }
 
-        $where_conditions = [];
-
-        if (str_contains($restrict, 'IN (') || str_contains($restrict, 'AND') || str_contains($restrict, 'OR')) {
-            $where_conditions[] = new QueryExpression($restrict);
-        } else {
-            $where_conditions[] = new QueryExpression($restrict);
-        }
-
-        $entity_restrict = $dbu->getEntitiesRestrictRequest('', 'glpi_problems');
-        if (!empty($entity_restrict)) {
-            $where_conditions[] = new QueryExpression($entity_restrict);
-        }
-
         $query_params = [
             'SELECT' => $select_fields,
             'DISTINCT' => true,
             'FROM' => 'glpi_problems',
             'LEFT JOIN' => $left_joins,
-            'WHERE' => $where_conditions,
+            'WHERE' => $restrict + $dbu->getEntitiesRestrictCriteria('glpi_problems'),
             'ORDER' => $order,
             'LIMIT' => intval($_SESSION['glpilist_limit']),
         ];
