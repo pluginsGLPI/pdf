@@ -30,6 +30,8 @@
  *  --------------------------------------------------------------------------
  */
 
+use Glpi\Form\ServiceCatalog\ServiceCatalog;
+
 class PluginPdfKnowbaseItem extends PluginPdfCommon
 {
     public static string $rightname = 'plugin_pdf';
@@ -47,6 +49,11 @@ class PluginPdfKnowbaseItem extends PluginPdfCommon
         unset($onglets['KnowbaseItemTranslation$1']);
         unset($onglets['KnowbaseItem_Revision$1']);
 
+        $this->obj->addStandardTab(Document_Item::class, $onglets, $options);
+        $this->obj->addStandardTab(ServiceCatalog::class, $onglets, $options);
+        $this->obj->addStandardTab(Log::class, $onglets, $options);
+        $this->obj->addStandardTab(KnowbaseItem_Comment::class, $onglets, $options);
+
         return $onglets;
     }
 
@@ -63,11 +70,11 @@ class PluginPdfKnowbaseItem extends PluginPdfCommon
             return false;
         }
 
-        $knowbaseitemcategories_id = $item->getField('knowbaseitemcategories_id');
+        $forms_categories_id = $item->getField('forms_categories_id');
         $fullcategoryname
         = Toolbox::stripTags($dbu->getTreeValueCompleteName(
-            'glpi_knowbaseitemcategories',
-            $knowbaseitemcategories_id,
+            'glpi_forms_categories',
+            (int) $forms_categories_id,
         ));
 
         $question

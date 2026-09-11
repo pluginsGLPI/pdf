@@ -163,7 +163,7 @@ class PluginPdfItem_Problem extends PluginPdfCommon
                     );
 
                     if (!empty($entity_restrict)) {
-                        $query_params['WHERE'][] = new QueryExpression($entity_restrict);
+                        $query_params['WHERE'] += $entity_restrict;
                     }
 
                     $result_linked = $DB->request($query_params);
