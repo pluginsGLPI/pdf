@@ -153,7 +153,7 @@ class PluginPdfUser extends PluginPdfCommon
             '<b><i>' . sprintf(
                 __s('%1$s: %2$s'),
                 __s('Language') . '</i></b>',
-                Dropdown::getLanguageName($item->fields['language']),
+                Dropdown::getLanguageName($item->fields['language'] ?? "en_GB"),
             ),
         );
 
