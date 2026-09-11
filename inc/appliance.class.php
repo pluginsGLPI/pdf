@@ -219,7 +219,8 @@ class PluginPdfAppliance extends PluginPdfCommon
         $pdf->displayTitle('<b>' . _sn('Associated item', 'Associated items', 2) . '</b>');
 
         $result = $DB->request([
-            'SELECT' => 'DISTINCT itemtype',
+            'SELECT' => 'itemtype',
+            'DISTINCT' => true,
             'FROM'   => 'glpi_appliances_items',
             'WHERE'  => ['appliances_id' => $instID],
         ]);
