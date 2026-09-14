@@ -30,7 +30,7 @@
  *  --------------------------------------------------------------------------
  */
 
-use Glpi\DBAL\QueryExpression;
+
 
 /**
  *  -------------------------------------------------------------------------
@@ -162,7 +162,7 @@ class PluginPdfItem_Problem extends PluginPdfCommon
                         $item->maybeRecursive(),
                     );
 
-                    if (!empty($entity_restrict)) {
+                    if ($entity_restrict !== []) {
                         $query_params['WHERE'] += $entity_restrict;
                     }
 
