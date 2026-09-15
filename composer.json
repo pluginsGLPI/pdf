@@ -18,7 +18,8 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Glpi\\Tools\\": "../../tools/src/"
+            "Glpi\\Tools\\": "../../tools/src/",
+            "GlpiPlugin\\Pdf\\Tests\\": "tests/"
         }
     }
 }

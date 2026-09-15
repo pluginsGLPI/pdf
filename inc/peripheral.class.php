@@ -63,11 +63,7 @@ class PluginPdfPeripheral extends PluginPdfCommon
         PluginPdfCommon::mainLine($pdf, $item, 'user-management');
 
         $pdf->displayLine(
-            '<b><i>' . sprintf(
-                __s('%1$s: %2$s'),
-                __s('Group') . '</i></b>',
-                Dropdown::getDropdownName('glpi_groups', $item->fields['groups_id']),
-            ),
+            '<b><i>' . sprintf(__s('%1$s: %2$s'), __s('Group') . '</i></b>', self::getGroupName($item)),
             '<b><i>' . sprintf(__s('%1$s: %2$s'), __s('Brand') . '</i></b>', $item->fields['brand']),
         );
 
