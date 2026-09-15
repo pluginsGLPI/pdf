@@ -95,7 +95,6 @@ class PluginPdfSimplePDF
         //set auto page breaks
         $pdf->SetAutoPageBreak(true, 15);
 
-
         // For standard language
         // set font
         $pdf->SetFont($font, '', 8);
@@ -128,11 +127,14 @@ class PluginPdfSimplePDF
             !empty($hook['logo_path'])
             && $config->getField('use_branding_logo')
         ) {
-            $this->pdf->SetHeaderData($hook['logo_path'], 15, $msg, '');
+            $logo_path = $hook['logo_path'];
         } else {
-            $path = Plugin::getPhpDir('pdf') . '/public/pics/';
-            $this->pdf->SetHeaderData($path . 'fd_logo.png', 15, $msg, '');
+            $logo_path = Plugin::getPhpDir('pdf') . '/public/pics/fd_logo.png';
         }
+
+        /* Pass image as inline data to TCPDF header to avoid permissions error on image's folder */
+        $logo = is_file($logo_path) ? '@' . file_get_contents($logo_path) : '';
+        $this->pdf->SetHeaderData($logo, 15, $msg, '');
     }
 
     /**
@@ -226,6 +228,64 @@ class PluginPdfSimplePDF
     }
 
     /**
+     * Prepare a cell's content so it wraps inside its column instead of overflowing past it.
+     *
+     * @param $msg   String cell content (plain text or HTML)
+     * @param $width Float  usable width of the target column (mm)
+    **/
+    private function wrapCellContent($msg, $width)
+    {
+        $msg = (string) $msg;
+        if ($width <= 0 || str_contains($msg, '<')) {
+            return $msg;
+        }
+
+        // Check width word by word
+        $words = explode(' ', $msg);
+        foreach ($words as &$word) {
+            $word = $this->breakWordToFit($word, $width);
+        }
+        unset($word);
+
+        return implode(' ', $words);
+    }
+
+    /**
+     * Insert the minimum number of breakable spaces needed for a single word to fit a width.
+     *
+     * @param $word  String single word (no spaces) to fit
+     * @param $width Float  usable width of the target column (mm)
+    **/
+    private function breakWordToFit($word, $width)
+    {
+        if ($this->pdf->GetStringWidth($word) <= $width) {
+            return $word;
+        }
+
+        preg_match_all('/[\/\\\\_.@:-]/', $word, $matches, PREG_OFFSET_CAPTURE);
+        $breakpoints = array_map(static fn($match) => $match[1] + 1, $matches[0]);
+        if ($breakpoints === []) {
+            return $word;
+        }
+        $breakpoints[] = strlen($word);
+
+        $result = '';
+        $linestart = 0;
+        $lastfit = 0;
+        foreach ($breakpoints as $point) {
+            $fits = $this->pdf->GetStringWidth(substr($word, $linestart, $point - $linestart)) <= $width;
+            if (!$fits && $lastfit > $linestart) {
+                $result .= substr($word, $linestart, $lastfit - $linestart) . ' ';
+                $linestart = $lastfit;
+            }
+            $lastfit = $point;
+        }
+        $result .= substr($word, $linestart);
+
+        return $result;
+    }
+
+    /**
      * display a row
      *
      * @param $gray     Integer gray level of the backkgroun of each cell
@@ -236,16 +296,26 @@ class PluginPdfSimplePDF
     **/
     private function displayInternal($gray, $padd, $defalign, $miny, $msgs)
     {
+        $msgs = array_map(
+            fn($msg, $i) => $this->wrapCellContent($msg, ($this->colsw[$i] ?? 0) - (2 * $padd)),
+            $msgs,
+            array_keys($msgs),
+        );
+
         $this->pdf->SetFillColor($gray, $gray, $gray);
         $this->pdf->SetCellPadding($padd);
 
         $max = $miny;
+        $rowy = $this->pdf->GetY();
+        $pageatstart = $this->pdf->getPage();
+        $measurey = $this->pdf->getMargins()['top'];
 
-        /* dry run - compute max cell height */
+        /* Dry run - compute max cell height. */
         $this->pdf->startTransaction();
         $i = 0;
         foreach ($msgs as $msg) {
             if ($i < count($this->cols)) {
+                $this->pdf->SetXY($this->colsx[$i], $measurey);
                 $this->pdf->writeHTMLCell(
                     $this->colsw[$i], // $w (float) Cell width. If 0, the cell extends up to the right margin.
                     $miny,            // $h (float) Cell minimum height. The cell extends automatically if needed.
@@ -253,23 +323,31 @@ class PluginPdfSimplePDF
                     '',               // $y (float) upper-left corner Y coordinate
                     $msg,             // $html (string) html text to print. Default value: empty string.
                     0,                // $border (mixed) Indicates if borders must be drawn around the cell. The value can be a number:<ul><li>0: no border (default)</li><li>1: frame</li></ul> or a string containing some or all of the following characters (in any order):<ul><li>L: left</li><li>T: top</li><li>R: right</li><li>B: bottom</li></ul> or an array of line styles for each border group - for example: array('LTRB' => array('width' => 2, 'cap' => 'butt', 'join' => 'miter', 'dash' => 0, 'color' => array(0, 0, 0)))
-                    0,                // $ln (int) Indicates where the current position should go after the call. Possible values are:<ul><li>0: to the right (or left for RTL language)</li><li>1: to the beginning of the next line</li><li>2: below</li></ul>
+                    2,                // $ln (int) Indicates where the current position should go after the call. Possible values are:<ul><li>0: to the right (or left for RTL language)</li><li>1: to the beginning of the next line</li><li>2: below</li></ul>
                     1,                // $fill (boolean) Indicates if the cell background must be painted (true) or transparent (false).
                     true,             // $reseth (boolean) if true reset the last cell height (default true).
                     self::LEFT,       // $align (string) Allows to center or align the text. Possible values are:<ul><li>L : left align</li><li>C : center</li><li>R : right align</li><li>'' : empty string : left for LTR or right for RTL</li></ul>
                     true,              // $autopadding (boolean) if true, uses internal padding and automatically adjust it to account for line width.
                 );
-                if ($this->pdf->getLastH() > $max) {
-                    $max = $this->pdf->getLastH();
+                $height = $this->pdf->GetY() - $measurey;
+                if ($this->pdf->getPage() === $pageatstart && $height > $max) {
+                    $max = $height;
                 }
                 $i++;
             } else {
                 break;
             }
         }
-        $this->pdf = $this->pdf->rollbackTransaction();
+        $this->pdf->rollbackTransaction(true);
+
+        // Detect if content will go over page footer and add new page
+        if ($rowy + $max > $this->pdf->getPageHeight() - $this->pdf->getBreakMargin()) {
+            $this->pdf->AddPage();
+            $rowy = $this->pdf->GetY();
+        }
 
         /* real run */
+        $pagebefore = $this->pdf->getPage();
         $i = 0;
         foreach ($msgs as $msg) {
             if ($i < count($this->cols)) {
@@ -298,7 +376,12 @@ class PluginPdfSimplePDF
                 break;
             }
         }
-        $this->pdf->SetY($this->pdf->GetY() + 1);
+        // TCPDF 7.0 doesn't update getLastH / $lastH, so we need to track the current height ourselves.
+        if ($this->pdf->getPage() === $pagebefore) {
+            $this->pdf->SetY($rowy + $max + 1);
+        } else {
+            $this->pdf->SetY($this->pdf->GetY() + 1);
+        }
     }
 
     /**
