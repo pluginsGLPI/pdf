@@ -15,7 +15,7 @@ This plugin allow you to select and export informations of an equipment to PDF f
 
 ## Download
 
-Releases can be donwloaded on [GitHub](https://github.com/PluginsGLPI/pdf/releases).
+Releases can be downloaded on [GitHub](https://github.com/PluginsGLPI/pdf/releases).
 
 ## Documentation
 
