@@ -35,6 +35,13 @@ use Glpi\RichText\RichText;
 //use TCPDF;
 
 define('K_PATH_IMAGES', '');
+
+if (!defined('K_ALLOWED_PATHS')) {
+    define('K_ALLOWED_PATHS', [
+        GLPI_PICTURE_DIR,
+        Plugin::getPhpDir('pdf') . '/public/pics',
+    ]);
+}
 class PluginPdfSimplePDF
 {
     // Page orientation
@@ -132,15 +139,7 @@ class PluginPdfSimplePDF
             $logo_path = Plugin::getPhpDir('pdf') . '/public/pics/fd_logo.png';
         }
 
-        /* TCPDF's Header() only accepts a real file path (is_file() check), not the '@data' syntax Image() supports */
-        $logo = '';
-        if (is_file($logo_path)) {
-            $tmp_logo = GLPI_TMP_DIR . '/' . uniqid('pdf_header_logo_') . '.' . pathinfo($logo_path, PATHINFO_EXTENSION);
-            if (copy($logo_path, $tmp_logo)) {
-                $logo = $tmp_logo;
-            }
-        }
-        $this->pdf->SetHeaderData($logo, 15, $msg, '');
+        $this->pdf->SetHeaderData($logo_path, 15, $msg, '');
     }
 
     /**
