@@ -265,7 +265,18 @@ class PluginPdfSimplePDF
     private function breakWordToFit($word, $width)
     {
         if ($this->pdf->GetStringWidth($word) <= $width) {
-            return $word;
+            // No delimiter to split on: force a character-level break so the word still fits.
+            $result = '';
+            $chunk = '';
+            foreach (preg_split('//u', $word, -1, PREG_SPLIT_NO_EMPTY) as $char) {
+                if ($chunk !== '' && $this->pdf->GetStringWidth($chunk . $char) > $width) {
+                    $result .= $chunk . ' ';
+                    $chunk = '';
+                }
+                $chunk .= $char;
+            }
+
+            return $result . $chunk;
         }
 
         preg_match_all('/[\/\\\\_.@:-]/', $word, $matches, PREG_OFFSET_CAPTURE);
