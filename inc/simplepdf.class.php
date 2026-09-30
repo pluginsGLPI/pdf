@@ -132,8 +132,14 @@ class PluginPdfSimplePDF
             $logo_path = Plugin::getPhpDir('pdf') . '/public/pics/fd_logo.png';
         }
 
-        /* Pass image as inline data to TCPDF header to avoid permissions error on image's folder */
-        $logo = is_file($logo_path) ? '@' . file_get_contents($logo_path) : '';
+        /* TCPDF's Header() only accepts a real file path (is_file() check), not the '@data' syntax Image() supports */
+        $logo = '';
+        if (is_file($logo_path)) {
+            $tmp_logo = GLPI_TMP_DIR . '/' . uniqid('pdf_header_logo_') . '.' . pathinfo($logo_path, PATHINFO_EXTENSION);
+            if (copy($logo_path, $tmp_logo)) {
+                $logo = $tmp_logo;
+            }
+        }
         $this->pdf->SetHeaderData($logo, 15, $msg, '');
     }
 
