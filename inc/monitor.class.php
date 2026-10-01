@@ -64,7 +64,7 @@ class PluginPdfMonitor extends PluginPdfCommon
             '<b><i>' . sprintf(
                 __s('%1$s: %2$s'),
                 __s('Group') . '</i></b>',
-                Dropdown::getDropdownName('glpi_groups', $item->fields['groups_id']),
+                PluginPdfCommon::getGroupNames($item->fields['groups_id']),
             ),
             '<b><i>' . sprintf(
                 __s('%1$s: %2$s'),

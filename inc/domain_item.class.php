@@ -84,11 +84,35 @@ class PluginPdfDomain_Item extends PluginPdfCommon
                 __s('Expiration date'),
             );
 
-            foreach ($result as $data) {
+            $domains     = iterator_to_array($result, false);
+            $tech_groups = [];
+            $groups      = $DB->request([
+                'SELECT'     => ['glpi_groups_items.items_id', 'glpi_groups.completename'],
+                'FROM'       => Group_Item::getTable(),
+                'INNER JOIN' => [
+                    'glpi_groups' => [
+                        'FKEY' => [
+                            'glpi_groups_items' => 'groups_id',
+                            'glpi_groups'       => 'id',
+                        ],
+                    ],
+                ],
+                'WHERE' => [
+                    'glpi_groups_items.itemtype' => Domain::class,
+                    'glpi_groups_items.items_id' => array_column($domains, 'id'),
+                    'glpi_groups_items.type'     => Group_Item::GROUP_TYPE_TECH,
+                ],
+                'ORDER' => 'glpi_groups.completename',
+            ]);
+            foreach ($groups as $group) {
+                $tech_groups[$group['items_id']][] = $group['completename'];
+            }
+
+            foreach ($domains as $data) {
                 $pdf->displayLine(
                     $data['name'],
                     Dropdown::getDropdownName('glpi_entities', $data['entities_id']),
-                    Dropdown::getDropdownName('glpi_groups', $data['groups_id_tech']),
+                    Toolbox::stripTags(implode(', ', $tech_groups[$data['id']] ?? [])),
                     getUserName($data['users_id_tech']),
                     Dropdown::getDropdownName('glpi_domaintypes', $data['domaintypes_id']),
                     Dropdown::getDropdownName('glpi_domainrelations', $data['domainrelations_id']),
