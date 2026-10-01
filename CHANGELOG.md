@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 - Dependencies conflicts with core
 - Internal server error when generating appliance asset pdf
+- Display all groups and groups in charge in asset PDF exports
+- Fix warning on the Domains tab of PDF exports
 
 ## [4.1.5] - 2026-09-01
 
