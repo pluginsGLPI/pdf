@@ -96,16 +96,8 @@ class PluginPdfPrinter extends PluginPdfCommon
         );
 
         $pdf->displayLine(
-            '<b><i>' . sprintf(
-                __s('%1$s: %2$s'),
-                __s('Group') . '</i></b>',
-                Dropdown::getDropdownName('glpi_groups', $printer->fields['groups_id']),
-            ),
-            '<b><i>' . sprintf(
-                __s('%1$s: %2$s'),
-                __s('UUID') . '</i></b>',
-                $printer->fields['uuid'],
-            ),
+            '<b><i>' . sprintf(__s('%1$s: %2$s'), __s('Group') . '</i></b>', self::getGroupName($printer)),
+            '<b><i>' . sprintf(__s('%1$s: %2$s'), __s('UUID') . '</i></b>', $printer->fields['uuid']),
         );
 
 
