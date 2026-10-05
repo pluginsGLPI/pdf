@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 
+- Broken display in PDF since TCPDF 7
 - Dependencies conflicts with core
 - Internal server error when generating appliance asset pdf
 - CI: fix Psalm cache directory, declare a unique composer autoloader suffix
