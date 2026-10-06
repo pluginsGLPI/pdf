@@ -5,7 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [UNRELEASED]
+## [4.2.0] - 2026-10-06
+
+### Added
+
+- GLPI 12 compatibility
 
 ### Fixed
 
@@ -15,10 +19,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - CI: fix Psalm cache directory, declare a unique composer autoloader suffix
 
 ## [4.1.5] - 2026-09-01
-
-### Added
-
-- GLPI 12 compatibility
 
 ### Fixed
 

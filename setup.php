@@ -34,8 +34,7 @@
  */
 
 
-
-define('PLUGIN_PDF_VERSION', '4.1.5');
+define('PLUGIN_PDF_VERSION', '4.2.0');
 define('PLUGIN_PDF_MIN_GLPI', '12.0.0');
 define('PLUGIN_PDF_MAX_GLPI', '12.0.99');
 
