@@ -77,7 +77,7 @@ class PluginPdfDocument extends PluginPdfCommon
             }
             $pdf->displayTitle($title);
 
-            $pdf->setColumnsSize(20, 15, 10, 10, 10, 8, 20, 7);
+            $pdf->setColumnsSize(18, 14, 9, 9, 9, 13, 17, 11);
             $pdf->displayTitle(
                 __s('Name'),
                 __s('Entity'),
