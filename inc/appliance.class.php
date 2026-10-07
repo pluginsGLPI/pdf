@@ -154,10 +154,7 @@ class PluginPdfAppliance extends PluginPdfCommon
             sprintf(
                 __s('%1$s: %2$s'),
                 '<b><i>' . __s('Group in charge of the hardware') . '</i></b>',
-                Toolbox::stripTags(Dropdown::getDropdownName(
-                    'glpi_groups',
-                    $item->fields['groups_id_tech'],
-                )),
+                PluginPdfCommon::getGroupNames($item->fields['groups_id_tech']),
             ),
         );
 
@@ -183,10 +180,7 @@ class PluginPdfAppliance extends PluginPdfCommon
             sprintf(
                 __s('%1$s: %2$s'),
                 '<b><i>' . __s('Group') . '</i></b>',
-                Toolbox::stripTags(Dropdown::getDropdownName(
-                    'glpi_groups',
-                    $item->fields['groups_id'],
-                )),
+                PluginPdfCommon::getGroupNames($item->fields['groups_id']),
             ),
         );
 

@@ -431,6 +431,21 @@ abstract class PluginPdfCommon extends CommonGLPI
         }
     }
 
+    /**
+     * Get the names of groups, sorted and separated by commas, ready to be displayed in a PDF cell
+     *
+     * @param array $groups_ids
+     *
+     * @return string
+     */
+    public static function getGroupNames(array $groups_ids): string
+    {
+        $names = Dropdown::getDropdownArrayNames('glpi_groups', $groups_ids);
+        natcasesort($names);
+
+        return Toolbox::stripTags(implode(', ', $names));
+    }
+
     public static function mainTitle(PluginPdfSimplePDF $pdf, $item)
     {
         $pdf->setColumnsSize(50, 50);
@@ -520,10 +535,7 @@ abstract class PluginPdfCommon extends CommonGLPI
                     '<b><i>' . sprintf(
                         __s('%1$s: %2$s'),
                         __s('Group in charge of the hardware') . '</i></b>',
-                        Dropdown::getDropdownName(
-                            'glpi_groups',
-                            $item->fields['groups_id_tech'],
-                        ),
+                        self::getGroupNames($item->fields['groups_id_tech']),
                     ),
                     '<b><i>' . sprintf(
                         __s('%1$s: %2$s'),

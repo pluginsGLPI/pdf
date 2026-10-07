@@ -99,7 +99,7 @@ class PluginPdfPrinter extends PluginPdfCommon
             '<b><i>' . sprintf(
                 __s('%1$s: %2$s'),
                 __s('Group') . '</i></b>',
-                Dropdown::getDropdownName('glpi_groups', $printer->fields['groups_id']),
+                PluginPdfCommon::getGroupNames($printer->fields['groups_id']),
             ),
             '<b><i>' . sprintf(
                 __s('%1$s: %2$s'),
