@@ -97,4 +97,38 @@ class SimplePDFTest extends GLPITestCase
             $this->assertLessThanOrEqual($width, $this->getStringWidth($pdf, $chunk));
         }
     }
+
+    /**
+     * Test nested quote url in a style attribute
+     * used to break cleanTableHtml regex and crash TCPDF
+     */
+    public function testCleanTableHtmlWithNestedQuoteUrlStyle(): void
+    {
+        $html = <<<HTML
+            <table style="width: 614px; border-collapse: collapse;" border="0" width="614">
+                <tbody>
+                    <tr>
+                        <td style="width: 51.8pt; height: 15.75pt; background-image: url('https://example.com/pics/a.jpg');">Content</td>
+                    </tr>
+                </tbody>
+            </table>
+            HTML;
+
+        $pdf = new PluginPdfSimplePDF();
+        $cleaned = $this->callPrivateMethod($pdf, 'cleanTableHtml', $html);
+
+        // no duplicated attribute on <table>
+        $this->assertMatchesRegularExpression('/^<table[^>]*>/', $cleaned);
+        preg_match('/^<table([^>]*)>/', $cleaned, $matches);
+        $tableAttributes = $matches[1];
+
+        $this->assertSame(1, substr_count($tableAttributes, 'border='), 'the <table> tag must have a single border attribute');
+        $this->assertSame(1, substr_count($tableAttributes, 'style='), 'the <table> tag must have a single style attribute');
+
+        // width/height stripped, nested url untouched
+        $this->assertStringNotContainsStringIgnoringCase('width: 614px', $cleaned);
+        $this->assertStringNotContainsStringIgnoringCase('width: 51.8pt', $cleaned);
+        $this->assertStringNotContainsStringIgnoringCase('height: 15.75pt', $cleaned);
+        $this->assertStringContainsString("url('https://example.com/pics/a.jpg')", $cleaned);
+    }
 }
