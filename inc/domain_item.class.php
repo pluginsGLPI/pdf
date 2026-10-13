@@ -84,11 +84,27 @@ class PluginPdfDomain_Item extends PluginPdfCommon
                 __s('Expiration date'),
             );
 
-            foreach ($result as $data) {
+            $domains     = iterator_to_array($result, false);
+            $tech_groups = [];
+            $groups = $DB->request([
+                'SELECT' => ['items_id', 'groups_id'],
+                'FROM'   => Group_Item::getTable(),
+                'WHERE'  => [
+                    'itemtype' => Domain::class,
+                    'items_id' => array_column($domains, 'id'),
+                    'type'     => Group_Item::GROUP_TYPE_TECH,
+                ],
+            ]);
+
+            foreach ($groups as $group) {
+                $tech_groups[$group['items_id']][] = $group['groups_id'];
+            }
+
+            foreach ($domains as $data) {
                 $pdf->displayLine(
                     $data['name'],
                     Dropdown::getDropdownName('glpi_entities', $data['entities_id']),
-                    Dropdown::getDropdownName('glpi_groups', $data['groups_id_tech']),
+                    PluginPdfCommon::getGroupNames($tech_groups[$data['id']] ?? []),
                     getUserName($data['users_id_tech']),
                     Dropdown::getDropdownName('glpi_domaintypes', $data['domaintypes_id']),
                     Dropdown::getDropdownName('glpi_domainrelations', $data['domainrelations_id']),
