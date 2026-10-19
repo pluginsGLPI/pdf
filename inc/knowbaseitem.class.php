@@ -63,12 +63,15 @@ class PluginPdfKnowbaseItem extends PluginPdfCommon
             return false;
         }
 
-        $knowbaseitemcategories_id = $item->getField('knowbaseitemcategories_id');
-        $fullcategoryname
-        = Toolbox::stripTags($dbu->getTreeValueCompleteName(
-            'glpi_knowbaseitemcategories',
-            $knowbaseitemcategories_id,
-        ));
+        // KB items can be linked to several categories
+        $categories = [];
+        foreach (KnowbaseItem_KnowbaseItemCategory::getItems($item) as $link) {
+            $categories[] = $dbu->getTreeValueCompleteName(
+                'glpi_knowbaseitemcategories',
+                $link['knowbaseitemcategories_id'],
+            );
+        }
+        $fullcategoryname = Toolbox::stripTags(implode(', ', $categories));
 
         $question
         = Toolbox::stripTags(html_entity_decode($item->getField('name')));

@@ -241,6 +241,16 @@ class PluginPdfSimplePDF
 
         $max = $miny;
 
+        /* drop images TCPDF cannot decode (corrupted file, invalid PNG, ...), they would crash the whole export */
+        $msgs = array_map(
+            fn($msg) => preg_replace_callback(
+                '/<img\b[^>]*>/i',
+                fn($img) => $this->canRenderHtml($img[0]) ? $img[0] : '',
+                (string) $msg,
+            ),
+            $msgs,
+        );
+
         /* dry run - compute max cell height */
         $this->pdf->startTransaction();
         $i = 0;
@@ -299,6 +309,27 @@ class PluginPdfSimplePDF
             }
         }
         $this->pdf->SetY($this->pdf->GetY() + 1);
+    }
+
+    /**
+     * Check if TCPDF is able to render an HTML fragment, without altering the document
+     *
+     * @param string $html
+     *
+     * @return bool
+    **/
+    private function canRenderHtml(string $html): bool
+    {
+        $this->pdf->startTransaction();
+        try {
+            $this->pdf->writeHTMLCell(0, 0, '', '', $html);
+            $success = true;
+        } catch (Throwable $e) {
+            $success = false;
+        }
+        $this->pdf = $this->pdf->rollbackTransaction();
+
+        return $success;
     }
 
     /**
