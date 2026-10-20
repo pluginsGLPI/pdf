@@ -241,6 +241,16 @@ class PluginPdfSimplePDF
 
         $max = $miny;
 
+        /* drop images TCPDF cannot decode (corrupted file, invalid PNG, ...), they would crash the whole export */
+        $msgs = array_map(
+            fn($msg) => preg_replace_callback(
+                '/<img\b[^>]*>/i',
+                fn($img) => $this->canRenderHtml($img[0]) ? $img[0] : '',
+                (string) $msg,
+            ),
+            $msgs,
+        );
+
         /* dry run - compute max cell height */
         $this->pdf->startTransaction();
         $i = 0;
@@ -302,6 +312,27 @@ class PluginPdfSimplePDF
     }
 
     /**
+     * Check if TCPDF is able to render an HTML fragment, without altering the document
+     *
+     * @param string $html
+     *
+     * @return bool
+    **/
+    private function canRenderHtml(string $html): bool
+    {
+        $this->pdf->startTransaction();
+        try {
+            $this->pdf->writeHTMLCell(0, 0, '', '', $html);
+            $success = true;
+        } catch (Throwable $e) {
+            $success = false;
+        }
+        $this->pdf = $this->pdf->rollbackTransaction();
+
+        return $success;
+    }
+
+    /**
      * display a Title row, centered with dark background
      *
      * param list of strings, one string per column
@@ -359,8 +390,9 @@ class PluginPdfSimplePDF
         $content = html_entity_decode($content, ENT_QUOTES, 'UTF-8');
         $content = RichText::getSafeHtml($content);
 
+        // `=` may be encoded as `&#61;` by the sanitizer
         preg_match_all(
-            '/<a\b[^>]*>\s*(<img\b[^>]*src=["\']([^"\']*docid=(\d+)[^"\']*)["\'][^>]*>)\s*<\/a>/i',
+            '/<a\b[^>]*>\s*(<img\b[^>]*src=["\']([^"\']*docid(?:=|&#61;)(\d+)[^"\']*)["\'][^>]*>)\s*<\/a>/i',
             $content,
             $matches,
             PREG_SET_ORDER,
@@ -382,13 +414,12 @@ class PluginPdfSimplePDF
                     if (file_exists($file_path)) {
                         // Get actual image dimensions from file
                         $img_info_actual = @getimagesize($file_path);
-                        $actual_width = 450;  // Default
-                        $actual_height = 300; // Default
-
-                        if ($img_info_actual !== false) {
-                            $actual_width = $img_info_actual[0];
-                            $actual_height = $img_info_actual[1];
+                        if ($img_info_actual === false) {
+                            // not an image: TCPDF would stop the whole export with die()
+                            $content = str_replace($full_a_tag, '', $content);
+                            continue;
                         }
+                        [$actual_width, $actual_height] = $img_info_actual;
 
                         // Extract width and height from the HTML img tag
                         $html_width = null;
