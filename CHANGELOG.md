@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 - Fix KB PDF export crash on invalid image and missing categories
 - Fix KB images missing from PDF export
+- Fix base64 images (e.g. in ticket tasks) corrupted or missing in PDF export
 
 ## [4.1.6] - 2026-10-06
 
