@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 
 - Fix KB PDF export crash on invalid image and missing categories
+- Fix KB images missing from PDF export
 
 ## [4.1.6] - 2026-10-06
 

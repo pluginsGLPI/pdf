@@ -34,12 +34,29 @@ declare(strict_types=1);
 
 namespace GlpiPlugin\Pdf\Tests\Units;
 
-use Glpi\Tests\GLPITestCase;
+use Document;
+use Glpi\Tests\DbTestCase;
 use PluginPdfSimplePDF;
+use Psr\Log\LogLevel;
 use ReflectionMethod;
 
-class SimplePdfTest extends GLPITestCase
+class SimplePdfTest extends DbTestCase
 {
+    /**
+     * @var string[]
+     */
+    private array $files_to_remove = [];
+
+    public function tearDown(): void
+    {
+        foreach ($this->files_to_remove as $file) {
+            unlink($file);
+        }
+        $this->files_to_remove = [];
+
+        parent::tearDown();
+    }
+
     /**
      * Test nested quote url in a style attribute
      * used to break cleanTableHtml regex and crash TCPDF
@@ -74,5 +91,124 @@ class SimplePdfTest extends GLPITestCase
         $this->assertStringNotContainsStringIgnoringCase('width: 51.8pt', $cleaned);
         $this->assertStringNotContainsStringIgnoringCase('height: 15.75pt', $cleaned);
         $this->assertStringContainsString("url('https://example.com/pics/a.jpg')", $cleaned);
+    }
+
+    /**
+     * Test a corrupted PNG (valid header, broken data)
+     * used to crash TCPDF with "imagecolorat(): Argument #1 ($image) must be of type GdImage, false given"
+     */
+    public function testDisplayLineDropsCorruptedPng(): void
+    {
+        $file = GLPI_TMP_DIR . '/' . uniqid('corrupted_', true) . '.png';
+        file_put_contents($file, $this->getCorruptedPngContent());
+
+        try {
+            $pdf = new PluginPdfSimplePDF();
+            $pdf->newPage();
+            $pdf->setColumnsSize(100);
+            $pdf->displayLine('before <img src="' . $file . '" width="10" height="10"> after');
+
+            $this->assertStringStartsWith('%PDF-', $pdf->output());
+        } finally {
+            unlink($file);
+        }
+
+        $this->hasPhpLogRecordThatContains('fatal libpng error', LogLevel::WARNING);
+        $this->hasPhpLogRecordThatContains('setjmp returns error condition', LogLevel::WARNING);
+        $this->hasPhpLogRecordThatContains('is not a valid PNG file', LogLevel::WARNING);
+    }
+
+    /**
+     * Test a KB image pointing to a document
+     * the `docid` link was not found once `=` encoded as `&#61;` by the sanitizer, so the image was missing from the PDF
+     */
+    public function testDisplayTextEmbedsDocumentImage(): void
+    {
+        $docid = $this->createDocumentFile('PNG', 'png', $this->getValidPngContent());
+
+        $pdf = new PluginPdfSimplePDF();
+        $pdf->newPage();
+        $pdf->displayText('Answer', $this->getDocumentImageHtml($docid));
+
+        $this->assertStringContainsString('/Subtype /Image', $pdf->output());
+    }
+
+    /**
+     * Test a KB image pointing to a document that is not an image
+     */
+    public function testDisplayTextDropsNonImageDocument(): void
+    {
+        $docid = $this->createDocumentFile('PNG', 'png', 'this is not an image');
+
+        $pdf = new PluginPdfSimplePDF();
+        $pdf->newPage();
+        $pdf->displayText('Answer', $this->getDocumentImageHtml($docid));
+
+        $output = $pdf->output();
+        $this->assertStringStartsWith('%PDF-', $output);
+        $this->assertStringNotContainsString('/Subtype /Image', $output);
+    }
+
+    /**
+     * Create a document whose file is stored in GLPI_DOC_DIR
+     */
+    private function createDocumentFile(string $dir, string $extension, string $content): int
+    {
+        global $DB;
+
+        $this->login();
+
+        $filepath = $dir . '/' . uniqid('', true) . '.' . $extension;
+        $file = GLPI_DOC_DIR . '/' . $filepath;
+        if (!is_dir(dirname($file))) {
+            mkdir(dirname($file), 0o777, true);
+        }
+        file_put_contents($file, $content);
+        $this->files_to_remove[] = $file;
+
+        $DB->insert(Document::getTable(), [
+            'name'        => 'test document',
+            'filename'    => 'test.' . $extension,
+            'filepath'    => $filepath,
+            'mime'        => 'image/png',
+            'entities_id' => $this->getTestRootEntity(true),
+        ]);
+
+        return $DB->insertId();
+    }
+
+    /**
+     * Get the HTML of an image inserted in a rich text
+     */
+    private function getDocumentImageHtml(int $docid): string
+    {
+        $url = '/front/document.send.php?docid=' . $docid;
+
+        return '<p>before</p><a href="' . $url . '"><img src="' . $url . '"></a><p>after</p>';
+    }
+
+    /**
+     * Build a valid 2x2 PNG file
+     */
+    private function getValidPngContent(): string
+    {
+        $image = imagecreatetruecolor(2, 2);
+        ob_start();
+        imagepng($image);
+
+        return ob_get_clean();
+    }
+
+    /**
+     * Build a PNG file with a valid RGBA header but undecodable image data
+     */
+    private function getCorruptedPngContent(): string
+    {
+        $chunk = (static fn(string $type, string $data): string => pack('N', strlen($data)) . $type . $data . pack('N', crc32($type . $data)));
+
+        return "\x89PNG\r\n\x1a\n"
+            . $chunk('IHDR', pack('NNCCCCC', 2, 2, 8, 6, 0, 0, 0))
+            . $chunk('IDAT', 'not zlib compressed data')
+            . $chunk('IEND', '');
     }
 }

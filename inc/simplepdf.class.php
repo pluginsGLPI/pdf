@@ -390,8 +390,9 @@ class PluginPdfSimplePDF
         $content = html_entity_decode($content, ENT_QUOTES, 'UTF-8');
         $content = RichText::getSafeHtml($content);
 
+        // `=` may be encoded as `&#61;` by the sanitizer
         preg_match_all(
-            '/<a\b[^>]*>\s*(<img\b[^>]*src=["\']([^"\']*docid=(\d+)[^"\']*)["\'][^>]*>)\s*<\/a>/i',
+            '/<a\b[^>]*>\s*(<img\b[^>]*src=["\']([^"\']*docid(?:=|&#61;)(\d+)[^"\']*)["\'][^>]*>)\s*<\/a>/i',
             $content,
             $matches,
             PREG_SET_ORDER,
@@ -413,13 +414,12 @@ class PluginPdfSimplePDF
                     if (file_exists($file_path)) {
                         // Get actual image dimensions from file
                         $img_info_actual = @getimagesize($file_path);
-                        $actual_width = 450;  // Default
-                        $actual_height = 300; // Default
-
-                        if ($img_info_actual !== false) {
-                            $actual_width = $img_info_actual[0];
-                            $actual_height = $img_info_actual[1];
+                        if ($img_info_actual === false) {
+                            // not an image: TCPDF would stop the whole export with die()
+                            $content = str_replace($full_a_tag, '', $content);
+                            continue;
                         }
+                        [$actual_width, $actual_height] = $img_info_actual;
 
                         // Extract width and height from the HTML img tag
                         $html_width = null;
