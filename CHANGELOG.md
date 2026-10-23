@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 
 - Fix PDF export crash on tickets with tables containing nested-quote styles
+- Fix base64 images (e.g. in ticket tasks) corrupted or missing in PDF export
 
 ## [4.2.0] - 2026-10-06
 
