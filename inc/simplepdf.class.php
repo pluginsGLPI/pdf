@@ -458,74 +458,25 @@ class PluginPdfSimplePDF
         $content = html_entity_decode($content, ENT_QUOTES, 'UTF-8');
         $content = RichText::getSafeHtml($content);
 
-        preg_match_all(
-            '/<a\b[^>]*>\s*(<img\b[^>]*src=["\']([^"\']*docid=(\d+)[^"\']*)["\'][^>]*>)\s*<\/a>/i',
-            $content,
-            $matches,
-            PREG_SET_ORDER,
-        );
-
-        if ($matches !== []) {
-            $document = new Document();
-            foreach ($matches as $match) {
-                $full_a_tag = $match[0];
-                $full_img_tag = $match[1];
-                $docid = (int) $match[3];
-
-                if (
-                    $document->getFromDB($docid)
-                    && $document->canViewFile()
-                    && isset($document->fields['filepath'])
-                ) {
-                    $file_path = GLPI_DOC_DIR . '/' . $document->fields['filepath'];
-                    if (file_exists($file_path)) {
-                        // Get actual image dimensions from file
-                        $img_info_actual = @getimagesize($file_path);
-                        $actual_width = 450;  // Default
-                        $actual_height = 300; // Default
-
-                        if ($img_info_actual !== false) {
-                            $actual_width = $img_info_actual[0];
-                            $actual_height = $img_info_actual[1];
-                        }
-
-                        // Extract width and height from the HTML img tag
-                        $html_width = null;
-                        $html_height = null;
-
-                        if (preg_match('/width=["\']?(\d+)["\']?/i', $full_img_tag, $w_match)) {
-                            $html_width = (int) $w_match[1];
-                        }
-                        if (preg_match('/height=["\']?(\d+)["\']?/i', $full_img_tag, $h_match)) {
-                            $html_height = (int) $h_match[1];
-                        }
-
-                        // Calculate display dimensions preserving aspect ratio
-                        $display_width = $html_width ?? $actual_width;
-                        $display_height = $html_height ?? $actual_height;
-
-                        // If only one dimension is specified, calculate the other to preserve ratio
-                        if ($html_width && !$html_height) {
-                            $display_height = (int) ($html_width * $actual_height / $actual_width);
-                        } elseif ($html_height && !$html_width) {
-                            $display_width = (int) ($html_height * $actual_width / $actual_height);
-                        }
-
-                        // Apply maximum width constraint (200 pixels max)
-                        $max_width = 200;
-                        if ($display_width > $max_width) {
-                            $ratio = $max_width / $display_width;
-                            $display_width = $max_width;
-                            $display_height = (int) ($display_height * $ratio);
-                        }
-
-                        // Replace the original image by a properly resized one + remove the a tag
-                        $display_image_tag = '<img src="file://' . $file_path . '" width="' . $display_width . '" height="' . $display_height . '">';
-                        $content = str_replace($full_a_tag, $display_image_tag, $content);
-                    }
+        // The sanitizer encodes some characters in attributes (e.g. "=" => "&#61;", "+" => "&#43;"), which TCPDF
+        // does not decode: document URLs are no longer recognized and base64 data URIs get corrupted.
+        // Images are therefore resolved here from their decoded "src" and passed to TCPDF as validated data streams.
+        $content = preg_replace_callback(
+            '/(<a\b[^>]*>\s*)?(<img\b[^>]*>)(\s*<\/a>)?/i',
+            function (array $match): string {
+                $img_tag = $this->buildPdfImageTag($match[2]);
+                if ($img_tag === null) {
+                    return $match[0];
                 }
-            }
-        }
+                if ($match[1] !== '' && ($match[3] ?? '') !== '') {
+                    // Remove the link wrapping the image
+                    return $img_tag;
+                }
+
+                return $match[1] . $img_tag . ($match[3] ?? '');
+            },
+            $content,
+        );
 
         // Split content by tables, keeping tables in the result
         $segments = preg_split('/(<table\b[^>]*>.*?<\/table>)/is', $content, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
@@ -550,6 +501,82 @@ class PluginPdfSimplePDF
 
         /* Restore */
         [$this->cols, $this->colsx, $this->colsw, $this->align, ] = $save;
+    }
+
+    /**
+     * Build an <img> tag usable by TCPDF from a sanitized <img> tag.
+     *
+     * Supported sources are GLPI documents (document.send.php?docid=X) and base64 data URIs.
+     * Image data is validated with GD before being embedded, to prevent TCPDF from failing on corrupted images.
+     *
+     * @param string $img_tag sanitized <img> tag
+     *
+     * @return string|null new <img> tag, empty string if the image must be dropped, null if the tag must be kept as is
+     */
+    private function buildPdfImageTag(string $img_tag): ?string
+    {
+        if (!preg_match('/\bsrc\s*=\s*(["\'])(.*?)\1/is', $img_tag, $src_match)) {
+            return null;
+        }
+        $src = html_entity_decode($src_match[2], ENT_QUOTES | ENT_HTML5, 'UTF-8');
+
+        $data = null;
+        if (preg_match('/^data:image\/[a-z0-9.+-]+;base64,(.*)$/is', $src, $data_match)) {
+            $data = base64_decode(preg_replace('/\s+/', '', $data_match[1]), true);
+        } elseif (str_contains(parse_url($src, PHP_URL_PATH) ?? '', 'document.send.php')) {
+            parse_str(parse_url($src, PHP_URL_QUERY) ?? '', $query);
+            $document = new Document();
+            if (
+                isset($query['docid'])
+                && $document->getFromDB((int) $query['docid'])
+                && $document->canViewFile()
+                && !empty($document->fields['filepath'])
+            ) {
+                $file_path = GLPI_DOC_DIR . '/' . $document->fields['filepath'];
+                $data = is_readable($file_path) ? file_get_contents($file_path) : false;
+            } else {
+                $data = false;
+            }
+        } else {
+            return null;
+        }
+
+        // Drop unreadable or corrupted images instead of letting TCPDF fail
+        if (
+            !is_string($data)
+            || ($img_info = @getimagesizefromstring($data)) === false
+            || @imagecreatefromstring($data) === false
+        ) {
+            return '';
+        }
+        $actual_width  = $img_info[0];
+        $actual_height = $img_info[1];
+
+        // Extract width and height from the HTML img tag
+        $html_width  = preg_match('/\bwidth=["\']?(\d+)/i', $img_tag, $w_match) ? (int) $w_match[1] : null;
+        $html_height = preg_match('/\bheight=["\']?(\d+)/i', $img_tag, $h_match) ? (int) $h_match[1] : null;
+
+        // Calculate display dimensions preserving aspect ratio
+        $display_width  = $html_width ?: $actual_width;
+        $display_height = $html_height ?: $actual_height;
+
+        // If only one dimension is specified, calculate the other to preserve ratio
+        if ($html_width && !$html_height) {
+            $display_height = (int) ($html_width * $actual_height / $actual_width);
+        } elseif ($html_height && !$html_width) {
+            $display_width = (int) ($html_height * $actual_width / $actual_height);
+        }
+
+        // Apply maximum width constraint (200 pixels max)
+        $max_width = 200;
+        if ($display_width > $max_width) {
+            $ratio          = $max_width / $display_width;
+            $display_width  = $max_width;
+            $display_height = (int) ($display_height * $ratio);
+        }
+
+        // "@" prefix: TCPDF data stream, no local file or remote URL access needed
+        return '<img src="@' . base64_encode($data) . '" width="' . $display_width . '" height="' . $display_height . '">';
     }
 
     /**
