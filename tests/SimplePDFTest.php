@@ -131,4 +131,49 @@ class SimplePDFTest extends GLPITestCase
         $this->assertStringNotContainsStringIgnoringCase('height: 15.75pt', $cleaned);
         $this->assertStringContainsString("url('https://example.com/pics/a.jpg')", $cleaned);
     }
+
+    /**
+     * Test a base64 image in a rich text (e.g. a ticket task)
+     * `+` and `=` were encoded as `&#43;` and `&#61;` by the sanitizer, so the image data was corrupted and TCPDF crashed
+     */
+    public function testDisplayTextEmbedsBase64Image(): void
+    {
+        // 1x1 semi-transparent PNG, its base64 contains both `+` and `=`
+        $base64 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAADUlEQVQImWP4z8BQBwAEfwF+fk6erwAAAABJRU5ErkJggg==';
+
+        $pdf = new PluginPdfSimplePDF();
+        $pdf->newPage();
+        $pdf->displayText('Description', '<p>before <img src="data:image/png;base64,' . $base64 . '" width="10"> after</p>');
+
+        $this->assertStringContainsString('/Subtype /Image', $pdf->output());
+    }
+
+    /**
+     * Test a corrupted base64 image in a rich text
+     */
+    public function testDisplayTextDropsCorruptedBase64Image(): void
+    {
+        $base64 = base64_encode($this->getCorruptedPngContent());
+
+        $pdf = new PluginPdfSimplePDF();
+        $pdf->newPage();
+        $pdf->displayText('Description', '<p>before <img src="data:image/png;base64,' . $base64 . '" width="10"> after</p>');
+
+        $output = $pdf->output();
+        $this->assertStringStartsWith('%PDF-', $output);
+        $this->assertStringNotContainsString('/Subtype /Image', $output);
+    }
+
+    /**
+     * Build a PNG file with a valid RGBA header but undecodable image data
+     */
+    private function getCorruptedPngContent(): string
+    {
+        $chunk = (static fn(string $type, string $data): string => pack('N', strlen($data)) . $type . $data . pack('N', crc32($type . $data)));
+
+        return "\x89PNG\r\n\x1a\n"
+            . $chunk('IHDR', pack('NNCCCCC', 2, 2, 8, 6, 0, 0, 0))
+            . $chunk('IDAT', 'not zlib compressed data')
+            . $chunk('IEND', '');
+    }
 }
