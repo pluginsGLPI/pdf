@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- Add Transifex translations link to README
+
 ### Fixed
 
 - Fix PDF export crash on tickets with tables containing nested-quote styles

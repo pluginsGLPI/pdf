@@ -46,3 +46,7 @@ Obtain a personalized service experience, associated with benefits and opportuni
 ## Copying
 
 * **Code**: you can redistribute it and/or modify it under the terms of the GNU General Public License ([AGPL-3.0](https://www.gnu.org/licenses/agpl-3.0.html)).
+
+## Additional resources
+
+* [Translations on Transifex](https://explore.transifex.com/teclib/glpi-plugin-pdf/)
