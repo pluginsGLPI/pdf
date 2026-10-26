@@ -539,8 +539,12 @@ class PluginPdfItem_SoftwareVersion extends PluginPdfCommon
                         'glpi_softwareversions' => 'id',
                         [
                             'OR' => [
-                                'glpi_softwarelicenses.softwareversions_id_use' => 0,
-                                'glpi_softwarelicenses.softwareversions_id_buy' => 'glpi_softwareversions.id',
+                                'AND' => [
+                                    'glpi_softwarelicenses.softwareversions_id_use' => 0,
+                                    'glpi_softwarelicenses.softwareversions_id_buy' => new QueryExpression(
+                                        $DB::quoteName('glpi_softwareversions.id'),
+                                    ),
+                                ],
                             ],
                         ],
                     ],
