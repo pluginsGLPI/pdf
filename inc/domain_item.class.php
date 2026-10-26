@@ -85,20 +85,11 @@ class PluginPdfDomain_Item extends PluginPdfCommon
             );
 
             $domains     = iterator_to_array($result, false);
-            $tech_groups = [];
-            $groups = $DB->request([
-                'SELECT' => ['items_id', 'groups_id'],
-                'FROM'   => Group_Item::getTable(),
-                'WHERE'  => [
-                    'itemtype' => Domain::class,
-                    'items_id' => array_column($domains, 'id'),
-                    'type'     => Group_Item::GROUP_TYPE_TECH,
-                ],
-            ]);
-
-            foreach ($groups as $group) {
-                $tech_groups[$group['items_id']][] = $group['groups_id'];
-            }
+            $tech_groups = PluginPdfCommon::getGroupsIdsForItems(
+                Domain::class,
+                array_column($domains, 'id'),
+                Group_Item::GROUP_TYPE_TECH,
+            );
 
             foreach ($domains as $data) {
                 $pdf->displayLine(

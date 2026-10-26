@@ -449,6 +449,41 @@ abstract class PluginPdfCommon extends CommonGLPI
         return Toolbox::stripTags(implode(', ', $names));
     }
 
+    /**
+     * Get the groups ids of several items of the same type, indexed by item id
+     *
+     * @param string $itemtype
+     * @param array  $items_ids
+     * @param int    $type      Group_Item::GROUP_TYPE_NORMAL or Group_Item::GROUP_TYPE_TECH
+     *
+     * @return array<int, int[]>
+     */
+    public static function getGroupsIdsForItems(string $itemtype, array $items_ids, int $type): array
+    {
+        /** @var DBmysql $DB */
+        global $DB;
+
+        if ($items_ids === []) {
+            return [];
+        }
+
+        $groups_ids = [];
+        $iterator   = $DB->request([
+            'SELECT' => ['items_id', 'groups_id'],
+            'FROM'   => Group_Item::getTable(),
+            'WHERE'  => [
+                'itemtype' => $itemtype,
+                'items_id' => array_values(array_unique($items_ids)),
+                'type'     => $type,
+            ],
+        ]);
+        foreach ($iterator as $row) {
+            $groups_ids[$row['items_id']][] = $row['groups_id'];
+        }
+
+        return $groups_ids;
+    }
+
     public static function mainTitle(PluginPdfSimplePDF $pdf, $item)
     {
         $pdf->setColumnsSize(50, 50);

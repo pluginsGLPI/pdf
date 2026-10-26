@@ -164,7 +164,6 @@ class PluginPdfItem_SoftwareLicense extends PluginPdfCommon
                     'glpi_entities.name AS entity',
                     'glpi_locations.completename AS location',
                     'glpi_states.name AS state',
-                    'glpi_groups.name AS groupe',
                     'glpi_softwarelicenses.name AS lname',
                     'glpi_softwarelicenses.id AS lID',
                 ],
@@ -203,12 +202,6 @@ class PluginPdfItem_SoftwareLicense extends PluginPdfCommon
                             'glpi_states' => 'id',
                         ],
                     ],
-                    'glpi_groups' => [
-                        'ON' => [
-                            'glpi_computers' => 'groups_id',
-                            'glpi_groups' => 'id',
-                        ],
-                    ],
                     'glpi_users' => [
                         'ON' => [
                             'glpi_computers' => 'users_id',
@@ -232,7 +225,12 @@ class PluginPdfItem_SoftwareLicense extends PluginPdfCommon
                 $query_params['WHERE'][] = new QueryExpression($entity_restrict);
             }
 
-            $result = $DB->request($query_params);
+            $result = iterator_to_array($DB->request($query_params), false);
+            $groups = PluginPdfCommon::getGroupsIdsForItems(
+                Computer::class,
+                array_column($result, 'cID'),
+                Group_Item::GROUP_TYPE_NORMAL,
+            );
 
             $showEntity = ($license->isRecursive());
             if ($showEntity) {
@@ -276,7 +274,7 @@ class PluginPdfItem_SoftwareLicense extends PluginPdfCommon
                         $data['otherserial'],
                         $data['location'],
                         $data['state'],
-                        $data['groupe'],
+                        PluginPdfCommon::getGroupNames($groups[$data['cID']] ?? []),
                         $data['username'],
                     );
                 } else {
@@ -286,7 +284,7 @@ class PluginPdfItem_SoftwareLicense extends PluginPdfCommon
                         $data['otherserial'],
                         $data['location'],
                         $data['state'],
-                        $data['groupe'],
+                        PluginPdfCommon::getGroupNames($groups[$data['cID']] ?? []),
                         $data['username'],
                     );
                 }

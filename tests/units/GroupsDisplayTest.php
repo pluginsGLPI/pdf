@@ -44,6 +44,8 @@ use Domain_Item;
 use Glpi\Tests\DbTestCase;
 use GlpiPlugin\Pdf\Tests\RecordingSimplePDF;
 use Group;
+use Item_SoftwareLicense;
+use Item_SoftwareVersion;
 use Monitor;
 use NetworkEquipment;
 use Peripheral;
@@ -54,6 +56,8 @@ use PluginPdfCartridgeItem;
 use PluginPdfComputer;
 use PluginPdfConsumableItem;
 use PluginPdfDomain_Item;
+use PluginPdfItem_SoftwareLicense;
+use PluginPdfItem_SoftwareVersion;
 use PluginPdfMonitor;
 use PluginPdfNetworkEquipment;
 use PluginPdfPeripheral;
@@ -62,6 +66,8 @@ use PluginPdfPrinter;
 use PluginPdfSoftware;
 use Printer;
 use Software;
+use SoftwareLicense;
+use SoftwareVersion;
 
 class GroupsDisplayTest extends DbTestCase
 {
@@ -162,6 +168,66 @@ class GroupsDisplayTest extends DbTestCase
 
         $pdf = new RecordingSimplePDF();
         PluginPdfDomain_Item::pdfForItem($pdf, $computer);
+
+        $this->assertContains('PDF group A, PDF group B', $pdf->cells);
+    }
+
+    public function testLicenseByComputerDisplaysAllGroups(): void
+    {
+        $this->login();
+        $entity_id = $this->getTestRootEntity(true);
+        $group_b = $this->createItem(Group::class, ['name' => 'PDF group B', 'entities_id' => $entity_id]);
+        $group_a = $this->createItem(Group::class, ['name' => 'PDF group A', 'entities_id' => $entity_id]);
+
+        $computer = $this->createItem(Computer::class, [
+            'name'        => 'PDF computer',
+            'entities_id' => $entity_id,
+            'groups_id'   => [$group_a->getID(), $group_b->getID()],
+        ]);
+        $software = $this->createItem(Software::class, ['name' => 'PDF software', 'entities_id' => $entity_id]);
+        $license  = $this->createItem(SoftwareLicense::class, [
+            'name'         => 'PDF license',
+            'softwares_id' => $software->getID(),
+            'entities_id'  => $entity_id,
+        ]);
+        $this->createItem(Item_SoftwareLicense::class, [
+            'softwarelicenses_id' => $license->getID(),
+            'itemtype'            => Computer::class,
+            'items_id'            => $computer->getID(),
+        ]);
+
+        $pdf = new RecordingSimplePDF();
+        PluginPdfItem_SoftwareLicense::pdfForLicenseByComputer($pdf, $license);
+
+        $this->assertContains('PDF group A, PDF group B', $pdf->cells);
+    }
+
+    public function testSoftwareInstallationsDisplayAllGroups(): void
+    {
+        $this->login();
+        $entity_id = $this->getTestRootEntity(true);
+        $group_b = $this->createItem(Group::class, ['name' => 'PDF group B', 'entities_id' => $entity_id]);
+        $group_a = $this->createItem(Group::class, ['name' => 'PDF group A', 'entities_id' => $entity_id]);
+
+        $computer = $this->createItem(Computer::class, [
+            'name'        => 'PDF computer',
+            'entities_id' => $entity_id,
+            'groups_id'   => [$group_a->getID(), $group_b->getID()],
+        ]);
+        $software = $this->createItem(Software::class, ['name' => 'PDF software', 'entities_id' => $entity_id]);
+        $version  = $this->createItem(SoftwareVersion::class, [
+            'name'         => '1.0',
+            'softwares_id' => $software->getID(),
+            'entities_id'  => $entity_id,
+        ]);
+        $this->createItem(Item_SoftwareVersion::class, [
+            'softwareversions_id' => $version->getID(),
+            'itemtype'            => Computer::class,
+            'items_id'            => $computer->getID(),
+        ]);
+
+        $pdf = new RecordingSimplePDF();
+        PluginPdfItem_SoftwareVersion::pdfForSoftware($pdf, $software);
 
         $this->assertContains('PDF group A, PDF group B', $pdf->cells);
     }

@@ -207,15 +207,6 @@ class PluginPdfItem_SoftwareVersion extends PluginPdfCommon
                 $query['SELECT'][] = new QueryExpression($DB->quoteValue('') . ' AS ' . $DB->quoteName('state'));
             }
 
-            if ($DB->fieldExists($itemtable, 'groups_id')) {
-                $query['SELECT'][]                 = 'glpi_groups.name AS groupe';
-                $query['LEFT JOIN']['glpi_groups'] = ['FKEY' => [$itemtable => 'groups_id',
-                    'glpi_groups'                                           => 'id'],
-                ];
-            } else {
-                $query['SELECT'][] = new QueryExpression($DB->quoteValue('') . ' AS ' . $DB->quoteName('groupe'));
-            }
-
             if ($DB->fieldExists($itemtable, 'is_deleted')) {
                 $query['WHERE']["{$itemtable}.is_deleted"] = 0;
             }
@@ -235,7 +226,20 @@ class PluginPdfItem_SoftwareVersion extends PluginPdfCommon
         ];
 
 
-        $iterator = $DB->request($criteria);
+        $iterator = iterator_to_array($DB->request($criteria), false);
+
+        $items_ids = [];
+        foreach ($iterator as $data) {
+            $items_ids[$data['item_type']][] = $data['iID'];
+        }
+        $groups = [];
+        foreach ($items_ids as $itemtype => $ids) {
+            $groups[$itemtype] = PluginPdfCommon::getGroupsIdsForItems(
+                $itemtype,
+                $ids,
+                Group_Item::GROUP_TYPE_NORMAL,
+            );
+        }
 
         $pdf->setColumnsSize(100);
         $title = '<b>' . _sn('Installation', 'Installations', $number) . '</b>';
@@ -284,24 +288,22 @@ class PluginPdfItem_SoftwareVersion extends PluginPdfCommon
                         $tmp[] = $licname;
                     }
                 }
-                $linkUser = User::canView();
                 $pdf->displayLine(
                     $data['version'],
-                    $data['item_type'],
                     $itemname,
                     $data['serial'],
                     $data['otherserial'],
                     $data['location'],
                     $data['state'],
-                    $data['groupe'],
+                    PluginPdfCommon::getGroupNames($groups[$data['item_type']][$data['iID']] ?? []),
                     formatUserName(
                         $data['userid'],
                         $data['username'],
                         $data['userrealname'],
                         $data['userfirstname'],
-                        $linkUser ? 1 : 0,
                     ),
                     implode(', ', $tmp),
+                    $data['item_type']::getTypeName(1),
                 );
             }
         }
