@@ -440,7 +440,10 @@ abstract class PluginPdfCommon extends CommonGLPI
      */
     public static function getGroupNames(array $groups_ids): string
     {
-        $names = Dropdown::getDropdownArrayNames('glpi_groups', $groups_ids);
+        $names = array_map(
+            static fn($id) => Dropdown::getDropdownName('glpi_groups', $id),
+            $groups_ids,
+        );
         natcasesort($names);
 
         return Toolbox::stripTags(implode(', ', $names));
