@@ -41,6 +41,7 @@ use Domain_Item;
 use Glpi\Tests\DbTestCase;
 use GlpiPlugin\Pdf\Tests\RecordingSimplePDF;
 use Group;
+use Group_User;
 use Item_SoftwareLicense;
 use Item_SoftwareVersion;
 use Monitor;
@@ -53,6 +54,7 @@ use PluginPdfCartridgeItem;
 use PluginPdfComputer;
 use PluginPdfConsumableItem;
 use PluginPdfDomain_Item;
+use PluginPdfGroup;
 use PluginPdfItem_SoftwareLicense;
 use PluginPdfItem_SoftwareVersion;
 use PluginPdfMonitor;
@@ -61,10 +63,12 @@ use PluginPdfPeripheral;
 use PluginPdfPhone;
 use PluginPdfPrinter;
 use PluginPdfSoftware;
+use PluginPdfUser;
 use Printer;
 use Software;
 use SoftwareLicense;
 use SoftwareVersion;
+use User;
 
 class GroupsDisplayTest extends DbTestCase
 {
@@ -227,5 +231,55 @@ class GroupsDisplayTest extends DbTestCase
         PluginPdfItem_SoftwareVersion::pdfForSoftware($pdf, $software);
 
         $this->assertContains('PDF group A, PDF group B', $pdf->cells);
+    }
+
+    public static function techProvider(): iterable
+    {
+        yield 'used items'    => ['tech' => false, 'field' => 'groups_id'];
+        yield 'managed items' => ['tech' => true, 'field' => 'groups_id_tech'];
+    }
+
+    #[DataProvider('techProvider')]
+    public function testGroupItemsDisplaysAllGroups(bool $tech, string $field): void
+    {
+        $this->login();
+        $entity_id = $this->getTestRootEntity(true);
+        $group_b = $this->createItem(Group::class, ['name' => 'PDF group B', 'entities_id' => $entity_id]);
+        $group_a = $this->createItem(Group::class, ['name' => 'PDF group A', 'entities_id' => $entity_id]);
+
+        $this->createItem(Computer::class, [
+            'name'        => 'PDF computer',
+            'entities_id' => $entity_id,
+            $field        => [$group_a->getID(), $group_b->getID()],
+        ]);
+
+        $pdf = new RecordingSimplePDF();
+        PluginPdfGroup::pdfItems($pdf, $group_a, $tech, true, false);
+
+        $this->assertContains('PDF computer', $pdf->cells);
+        $this->assertContains('PDF group A, PDF group B', $pdf->cells);
+    }
+
+    #[DataProvider('techProvider')]
+    public function testUserItemsDisplaysItemsOfUserGroups(bool $tech, string $field): void
+    {
+        $this->login();
+        $entity_id = $this->getTestRootEntity(true);
+        $group_b = $this->createItem(Group::class, ['name' => 'PDF group B', 'entities_id' => $entity_id]);
+        $group_a = $this->createItem(Group::class, ['name' => 'PDF group A', 'entities_id' => $entity_id]);
+
+        $user = $this->createItem(User::class, ['name' => 'pdf_user', 'entities_id' => $entity_id]);
+        $this->createItem(Group_User::class, ['groups_id' => $group_a->getID(), 'users_id' => $user->getID()]);
+        $this->createItem(Computer::class, [
+            'name'        => 'PDF computer',
+            'entities_id' => $entity_id,
+            $field        => [$group_a->getID(), $group_b->getID()],
+        ]);
+
+        $pdf = new RecordingSimplePDF();
+        PluginPdfUser::pdfItems($pdf, $user, $tech);
+
+        $this->assertContains('PDF computer', $pdf->cells);
+        $this->assertContains('Group = PDF group A', $pdf->cells);
     }
 }

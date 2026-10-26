@@ -192,9 +192,6 @@ class PluginPdfGroup extends PluginPdfCommon
             $pdf->displayLine(__s('No item found'));
         }
 
-        $tmpgrp = new Group();
-        new User();
-
         foreach ($datas as $data) {
             if (!($item = $dbu->getItemForItemtype($data['itemtype']))) {
                 continue;
@@ -203,10 +200,8 @@ class PluginPdfGroup extends PluginPdfCommon
 
             $col4 = '';
             if ($tree || $user) {
-                if ($grp = $item->getField($field)) {
-                    if ($tmpgrp->getFromDB($grp)) {
-                        $col4 = $tmpgrp->getNameID();
-                    }
+                if ($grps = $item->getField($field)) {
+                    $col4 = PluginPdfCommon::getGroupNames($grps);
                 } elseif ($usr = $item->getField(str_replace('groups', 'users', $field))) {
                     $col4 = Toolbox::stripTags($dbu->getUserName($usr));
                 }
