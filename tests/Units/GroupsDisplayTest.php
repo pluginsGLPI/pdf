@@ -21,8 +21,6 @@
  *
  * @author    Nelly Mahu-Lasson, Remi Collet, Teclib
  * @copyright Copyright (c) 2009-2022 PDF plugin team
- * @copyright Copyright (c) 2009-2022 PDF plugin team
- * @license   AGPL License 3.0 or (at your option) any later version
  * @license   AGPL License 3.0 or (at your option) any later version
  * @link      https://github.com/pluginsGLPI/pdf/
  * @link      http://www.glpi-project.org/
