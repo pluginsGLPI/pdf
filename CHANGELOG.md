@@ -12,6 +12,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Fix KB PDF export crash on invalid image and missing categories
 - Fix KB images missing from PDF export
 - Fix base64 images (e.g. in ticket tasks) corrupted or missing in PDF export
+- Display all groups and groups in charge in asset PDF exports
+- Fix warning on the Domains tab of PDF exports
+- Fix errors when generating a pdf with software license/installation tabs
 
 ## [4.1.6] - 2026-10-06
 
@@ -19,8 +22,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 - Dependencies conflicts with core
 - Internal server error when generating appliance asset pdf
-- Display all groups and groups in charge in asset PDF exports
-- Fix warning on the Domains tab of PDF exports
 - CI: fix Psalm cache directory, declare a unique composer autoloader suffix
 
 ## [4.1.5] - 2026-09-01

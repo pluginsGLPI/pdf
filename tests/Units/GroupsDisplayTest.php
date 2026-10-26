@@ -21,9 +21,8 @@
  *
  * @author    Nelly Mahu-Lasson, Remi Collet, Teclib
  * @copyright Copyright (c) 2009-2022 PDF plugin team
- * @copyright 2015-2024 Teclib' and contributors.
- * @copyright 2003-2014 by the INDEPNET Development Team.
- * @licence   https://www.gnu.org/licenses/gpl-3.0.html
+ * @copyright Copyright (c) 2009-2022 PDF plugin team
+ * @license   AGPL License 3.0 or (at your option) any later version
  * @license   AGPL License 3.0 or (at your option) any later version
  * @link      https://github.com/pluginsGLPI/pdf/
  * @link      http://www.glpi-project.org/
