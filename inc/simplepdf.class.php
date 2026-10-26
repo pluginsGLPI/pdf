@@ -241,6 +241,16 @@ class PluginPdfSimplePDF
 
         $max = $miny;
 
+        /* drop images TCPDF cannot decode (corrupted file, invalid PNG, ...), they would crash the whole export */
+        $msgs = array_map(
+            fn($msg) => preg_replace_callback(
+                '/<img\b[^>]*>/i',
+                fn($img) => $this->canRenderHtml($img[0]) ? $img[0] : '',
+                (string) $msg,
+            ),
+            $msgs,
+        );
+
         /* dry run - compute max cell height */
         $this->pdf->startTransaction();
         $i = 0;
@@ -302,6 +312,27 @@ class PluginPdfSimplePDF
     }
 
     /**
+     * Check if TCPDF is able to render an HTML fragment, without altering the document
+     *
+     * @param string $html
+     *
+     * @return bool
+    **/
+    private function canRenderHtml(string $html): bool
+    {
+        $this->pdf->startTransaction();
+        try {
+            $this->pdf->writeHTMLCell(0, 0, '', '', $html);
+            $success = true;
+        } catch (Throwable $e) {
+            $success = false;
+        }
+        $this->pdf = $this->pdf->rollbackTransaction();
+
+        return $success;
+    }
+
+    /**
      * display a Title row, centered with dark background
      *
      * param list of strings, one string per column
@@ -359,74 +390,25 @@ class PluginPdfSimplePDF
         $content = html_entity_decode($content, ENT_QUOTES, 'UTF-8');
         $content = RichText::getSafeHtml($content);
 
-        preg_match_all(
-            '/<a\b[^>]*>\s*(<img\b[^>]*src=["\']([^"\']*docid=(\d+)[^"\']*)["\'][^>]*>)\s*<\/a>/i',
-            $content,
-            $matches,
-            PREG_SET_ORDER,
-        );
-
-        if ($matches !== []) {
-            $document = new Document();
-            foreach ($matches as $match) {
-                $full_a_tag = $match[0];
-                $full_img_tag = $match[1];
-                $docid = (int) $match[3];
-
-                if (
-                    $document->getFromDB($docid)
-                    && $document->canViewFile()
-                    && isset($document->fields['filepath'])
-                ) {
-                    $file_path = GLPI_DOC_DIR . '/' . $document->fields['filepath'];
-                    if (file_exists($file_path)) {
-                        // Get actual image dimensions from file
-                        $img_info_actual = @getimagesize($file_path);
-                        $actual_width = 450;  // Default
-                        $actual_height = 300; // Default
-
-                        if ($img_info_actual !== false) {
-                            $actual_width = $img_info_actual[0];
-                            $actual_height = $img_info_actual[1];
-                        }
-
-                        // Extract width and height from the HTML img tag
-                        $html_width = null;
-                        $html_height = null;
-
-                        if (preg_match('/width=["\']?(\d+)["\']?/i', $full_img_tag, $w_match)) {
-                            $html_width = (int) $w_match[1];
-                        }
-                        if (preg_match('/height=["\']?(\d+)["\']?/i', $full_img_tag, $h_match)) {
-                            $html_height = (int) $h_match[1];
-                        }
-
-                        // Calculate display dimensions preserving aspect ratio
-                        $display_width = $html_width ?? $actual_width;
-                        $display_height = $html_height ?? $actual_height;
-
-                        // If only one dimension is specified, calculate the other to preserve ratio
-                        if ($html_width && !$html_height) {
-                            $display_height = (int) ($html_width * $actual_height / $actual_width);
-                        } elseif ($html_height && !$html_width) {
-                            $display_width = (int) ($html_height * $actual_width / $actual_height);
-                        }
-
-                        // Apply maximum width constraint (200 pixels max)
-                        $max_width = 200;
-                        if ($display_width > $max_width) {
-                            $ratio = $max_width / $display_width;
-                            $display_width = $max_width;
-                            $display_height = (int) ($display_height * $ratio);
-                        }
-
-                        // Replace the original image by a properly resized one + remove the a tag
-                        $display_image_tag = '<img src="file://' . $file_path . '" width="' . $display_width . '" height="' . $display_height . '">';
-                        $content = str_replace($full_a_tag, $display_image_tag, $content);
-                    }
+        // The sanitizer encodes some characters in attributes (e.g. "=" => "&#61;", "+" => "&#43;"), which TCPDF
+        // does not decode: document URLs are no longer recognized and base64 data URIs get corrupted.
+        // Images are therefore resolved here from their decoded "src" and passed to TCPDF as validated data streams.
+        $content = preg_replace_callback(
+            '/(<a\b[^>]*>\s*)?(<img\b[^>]*>)(\s*<\/a>)?/i',
+            function (array $match): string {
+                $img_tag = $this->buildPdfImageTag($match[2]);
+                if ($img_tag === null) {
+                    return $match[0];
                 }
-            }
-        }
+                if ($match[1] !== '' && ($match[3] ?? '') !== '') {
+                    // Remove the link wrapping the image
+                    return $img_tag;
+                }
+
+                return $match[1] . $img_tag . ($match[3] ?? '');
+            },
+            $content,
+        );
 
         // Split content by tables, keeping tables in the result
         $segments = preg_split('/(<table\b[^>]*>.*?<\/table>)/is', $content, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
@@ -454,6 +436,82 @@ class PluginPdfSimplePDF
     }
 
     /**
+     * Build an <img> tag usable by TCPDF from a sanitized <img> tag.
+     *
+     * Supported sources are GLPI documents (document.send.php?docid=X) and base64 data URIs.
+     * Image data is validated with GD before being embedded, to prevent TCPDF from failing on corrupted images.
+     *
+     * @param string $img_tag sanitized <img> tag
+     *
+     * @return string|null new <img> tag, empty string if the image must be dropped, null if the tag must be kept as is
+     */
+    private function buildPdfImageTag(string $img_tag): ?string
+    {
+        if (!preg_match('/\bsrc\s*=\s*(["\'])(.*?)\1/is', $img_tag, $src_match)) {
+            return null;
+        }
+        $src = html_entity_decode($src_match[2], ENT_QUOTES | ENT_HTML5, 'UTF-8');
+
+        $data = null;
+        if (preg_match('/^data:image\/[a-z0-9.+-]+;base64,(.*)$/is', $src, $data_match)) {
+            $data = base64_decode(preg_replace('/\s+/', '', $data_match[1]), true);
+        } elseif (str_contains(parse_url($src, PHP_URL_PATH) ?? '', 'document.send.php')) {
+            parse_str(parse_url($src, PHP_URL_QUERY) ?? '', $query);
+            $document = new Document();
+            if (
+                isset($query['docid'])
+                && $document->getFromDB((int) $query['docid'])
+                && $document->canViewFile()
+                && !empty($document->fields['filepath'])
+            ) {
+                $file_path = GLPI_DOC_DIR . '/' . $document->fields['filepath'];
+                $data = is_readable($file_path) ? file_get_contents($file_path) : false;
+            } else {
+                $data = false;
+            }
+        } else {
+            return null;
+        }
+
+        // Drop unreadable or corrupted images instead of letting TCPDF fail
+        if (
+            !is_string($data)
+            || ($img_info = @getimagesizefromstring($data)) === false
+            || @imagecreatefromstring($data) === false
+        ) {
+            return '';
+        }
+        $actual_width  = $img_info[0];
+        $actual_height = $img_info[1];
+
+        // Extract width and height from the HTML img tag
+        $html_width  = preg_match('/\bwidth=["\']?(\d+)/i', $img_tag, $w_match) ? (int) $w_match[1] : null;
+        $html_height = preg_match('/\bheight=["\']?(\d+)/i', $img_tag, $h_match) ? (int) $h_match[1] : null;
+
+        // Calculate display dimensions preserving aspect ratio
+        $display_width  = $html_width ?: $actual_width;
+        $display_height = $html_height ?: $actual_height;
+
+        // If only one dimension is specified, calculate the other to preserve ratio
+        if ($html_width && !$html_height) {
+            $display_height = (int) ($html_width * $actual_height / $actual_width);
+        } elseif ($html_height && !$html_width) {
+            $display_width = (int) ($html_height * $actual_width / $actual_height);
+        }
+
+        // Apply maximum width constraint (200 pixels max)
+        $max_width = 200;
+        if ($display_width > $max_width) {
+            $ratio          = $max_width / $display_width;
+            $display_width  = $max_width;
+            $display_height = (int) ($display_height * $ratio);
+        }
+
+        // "@" prefix: TCPDF data stream, no local file or remote URL access needed
+        return '<img src="@' . base64_encode($data) . '" width="' . $display_width . '" height="' . $display_height . '">';
+    }
+
+    /**
      * Display space between row
      *
      * @param $nb     (default 1)
@@ -475,30 +533,89 @@ class PluginPdfSimplePDF
         // Remove colgroup entirely (causes fixed widths)
         $html = preg_replace('/<colgroup\b[^>]*>.*?<\/colgroup>/is', '', $html);
 
-        // Remove table-layout:fixed style (prevents auto-sizing)
-        $html = preg_replace('/table-layout\s*:\s*fixed\s*;?/i', '', $html);
+        // Parse with DOMDocument rather than regexes: style/attribute values coming
+        // from pasted web content can contain nested quotes (e.g. style="...url('...')..."),
+        // which regex-based quote matching cannot handle reliably and ends up corrupting
+        // the markup fed to TCPDF (causing crashes on malformed HTML).
+        $dom = new DOMDocument();
+        $libxml_previous_state = libxml_use_internal_errors(true);
+        $dom->loadHTML(
+            '<?xml encoding="utf-8" ?><div>' . $html . '</div>',
+            LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD,
+        );
+        libxml_use_internal_errors($libxml_previous_state);
 
-        // Remove width/height styles only from table elements (table, td, th, tr)
-        $html = preg_replace('/(<(?:table|td|th|tr)\b[^>]*)\s+style\s*=\s*["\']([^"\']*)\bwidth\s*:\s*[^;"\'>]+;?([^"\']*)["\']/', '$1 style="$2$3"', $html);
-        $html = preg_replace('/(<(?:table|td|th|tr)\b[^>]*)\s+style\s*=\s*["\']([^"\']*)\bheight\s*:\s*[^;"\'>]+;?([^"\']*)["\']/', '$1 style="$2$3"', $html);
-
-        // Remove width/height attributes only from table elements (table, td, th, tr)
-        $html = preg_replace('/(<(?:table|td|th|tr)\b[^>]+)\s+width\s*=\s*["\']?[^"\'\s>]+["\']?/i', '$1', $html);
-        $html = preg_replace('/(<(?:table|td|th|tr)\b[^>]+)\s+height\s*=\s*["\']?[^"\'\s>]+["\']?/i', '$1', $html);
-
-        // Clean up empty style attributes and double spaces
-        $html = preg_replace('/\s+style\s*=\s*["\'][\s]*["\']/', '', $html);
-        $html = preg_replace('/\s+/', ' ', $html);
-
-        // Add border to table if missing (for visibility)
-        if (!preg_match('/border\s*=\s*["\']?[1-9]/i', $html)) {
-            $html = preg_replace('/<table/i', '<table border="1"', $html, 1);
+        $wrapper = $dom->getElementsByTagName('div')->item(0);
+        if ($wrapper === null) {
+            // Fallback: parsing failed unexpectedly, keep original content rather than losing it
+            return $html;
         }
 
-        // Force table to 100% width for PDF (do this LAST)
-        $html = preg_replace('/<table([^>]*)>/i', '<table$1 style="width:100%">', $html, 1);
+        $xpath = new DOMXPath($dom);
+        foreach (iterator_to_array($dom->getElementsByTagName('table')) as $table) {
+            // Remove width/height (attributes and styles) on the table and its rows/cells
+            foreach ($xpath->query('.//td | .//th | .//tr | .', $table) as $node) {
+                if (!($node instanceof DOMElement)) {
+                    continue;
+                }
 
-        return $html;
+                $node->removeAttribute('width');
+                $node->removeAttribute('height');
+
+                $style = $this->removeStyleProperties($node->getAttribute('style'), ['width', 'height', 'table-layout']);
+                if ($style === '') {
+                    $node->removeAttribute('style');
+                } else {
+                    $node->setAttribute('style', $style);
+                }
+            }
+
+            // Add border to table if missing (for visibility)
+            if (!$table->hasAttribute('border') || (int) $table->getAttribute('border') < 1) {
+                $table->setAttribute('border', '1');
+            }
+
+            // Force table to 100% width for PDF (do this LAST)
+            $style = trim($table->getAttribute('style') . ';width:100%;', ';');
+            $table->setAttribute('style', $style);
+        }
+
+        $output = '';
+        foreach (iterator_to_array($wrapper->childNodes) as $child) {
+            $output .= $dom->saveHTML($child);
+        }
+
+        return $output;
+    }
+
+    /**
+     * Remove the given CSS properties from an inline style declaration.
+     *
+     * @param $style      string    inline style attribute content
+     * @param $properties array     lowercase property names to strip
+     *
+     * @return string
+     **/
+    private function removeStyleProperties($style, array $properties)
+    {
+        if (trim($style) === '') {
+            return '';
+        }
+
+        $kept = [];
+        foreach (preg_split('/;(?![^(]*\))/', $style) as $declaration) {
+            $declaration = trim($declaration);
+            if ($declaration === '') {
+                continue;
+            }
+            $property = strtolower(trim(explode(':', $declaration, 2)[0]));
+            if (in_array($property, $properties, true)) {
+                continue;
+            }
+            $kept[] = $declaration;
+        }
+
+        return implode('; ', $kept);
     }
 
     /**

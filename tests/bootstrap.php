@@ -33,18 +33,11 @@
  *  --------------------------------------------------------------------------
  */
 
+$current_plugin_folder = basename(dirname(__DIR__));
+
 require __DIR__ . '/../../../tests/bootstrap.php';
+require dirname(__DIR__) . '/vendor/autoload.php';
 
-$plugin = new Plugin();
-$plugin->checkPluginState('pdf');
-$plugin->getFromDBbyDir('pdf');
-
-if (!$plugin->isInstalled('pdf')) {
-    $plugin->install($plugin->getID());
+if (!Plugin::isPluginActive($current_plugin_folder)) {
+    throw new RuntimeException(sprintf('Plugin %s is not active in the test database', $current_plugin_folder));
 }
-
-if (!$plugin->isActivated('pdf')) {
-    $plugin->activate($plugin->getID());
-}
-
-require_once __DIR__ . '/fixtures/RecordingSimplePDF.php';

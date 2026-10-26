@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [UNRELEASED]
 
+### Fixed
+
+- Fix KB PDF export crash on invalid image and missing categories
+- Fix KB images missing from PDF export
+- Fix base64 images (e.g. in ticket tasks) corrupted or missing in PDF export
+
+## [4.1.6] - 2026-10-06
+
 ### Fixed
 
 - Dependencies conflicts with core
@@ -21,9 +29,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 - Fix PDF Generation involving a Network port with multiple IPs
 - Fix PDF export of tabs renamed in GLPI 11
+- fix/tcpdf-nested-quotes-crash
+- Fix PDF export crash on tickets with tables containing nested-quote styles
 - Fix embedded document images in PDF exports
 - Fix rich text HTML re-activated after sanitization when exporting embedded images to PDF
 - Remove dead webservices hook registration
+
 
 ## [4.1.4] - 2026-07-30
 
