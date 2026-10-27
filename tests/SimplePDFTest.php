@@ -31,9 +31,9 @@
  *  --------------------------------------------------------------------------
  */
 
-use Glpi\Tests\GLPITestCase;
+use Glpi\Tests\DbTestCase;
 
-class SimplePDFTest extends GLPITestCase
+class SimplePDFTest extends DbTestCase
 {
     private function getStringWidth(PluginPdfSimplePDF $pdf, string $string): float
     {
@@ -130,5 +130,90 @@ class SimplePDFTest extends GLPITestCase
         $this->assertStringNotContainsStringIgnoringCase('width: 51.8pt', $cleaned);
         $this->assertStringNotContainsStringIgnoringCase('height: 15.75pt', $cleaned);
         $this->assertStringContainsString("url('https://example.com/pics/a.jpg')", $cleaned);
+    }
+
+    /**
+     * Test a base64 image in a rich text (e.g. a ticket task)
+     * `+` and `=` were encoded as `&#43;` and `&#61;` by the sanitizer, so the image data was corrupted and TCPDF crashed
+     */
+    public function testDisplayTextEmbedsBase64Image(): void
+    {
+        // 1x1 semi-transparent PNG, its base64 contains both `+` and `=`
+        $base64 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAADUlEQVQImWP4z8BQBwAEfwF+fk6erwAAAABJRU5ErkJggg==';
+
+        $pdf = new PluginPdfSimplePDF();
+        $pdf->newPage();
+        $pdf->displayText('Description', '<p>before <img src="data:image/png;base64,' . $base64 . '" width="10"> after</p>');
+
+        $this->assertStringContainsString('/Subtype /Image', $pdf->output());
+    }
+
+    /**
+     * Test a corrupted base64 image in a rich text
+     */
+    public function testDisplayTextDropsCorruptedBase64Image(): void
+    {
+        $base64 = base64_encode($this->getCorruptedPngContent());
+
+        $pdf = new PluginPdfSimplePDF();
+        $pdf->newPage();
+        $pdf->displayText('Description', '<p>before <img src="data:image/png;base64,' . $base64 . '" width="10"> after</p>');
+
+        $output = $pdf->output();
+        $this->assertStringStartsWith('%PDF-', $output);
+        $this->assertStringNotContainsString('/Subtype /Image', $output);
+    }
+
+    /**
+     * Test a large document image inside a table
+     * Its base64 data made the table regex hit `pcre.backtrack_limit`, and the whole content vanished from the PDF
+     */
+    public function testDisplayTextEmbedsLargeDocumentImageInTable(): void
+    {
+        $this->login();
+
+        // ~1 MB PNG: random pixels are not compressible
+        $image = imagecreatetruecolor(600, 600);
+        for ($x = 0; $x < 600; $x++) {
+            for ($y = 0; $y < 600; $y++) {
+                imagesetpixel($image, $x, $y, random_int(0, 0xFFFFFF));
+            }
+        }
+        $filename = uniqid('glpitest_', true) . '.png';
+        $this->assertTrue(imagepng($image, GLPI_TMP_DIR . '/' . $filename, 0));
+        $this->assertGreaterThan(1_000_000, filesize(GLPI_TMP_DIR . '/' . $filename));
+
+        $document = $this->createItem(
+            Document::class,
+            [
+                'filename'    => $filename,
+                'entities_id' => getItemByTypeName('Entity', '_test_root_entity', true),
+                '_filename'   => [$filename],
+            ],
+            ['filename', '_filename'],
+        );
+
+        $pdf = new PluginPdfSimplePDF();
+        $pdf->newPage();
+        $pdf->displayText(
+            'Description',
+            '<table><tr><td><a href="/front/document.send.php?docid=' . $document->getID() . '">'
+            . '<img src="/front/document.send.php?docid=' . $document->getID() . '" width="100"></a></td></tr></table>',
+        );
+
+        $this->assertStringContainsString('/Subtype /Image', $pdf->output());
+    }
+
+    /**
+     * Build a PNG file with a valid RGBA header but undecodable image data
+     */
+    private function getCorruptedPngContent(): string
+    {
+        $chunk = (static fn(string $type, string $data): string => pack('N', strlen($data)) . $type . $data . pack('N', crc32($type . $data)));
+
+        return "\x89PNG\r\n\x1a\n"
+            . $chunk('IHDR', pack('NNCCCCC', 2, 2, 8, 6, 0, 0, 0))
+            . $chunk('IDAT', 'not zlib compressed data')
+            . $chunk('IEND', '');
     }
 }
