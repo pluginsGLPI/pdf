@@ -461,19 +461,25 @@ class PluginPdfSimplePDF
         // The sanitizer encodes some characters in attributes (e.g. "=" => "&#61;", "+" => "&#43;"), which TCPDF
         // does not decode: document URLs are no longer recognized and base64 data URIs get corrupted.
         // Images are therefore resolved here from their decoded "src" and passed to TCPDF as validated data streams.
-        $content = preg_replace_callback(
+        // Resolved images are replaced by placeholders until the end of the processing: their (large) base64 data
+        // would otherwise make the table regex hit "pcre.backtrack_limit" and the whole content would be lost.
+        $images            = [];
+        $placeholder_token = 'pdfimg' . bin2hex(random_bytes(8)) . '_';
+        $content           = preg_replace_callback(
             '/(<a\b[^>]*>\s*)?(<img\b[^>]*>)(\s*<\/a>)?/i',
-            function (array $match): string {
+            function (array $match) use (&$images, $placeholder_token): string {
                 $img_tag = $this->buildPdfImageTag($match[2]);
                 if ($img_tag === null) {
                     return $match[0];
                 }
+                $placeholder          = $placeholder_token . count($images);
+                $images[$placeholder] = $img_tag;
                 if ($match[1] !== '' && ($match[3] ?? '') !== '') {
                     // Remove the link wrapping the image
-                    return $img_tag;
+                    return $placeholder;
                 }
 
-                return $match[1] . $img_tag . ($match[3] ?? '');
+                return $match[1] . $placeholder . ($match[3] ?? '');
             },
             $content,
         );
@@ -497,7 +503,18 @@ class PluginPdfSimplePDF
             }
         }
 
-        $this->displayInternal(240, 0.5, self::LEFT, $minline * 5, [$formatted_content]);
+        // Put back the resolved images
+        $formatted_content = strtr($formatted_content, $images);
+
+        // TCPDF also matches tables with a lazy regex and silently drops the whole content when it fails:
+        // raise "pcre.backtrack_limit" to fit the content size (large embedded images) while rendering it.
+        $backtrack_limit = ini_get('pcre.backtrack_limit');
+        ini_set('pcre.backtrack_limit', (string) max((int) $backtrack_limit, 2 * strlen($formatted_content)));
+        try {
+            $this->displayInternal(240, 0.5, self::LEFT, $minline * 5, [$formatted_content]);
+        } finally {
+            ini_set('pcre.backtrack_limit', $backtrack_limit);
+        }
 
         /* Restore */
         [$this->cols, $this->colsx, $this->colsw, $this->align, ] = $save;

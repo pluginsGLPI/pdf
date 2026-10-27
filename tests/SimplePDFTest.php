@@ -31,9 +31,9 @@
  *  --------------------------------------------------------------------------
  */
 
-use Glpi\Tests\GLPITestCase;
+use Glpi\Tests\DbTestCase;
 
-class SimplePDFTest extends GLPITestCase
+class SimplePDFTest extends DbTestCase
 {
     private function getStringWidth(PluginPdfSimplePDF $pdf, string $string): float
     {
@@ -162,6 +162,46 @@ class SimplePDFTest extends GLPITestCase
         $output = $pdf->output();
         $this->assertStringStartsWith('%PDF-', $output);
         $this->assertStringNotContainsString('/Subtype /Image', $output);
+    }
+
+    /**
+     * Test a large document image inside a table
+     * Its base64 data made the table regex hit `pcre.backtrack_limit`, and the whole content vanished from the PDF
+     */
+    public function testDisplayTextEmbedsLargeDocumentImageInTable(): void
+    {
+        $this->login();
+
+        // ~1 MB PNG: random pixels are not compressible
+        $image = imagecreatetruecolor(600, 600);
+        for ($x = 0; $x < 600; $x++) {
+            for ($y = 0; $y < 600; $y++) {
+                imagesetpixel($image, $x, $y, random_int(0, 0xFFFFFF));
+            }
+        }
+        $filename = uniqid('glpitest_', true) . '.png';
+        $this->assertTrue(imagepng($image, GLPI_TMP_DIR . '/' . $filename, 0));
+        $this->assertGreaterThan(1_000_000, filesize(GLPI_TMP_DIR . '/' . $filename));
+
+        $document = $this->createItem(
+            Document::class,
+            [
+                'filename'    => $filename,
+                'entities_id' => getItemByTypeName('Entity', '_test_root_entity', true),
+                '_filename'   => [$filename],
+            ],
+            ['filename', '_filename'],
+        );
+
+        $pdf = new PluginPdfSimplePDF();
+        $pdf->newPage();
+        $pdf->displayText(
+            'Description',
+            '<table><tr><td><a href="/front/document.send.php?docid=' . $document->getID() . '">'
+            . '<img src="/front/document.send.php?docid=' . $document->getID() . '" width="100"></a></td></tr></table>',
+        );
+
+        $this->assertStringContainsString('/Subtype /Image', $pdf->output());
     }
 
     /**
