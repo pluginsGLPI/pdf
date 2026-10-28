@@ -182,6 +182,37 @@ class SimplePdfTest extends DbTestCase
     }
 
     /**
+     * Test a large document image inside a table
+     * Its base64 data made the table regex hit `pcre.backtrack_limit`, and the whole content vanished from the PDF
+     */
+    public function testDisplayTextEmbedsLargeDocumentImageInTable(): void
+    {
+        // ~1 MB PNG: random pixels are not compressible
+        $image = imagecreatetruecolor(600, 600);
+        for ($x = 0; $x < 600; $x++) {
+            for ($y = 0; $y < 600; $y++) {
+                imagesetpixel($image, $x, $y, random_int(0, 0xFFFFFF));
+            }
+        }
+        ob_start();
+        imagepng($image, null, 0);
+        $content = ob_get_clean();
+        $this->assertGreaterThan(1_000_000, strlen($content));
+
+        $docid = $this->createDocumentFile('PNG', 'png', $content);
+        $url   = '/front/document.send.php?docid=' . $docid;
+
+        $pdf = new PluginPdfSimplePDF();
+        $pdf->newPage();
+        $pdf->displayText(
+            'Description',
+            '<table><tr><td><a href="' . $url . '"><img src="' . $url . '" width="100"></a></td></tr></table>',
+        );
+
+        $this->assertStringContainsString('/Subtype /Image', $pdf->output());
+    }
+
+    /**
      * Create a document whose file is stored in GLPI_DOC_DIR
      */
     private function createDocumentFile(string $dir, string $extension, string $content): int
