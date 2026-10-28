@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Fix warning on the Domains tab of PDF exports
 - Fix errors when generating a pdf with software license/installation tabs
 - Incomplete columns when exporting Users or Groups
+- Fix content missing from PDF export when a table contains a large image
 
 ## [4.1.6] - 2026-10-06
 
