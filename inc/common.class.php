@@ -431,6 +431,59 @@ abstract class PluginPdfCommon extends CommonGLPI
         }
     }
 
+    /**
+     * Get the names of groups, sorted and separated by commas, ready to be displayed in a PDF cell
+     *
+     * @param array $groups_ids
+     *
+     * @return string
+     */
+    public static function getGroupNames(array $groups_ids): string
+    {
+        $names = array_map(
+            static fn($id) => Dropdown::getDropdownName('glpi_groups', $id),
+            $groups_ids,
+        );
+        natcasesort($names);
+
+        return Toolbox::stripTags(implode(', ', $names));
+    }
+
+    /**
+     * Get the groups ids of several items of the same type, indexed by item id
+     *
+     * @param string $itemtype
+     * @param array  $items_ids
+     * @param int    $type      Group_Item::GROUP_TYPE_NORMAL or Group_Item::GROUP_TYPE_TECH
+     *
+     * @return array<int, int[]>
+     */
+    public static function getGroupsIdsForItems(string $itemtype, array $items_ids, int $type): array
+    {
+        /** @var DBmysql $DB */
+        global $DB;
+
+        if ($items_ids === []) {
+            return [];
+        }
+
+        $groups_ids = [];
+        $iterator   = $DB->request([
+            'SELECT' => ['items_id', 'groups_id'],
+            'FROM'   => Group_Item::getTable(),
+            'WHERE'  => [
+                'itemtype' => $itemtype,
+                'items_id' => array_values(array_unique($items_ids)),
+                'type'     => $type,
+            ],
+        ]);
+        foreach ($iterator as $row) {
+            $groups_ids[$row['items_id']][] = $row['groups_id'];
+        }
+
+        return $groups_ids;
+    }
+
     public static function mainTitle(PluginPdfSimplePDF $pdf, $item)
     {
         $pdf->setColumnsSize(50, 50);
@@ -520,10 +573,7 @@ abstract class PluginPdfCommon extends CommonGLPI
                     '<b><i>' . sprintf(
                         __s('%1$s: %2$s'),
                         __s('Group in charge of the hardware') . '</i></b>',
-                        Dropdown::getDropdownName(
-                            'glpi_groups',
-                            $item->fields['groups_id_tech'],
-                        ),
+                        self::getGroupNames($item->fields['groups_id_tech']),
                     ),
                     '<b><i>' . sprintf(
                         __s('%1$s: %2$s'),

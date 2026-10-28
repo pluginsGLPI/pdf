@@ -30,6 +30,8 @@
  *  --------------------------------------------------------------------------
  */
 
+use Glpi\DBAL\QueryExpression;
+
 class PluginPdfUser extends PluginPdfCommon
 {
     public static $rightname = 'plugin_pdf';
@@ -282,78 +284,73 @@ class PluginPdfUser extends PluginPdfCommon
             );
         }
 
-        $group_where = '';
-        $groups      = [];
+        $groups_ids = [];
+        foreach ($DB->request(['SELECT' => 'groups_id', 'FROM' => 'glpi_groups_users', 'WHERE' => ['users_id' => $ID]]) as $data) {
+            $groups_ids[] = $data['groups_id'];
+        }
 
-        $result = $DB->request(['SELECT' => ['glpi_groups_users.groups_id', 'name'],
-            'FROM'                       => 'glpi_groups_users',
-            'LEFT JOIN'                  => ['glpi_groups'
-                             => ['FKEY' => ['glpi_groups' => 'id',
-                                 'glpi_groups_users'      => 'groups_id']]],
-            'WHERE' => ['users_id' => $ID]]);
-
-        $number = count($result);
-
-        if ($number > 0) {
-            $first = true;
-
-            foreach ($result as $data) {
-                if ($first) {
-                    $first = false;
-                } else {
-                    $group_where .= ' OR ';
-                }
-
-                $group_where .= ' `' . $field_group . "` = '" . $data['groups_id'] . "' ";
-                $groups[$data['groups_id']] = $data['name'];
-            }
+        if ($groups_ids !== []) {
             $empty = false;
 
             foreach ($type_group as $itemtype) {
                 if (!($item = $dbu->getItemForItemtype($itemtype))) {
                     continue;
                 }
-                if ($item->canView() && $item->isField($field_group)) {
+                if ($item->canView()) {
                     $itemtable = $dbu->getTableForItemType($itemtype);
 
-                    $query = ['FROM' => $itemtable,
-                        'WHERE'      => [$group_where]];
+                    $query = [
+                        'SELECT' => [
+                            "$itemtable.*",
+                            new QueryExpression(
+                                'GROUP_CONCAT(DISTINCT ' . $DB::quoteName(Group_Item::getTable() . '.groups_id') . ') AS ' . $DB::quoteName('groups_ids'),
+                            ),
+                        ],
+                        'FROM'       => $itemtable,
+                        'INNER JOIN' => [
+                            Group_Item::getTable() => [
+                                'FKEY' => [
+                                    $itemtable             => 'id',
+                                    Group_Item::getTable() => 'items_id',
+                                    ['AND' => [Group_Item::getTable() . '.itemtype' => $itemtype]],
+                                ],
+                            ],
+                        ],
+                        'WHERE' => [
+                            Group_Item::getTable() . '.groups_id' => $groups_ids,
+                            Group_Item::getTable() . '.type'      => $tech ? Group_Item::GROUP_TYPE_TECH : Group_Item::GROUP_TYPE_NORMAL,
+                        ],
+                        'GROUPBY' => "$itemtable.id",
+                    ];
 
                     if ($item->maybeTemplate()) {
-                        $query['WHERE']['is_template'] = 0;
+                        $query['WHERE']["$itemtable.is_template"] = 0;
                     }
                     if ($item->maybeDeleted()) {
-                        $query['WHERE']['is_deleted'] = 0;
+                        $query['WHERE']["$itemtable.is_deleted"] = 0;
                     }
 
-                    $result = $DB->request($query);
-
-                    $type_name = $item->getTypeName();
-
-                    if (count($result) > 0) {
-                        foreach ($result as $data) {
-                            $name = $data['name'];
-                            if (empty($name)) {
-                                $name = sprintf(__s('%1$s (%2$s)'), $name, $data['id']);
-                            }
-                            $linktype = '';
-                            if (isset($groups[$data[$field_group]])) {
-                                $linktype = sprintf(
-                                    __s('%1$s = %2$s'),
-                                    _sn('Group', 'Groups', 1),
-                                    $groups[$data[$field_group]],
-                                );
-                            }
-                            $pdf->displayLine(
-                                $item->getTypeName(1),
-                                Dropdown::getDropdownName('glpi_entities', $data['entities_id']),
-                                $name,
-                                $data['serial'],
-                                $data['otherserial'],
-                                Dropdown::getDropdownName('glpi_states', $data['states_id']),
-                                $linktype,
-                            );
+                    foreach ($DB->request($query) as $data) {
+                        $name = $data['name'];
+                        if (empty($name)) {
+                            $name = sprintf(__s('%1$s (%2$s)'), $name, $data['id']);
                         }
+                        $item_groups_ids = explode(',', $data['groups_ids']);
+                        $pdf->displayLine(
+                            $item->getTypeName(1),
+                            Dropdown::getDropdownName('glpi_entities', $data['entities_id']),
+                            $name,
+                            $data['serial'] ?? '',
+                            $data['otherserial'] ?? '',
+                            isset($data['states_id'])
+                             ? Dropdown::getDropdownName('glpi_states', $data['states_id'])
+                             : '',
+                            sprintf(
+                                __s('%1$s = %2$s'),
+                                _sn('Group', 'Groups', count($item_groups_ids)),
+                                PluginPdfCommon::getGroupNames($item_groups_ids),
+                            ),
+                        );
                     }
                 }
             }

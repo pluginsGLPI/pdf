@@ -38,3 +38,5 @@ require dirname(__DIR__) . '/vendor/autoload.php';
 if (!Plugin::isPluginActive($current_plugin_folder)) {
     throw new RuntimeException(sprintf('Plugin %s is not active in the test database', $current_plugin_folder));
 }
+
+require_once __DIR__ . '/fixtures/RecordingSimplePDF.php';

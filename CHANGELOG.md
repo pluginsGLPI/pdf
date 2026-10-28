@@ -12,6 +12,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Fix KB PDF export crash on invalid image and missing categories
 - Fix KB images missing from PDF export
 - Fix base64 images (e.g. in ticket tasks) corrupted or missing in PDF export
+- Display all groups and groups in charge in asset PDF exports
+- Fix warning on the Domains tab of PDF exports
+- Fix errors when generating a pdf with software license/installation tabs
+- Incomplete columns when exporting Users or Groups
 
 ## [4.1.6] - 2026-10-06
 
