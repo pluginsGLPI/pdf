@@ -36,6 +36,7 @@ namespace GlpiPlugin\Pdf\Tests\Units;
 
 use Document;
 use Glpi\Tests\DbTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PluginPdfSimplePDF;
 use Psr\Log\LogLevel;
 use ReflectionMethod;
@@ -187,16 +188,7 @@ class SimplePdfTest extends DbTestCase
      */
     public function testDisplayTextEmbedsLargeDocumentImageInTable(): void
     {
-        // ~1 MB PNG: random pixels are not compressible
-        $image = imagecreatetruecolor(600, 600);
-        for ($x = 0; $x < 600; $x++) {
-            for ($y = 0; $y < 600; $y++) {
-                imagesetpixel($image, $x, $y, random_int(0, 0xFFFFFF));
-            }
-        }
-        ob_start();
-        imagepng($image, null, 0);
-        $content = ob_get_clean();
+        $content = $this->getLargePngContent();
         $this->assertGreaterThan(1_000_000, strlen($content));
 
         $docid = $this->createDocumentFile('PNG', 'png', $content);
@@ -209,6 +201,31 @@ class SimplePdfTest extends DbTestCase
             '<table><tr><td><a href="' . $url . '"><img src="' . $url . '" width="100"></a></td></tr></table>',
         );
 
+        $this->assertStringContainsString('/Subtype /Image', $pdf->output());
+    }
+
+    public static function largeBase64ImageProvider(): iterable
+    {
+        yield 'outside a table' => ['<p>before %s after</p>'];
+        yield 'inside a table'  => ['<table><tr><td>before %s after</td></tr></table>'];
+    }
+
+    /**
+     * Test a large pasted base64 image, inside and outside a table
+     * Its data made the `src` and table regexes hit `pcre.backtrack_limit`, and the image or the whole content was lost
+     */
+    #[DataProvider('largeBase64ImageProvider')]
+    public function testDisplayTextEmbedsLargeBase64Image(string $html): void
+    {
+        // ~1.5 MB base64 data
+        $base64 = base64_encode($this->getLargePngContent());
+        $this->assertGreaterThan(1_500_000, strlen($base64));
+
+        $pdf = new PluginPdfSimplePDF();
+        $pdf->newPage();
+        $pdf->displayText('Description', sprintf($html, '<img src="data:image/png;base64,' . $base64 . '" width="100">'));
+
+        // The whole content (including the image) was lost when a regex failed
         $this->assertStringContainsString('/Subtype /Image', $pdf->output());
     }
 
@@ -258,6 +275,23 @@ class SimplePdfTest extends DbTestCase
         $image = imagecreatetruecolor(2, 2);
         ob_start();
         imagepng($image);
+
+        return ob_get_clean();
+    }
+
+    /**
+     * Build a ~1.15 MB uncompressed PNG: random pixels are not compressible
+     */
+    private function getLargePngContent(): string
+    {
+        $image = imagecreatetruecolor(620, 620);
+        for ($x = 0; $x < 620; $x++) {
+            for ($y = 0; $y < 620; $y++) {
+                imagesetpixel($image, $x, $y, random_int(0, 0xFFFFFF));
+            }
+        }
+        ob_start();
+        imagepng($image, null, 0);
 
         return ob_get_clean();
     }

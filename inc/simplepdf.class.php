@@ -464,10 +464,10 @@ class PluginPdfSimplePDF
      */
     private function buildPdfImageTag(string $img_tag): ?string
     {
-        if (!preg_match('/\bsrc\s*=\s*(["\'])(.*?)\1/is', $img_tag, $src_match)) {
+        if (!preg_match('/\bsrc\s*=\s*(?|"([^"]*)"|\'([^\']*)\')/i', $img_tag, $src_match)) {
             return null;
         }
-        $src = html_entity_decode($src_match[2], ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $src = html_entity_decode($src_match[1], ENT_QUOTES | ENT_HTML5, 'UTF-8');
 
         $data = null;
         if (preg_match('/^data:image\/[a-z0-9.+-]+;base64,(.*)$/is', $src, $data_match)) {
