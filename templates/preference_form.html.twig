@@ -55,11 +55,11 @@
                         </legend>
 
                         <div class="mb-3 d-flex flex-wrap gap-2">
-                            <button type="button" class="btn btn-sm btn-outline-success" onclick="selectAllCheckboxes('{{ form_id }}')">
+                            <button type="button" class="btn btn-sm btn-outline-success" id="select_all_{{ form_id }}">
                                 <i class="ti ti-check me-1"></i>
                                 {{ __('Check all') }}
                             </button>
-                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="selectNoCheckboxes('{{ form_id }}')">
+                            <button type="button" class="btn btn-sm btn-outline-secondary" id="select_none_{{ form_id }}">
                                 <i class="ti ti-x me-1"></i>
                                 {{ __('Uncheck all') }}
                             </button>
@@ -189,6 +189,13 @@
 
     $(document).ready(function () {
         var formId = '{{ form_id }}';
+
+        $('#select_all_' + formId).on('click', function () {
+            selectAllCheckboxes(formId);
+        });
+        $('#select_none_' + formId).on('click', function () {
+            selectNoCheckboxes(formId);
+        });
 
         $('#' + formId + ' input[type="checkbox"][name^="item["]').each(function () {
             if ($(this).is(':checked')) {
