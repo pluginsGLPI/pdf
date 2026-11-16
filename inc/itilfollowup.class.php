@@ -44,8 +44,6 @@ class PluginPdfItilFollowup extends PluginPdfCommon
         /** @var DBmysql $DB */
         global $DB;
 
-        $dbu = new DbUtils();
-
         $ID   = $item->getField('id');
         $type = $item->getType();
 
@@ -88,14 +86,14 @@ class PluginPdfItilFollowup extends PluginPdfCommon
                 '<b><i>' . __s('Requester') . '</i></b>'); // Author
 
             foreach ($result as $data) {
-                $lib = $data['requesttypes_id'] ? Dropdown::getDropdownName('glpi_requesttypes', $data['requesttypes_id']) : '';
+                $lib = $data['requesttypes_id'] ? PluginPdfCommon::getDropdownNameCached('glpi_requesttypes', $data['requesttypes_id']) : '';
                 if ($data['is_private']) {
                     $lib = sprintf(__s('%1$s (%2$s)'), $lib, __s('Private'));
                 }
                 $pdf->displayLine(
                     Toolbox::stripTags($lib),
                     Html::convDateTime($data['date']),
-                    Toolbox::stripTags($dbu->getUserName($data['users_id'])),
+                    Toolbox::stripTags(PluginPdfCommon::getUserNameCached($data['users_id'])),
                 );
 
                 $content = $data['content'];

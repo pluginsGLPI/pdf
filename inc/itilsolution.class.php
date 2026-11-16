@@ -44,8 +44,6 @@ class PluginPdfITILSolution extends PluginPdfCommon
         /** @var DBmysql $DB */
         global $DB;
 
-        $dbu = new DbUtils();
-
         $pdf->setColumnsSize(100);
 
         $soluce = $DB->request(
@@ -63,7 +61,7 @@ class PluginPdfITILSolution extends PluginPdfCommon
             $pdf->displayTitle($title);
             foreach ($soluce as $row) {
                 if ($row['solutiontypes_id']) {
-                    $title = Toolbox::stripTags(Dropdown::getDropdownName(
+                    $title = Toolbox::stripTags(PluginPdfCommon::getDropdownNameCached(
                         'glpi_solutiontypes',
                         $row['solutiontypes_id'],
                     ));
@@ -89,7 +87,7 @@ class PluginPdfITILSolution extends PluginPdfCommon
                                     sprintf(
                                         __s('%1$s %2$s'),
                                         __s('By'),
-                                        Toolbox::stripTags($dbu->getUserName($row['users_id_approval'])),
+                                        Toolbox::stripTags(PluginPdfCommon::getUserNameCached($row['users_id_approval'])),
                                     )
                                     . '</i>';
                 }

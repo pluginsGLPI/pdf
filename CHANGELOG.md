@@ -17,6 +17,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Fix errors when generating a pdf with software license/installation tabs
 - Incomplete columns when exporting Users or Groups
 
+### Changed
+
+- Improve PDF generation performance (fewer SQL queries, faster rendering, session released during the export)
+
 ## [4.1.6] - 2026-10-06
 
 ### Fixed

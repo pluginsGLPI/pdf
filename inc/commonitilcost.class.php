@@ -121,7 +121,7 @@ class PluginPdfCommonItilCost extends PluginPdfCommon
                     $data['name'],
                     Html::convDate($data['begin_date']),
                     Html::convDate($data['end_date']),
-                    Toolbox::stripTags(Dropdown::getDropdownName(
+                    Toolbox::stripTags(PluginPdfCommon::getDropdownNameCached(
                         'glpi_budgets',
                         $data['budgets_id'],
                     )),

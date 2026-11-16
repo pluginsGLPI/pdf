@@ -44,8 +44,6 @@ class PluginPdfTicketTask extends PluginPdfCommon
         /** @var DBmysql $DB */
         global $DB;
 
-        $dbu = new DbUtils();
-
         $ID = $job->getField('id');
 
         //////////////Tasks///////////
@@ -117,20 +115,20 @@ class PluginPdfTicketTask extends PluginPdfCommon
                     $planification .= '<br>' . sprintf(
                         __s('%1$s: %2$s'),
                         __s('By user', 'pdf'),
-                        $dbu->getUserName($data['users_id_tech']),
+                        PluginPdfCommon::getUserNameCached($data['users_id_tech']),
                     );
                 }
                 if ($data['groups_id_tech'] > 0) {
                     $planification .= '<br>' . sprintf(
                         __s('%1$s: %2$s'),
                         __s('By group', 'pdf'),
-                        Dropdown::getDropdownName(
+                        PluginPdfCommon::getDropdownNameCached(
                             'glpi_groups',
                             $data['groups_id_tech'],
                         ),
                     );
                 }
-                $lib = $data['taskcategories_id'] ? Dropdown::getDropdownName('glpi_taskcategories', $data['taskcategories_id']) : '';
+                $lib = $data['taskcategories_id'] ? PluginPdfCommon::getDropdownNameCached('glpi_taskcategories', $data['taskcategories_id']) : '';
                 if ($data['is_private']) {
                     $lib = sprintf(__s('%1$s (%2$s)'), $lib, __s('Private'));
                 }
@@ -139,7 +137,7 @@ class PluginPdfTicketTask extends PluginPdfCommon
                     '</b>' . Toolbox::stripTags($lib),
                     Html::convDateTime($data['date']),
                     Html::timestampToString($data['actiontime'], false),
-                    Toolbox::stripTags($dbu->getUserName($data['users_id'])),
+                    Toolbox::stripTags(PluginPdfCommon::getUserNameCached($data['users_id'])),
                     $planification,
                 );
                 $content = $data['content'];

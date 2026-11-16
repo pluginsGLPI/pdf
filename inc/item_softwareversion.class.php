@@ -437,6 +437,38 @@ class PluginPdfItem_SoftwareVersion extends PluginPdfCommon
             $title = sprintf(__s('%1$s: %2$s'), $title, count($output));
             $pdf->displayTitle($title);
 
+            $licenses_by_version = [];
+            foreach ($DB->request([
+                'SELECT' => [
+                    'glpi_softwarelicenses.*',
+                    'glpi_softwarelicensetypes.name AS type',
+                ],
+                'FROM' => 'glpi_items_softwarelicenses',
+                'INNER JOIN' => [
+                    'glpi_softwarelicenses' => [
+                        'ON' => [
+                            'glpi_items_softwarelicenses' => 'softwarelicenses_id',
+                            'glpi_softwarelicenses' => 'id',
+                        ],
+                    ],
+                ],
+                'LEFT JOIN' => [
+                    'glpi_softwarelicensetypes' => [
+                        'ON' => [
+                            'glpi_softwarelicenses' => 'softwarelicensetypes_id',
+                            'glpi_softwarelicensetypes' => 'id',
+                            ['AND' => ['glpi_items_softwarelicenses.itemtype' => 'Computer']],
+                        ],
+                    ],
+                ],
+                'WHERE' => [
+                    'glpi_items_softwarelicenses.items_id' => $ID,
+                ],
+            ]) as $licdata) {
+                $version_key = $licdata['softwareversions_id_use'] ?: $licdata['softwareversions_id_buy'];
+                $licenses_by_version[$version_key][] = $licdata;
+            }
+
             $cat = -1;
             foreach ($output as $soft) {
                 if ($soft['softwarecategories_id'] != $cat) {
@@ -459,45 +491,9 @@ class PluginPdfItem_SoftwareVersion extends PluginPdfCommon
 
                 // From Item_SoftwareVersion::displaySoftsByCategory()
                 $verid = $soft['verid'];
-                $query_license_params = [
-                    'SELECT' => [
-                        'glpi_softwarelicenses.*',
-                        'glpi_softwarelicensetypes.name AS type',
-                    ],
-                    'FROM' => 'glpi_items_softwarelicenses',
-                    'INNER JOIN' => [
-                        'glpi_softwarelicenses' => [
-                            'ON' => [
-                                'glpi_items_softwarelicenses' => 'softwarelicenses_id',
-                                'glpi_softwarelicenses' => 'id',
-                            ],
-                        ],
-                    ],
-                    'LEFT JOIN' => [
-                        'glpi_softwarelicensetypes' => [
-                            'ON' => [
-                                'glpi_softwarelicenses' => 'softwarelicensetypes_id',
-                                'glpi_softwarelicensetypes' => 'id',
-                                ['AND' => ['glpi_items_softwarelicenses.itemtype' => 'Computer']],
-                            ],
-                        ],
-                    ],
-                    'WHERE' => [
-                        'glpi_items_softwarelicenses.items_id' => $ID,
-                        'OR' => [
-                            'glpi_softwarelicenses.softwareversions_id_use' => $verid,
-                            [
-                                'AND' => [
-                                    'glpi_softwarelicenses.softwareversions_id_use' => 0,
-                                    'glpi_softwarelicenses.softwareversions_id_buy' => $verid,
-                                ],
-                            ],
-                        ],
-                    ],
-                ];
 
                 $lic = '';
-                foreach ($DB->request($query_license_params) as $licdata) {
+                foreach (($verid !== null ? $licenses_by_version[$verid] ?? [] : []) as $licdata) {
                     $installed[] = $licdata['id'];
                     $lic .= (empty($lic) ? '' : ', ') . '<b>' . $licdata['name'] . '</b> ' . $licdata['serial'];
                     if (!empty($licdata['type'])) {
