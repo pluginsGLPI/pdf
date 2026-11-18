@@ -44,8 +44,6 @@ class PluginPdfChangeTask extends PluginPdfCommon
         /** @var DBmysql $DB */
         global $DB;
 
-        $dbu = new DbUtils();
-
         $ID = $job->getField('id');
 
         $result = $DB->request([
@@ -101,17 +99,17 @@ class PluginPdfChangeTask extends PluginPdfCommon
                     $planification .= '<br>' . sprintf(
                         __s('%1$s: %2$s'),
                         __s('By'),
-                        $dbu->getUserName($data['users_id_tech']),
+                        PluginPdfCommon::getUserNameCached($data['users_id_tech']),
                     );
                 }
 
-                $lib = $data['taskcategories_id'] ? Dropdown::getDropdownName('glpi_taskcategories', $data['taskcategories_id']) : '';
+                $lib = $data['taskcategories_id'] ? PluginPdfCommon::getDropdownNameCached('glpi_taskcategories', $data['taskcategories_id']) : '';
 
                 $pdf->displayLine(
                     '</b>' . Toolbox::stripTags($lib),
                     Html::convDateTime($data['date']),
                     Html::timestampToString($data['actiontime'], false),
-                    Toolbox::stripTags($dbu->getUserName($data['users_id'])),
+                    Toolbox::stripTags(PluginPdfCommon::getUserNameCached($data['users_id'])),
                     Toolbox::stripTags($planification),
                     1,
                 );

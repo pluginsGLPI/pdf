@@ -42,8 +42,7 @@ class PluginPdfInfocom extends PluginPdfCommon
     public static function pdfForItem(PluginPdfSimplePDF $pdf, CommonDBTM $item)
     {
         /** @var array $CFG_GLPI */
-        /** @var array $PDF_DEVICES */
-        global $CFG_GLPI, $PDF_DEVICES;
+        global $CFG_GLPI;
 
         $ID = $item->getField('id');
 
@@ -210,7 +209,7 @@ class PluginPdfInfocom extends PluginPdfCommon
             $currency = PluginPdfConfig::getInstance();
             $sym = '';
 
-            foreach ($PDF_DEVICES as $option => $value) {
+            foreach (PluginPdfConfig::getDevices() as $option => $value) {
                 if ($currency->fields['currency'] == $option) {
                     $sym = $value[1];
                 }

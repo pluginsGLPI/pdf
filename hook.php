@@ -39,6 +39,11 @@ function plugin_pdf_postinit()
     foreach ($PLUGIN_HOOKS['plugin_pdf'] as $type => $typepdf) {
         CommonGLPI::registerStandardTab($type, $typepdf);
     }
+
+    $active_plugins = Plugin::getPlugins();
+    if (in_array('datainjection', $active_plugins, true) || in_array('geststock', $active_plugins, true)) {
+        $PLUGIN_HOOKS['menu_entry']['pdf'] = 'front/preference.form.php';
+    }
 }
 
 

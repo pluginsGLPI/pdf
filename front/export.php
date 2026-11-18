@@ -74,6 +74,9 @@ if (isset($_POST['plugin_pdf_inventory_type'])
         }
 
         $itempdf = new $pdf_class($item);
+
+        Session::writeClose();
+
         $itempdf->generatePDF([$_POST['itemID']], $tab, ($_POST['page'] ?? 0));
     } else {
         throw new RuntimeException('Missing PDF plugin hook for type: ' . $type);

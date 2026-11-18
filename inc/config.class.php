@@ -150,8 +150,6 @@ class PluginPdfConfig extends CommonDBTM
 
     public static function showConfigForm($item)
     {
-        /** @var array $PDF_DEVICES */
-        global $PDF_DEVICES;
         $config = self::getInstance();
 
         $config->showFormHeader();
@@ -167,7 +165,7 @@ class PluginPdfConfig extends CommonDBTM
         }
 
         $options = [];
-        foreach ($PDF_DEVICES as $option => $value) {
+        foreach (self::getDevices() as $option => $value) {
             $options[$option] = $option . ' - ' . $value[0] . ' (' . $value[1] . ')';
         }
 
@@ -360,28 +358,42 @@ class PluginPdfConfig extends CommonDBTM
             'ZWL'     => [__s('Zimbabwe Dollar', 'pdf'), '$', false]];
     }
 
-    public static function formatNumber($value)
+    /**
+     * Get the list of the currencies
+     *
+     * @return array
+     */
+    public static function getDevices()
     {
-        /** @var array $PDF_DEVICES */
+        /** @var array|null $PDF_DEVICES */
         global $PDF_DEVICES;
 
+        return $PDF_DEVICES ??= self::currency();
+    }
 
-        $config = new Config();
-        $language = '';
-        foreach ($config->find(['context' => 'core',
-            'name'                        => 'language']) as $row) {
-            $language = $row['value'];
-        }
-        $user = new User();
-        $user->getFromDB($_SESSION['glpiID']);
-        if (!empty($user->fields['language'])) {
-            $language = $user->fields['language'];
+    public static function formatNumber($value)
+    {
+        static $formatters = [];
+
+        $users_id = (int) ($_SESSION['glpiID'] ?? 0);
+        if (!isset($formatters[$users_id])) {
+            $config = new Config();
+            $language = '';
+            foreach ($config->find(['context' => 'core',
+                'name'                        => 'language']) as $row) {
+                $language = $row['value'];
+            }
+            $user = new User();
+            $user->getFromDB($_SESSION['glpiID']);
+            if (!empty($user->fields['language'])) {
+                $language = $user->fields['language'];
+            }
+            $formatters[$users_id] = numfmt_create($language, NumberFormatter::CURRENCY);
         }
         $currency = PluginPdfConfig::getInstance();
 
-        $fmt = numfmt_create($language, NumberFormatter::CURRENCY);
-        $val = numfmt_format_currency($fmt, (float) $value, $currency->getField('currency'));
-        foreach ($PDF_DEVICES as $option => $value) {
+        $val = numfmt_format_currency($formatters[$users_id], (float) $value, $currency->getField('currency'));
+        foreach (self::getDevices() as $option => $value) {
             if ($currency->fields['currency'] == $option) {
                 $sym = $value[1];
 
@@ -392,11 +404,8 @@ class PluginPdfConfig extends CommonDBTM
 
     public static function currencyName()
     {
-        /** @var array $PDF_DEVICES */
-        global $PDF_DEVICES;
-
         $config = self::getInstance();
-        foreach ($PDF_DEVICES as $option => $value) {
+        foreach (self::getDevices() as $option => $value) {
             if ($config->getField('currency') == $option && isset($value[2])) {
                 return $value[0];
             }

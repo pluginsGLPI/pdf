@@ -70,14 +70,6 @@ function plugin_init_pdf()
         $PLUGIN_HOOKS['use_massive_action']['pdf'] = 1;
     }
 
-    $plugin = new Plugin();
-    if ($plugin->isActivated('datainjection')) {
-        $PLUGIN_HOOKS['menu_entry']['pdf'] = 'front/preference.form.php';
-    } elseif ($plugin->isActivated('geststock')) {
-        $PLUGIN_HOOKS['menu_entry']['pdf'] = 'front/preference.form.php';
-    }
-
-
     // Define the type for which we know how to generate PDF :
     $PLUGIN_HOOKS['plugin_pdf']['Appliance']        = 'PluginPdfAppliance';
     $PLUGIN_HOOKS['plugin_pdf']['CartridgeItem']    = 'PluginPdfCartridgeItem';

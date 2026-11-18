@@ -79,6 +79,9 @@ if (isset($PLUGIN_HOOKS['plugin_pdf'][$type]) && class_exists($PLUGIN_HOOKS['plu
     }
 
     $itempdf = new $pdf_class($item);
+
+    Session::writeClose();
+
     $itempdf->generatePDF($tab_id, $tab, ($pag ?? 0));
 } else {
     throw new RuntimeException('Missing PDF plugin hook for type: ' . $type);

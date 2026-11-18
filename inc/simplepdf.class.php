@@ -251,33 +251,10 @@ class PluginPdfSimplePDF
             $msgs,
         );
 
-        /* dry run - compute max cell height */
-        $this->pdf->startTransaction();
-        $i = 0;
-        foreach ($msgs as $msg) {
-            if ($i < count($this->cols)) {
-                $this->pdf->writeHTMLCell(
-                    $this->colsw[$i], // $w (float) Cell width. If 0, the cell extends up to the right margin.
-                    $miny,            // $h (float) Cell minimum height. The cell extends automatically if needed.
-                    '',               // $x (float) upper-left corner X coordinate
-                    '',               // $y (float) upper-left corner Y coordinate
-                    $msg,             // $html (string) html text to print. Default value: empty string.
-                    0,                // $border (mixed) Indicates if borders must be drawn around the cell. The value can be a number:<ul><li>0: no border (default)</li><li>1: frame</li></ul> or a string containing some or all of the following characters (in any order):<ul><li>L: left</li><li>T: top</li><li>R: right</li><li>B: bottom</li></ul> or an array of line styles for each border group - for example: array('LTRB' => array('width' => 2, 'cap' => 'butt', 'join' => 'miter', 'dash' => 0, 'color' => array(0, 0, 0)))
-                    0,                // $ln (int) Indicates where the current position should go after the call. Possible values are:<ul><li>0: to the right (or left for RTL language)</li><li>1: to the beginning of the next line</li><li>2: below</li></ul>
-                    1,                // $fill (boolean) Indicates if the cell background must be painted (true) or transparent (false).
-                    true,             // $reseth (boolean) if true reset the last cell height (default true).
-                    self::LEFT,       // $align (string) Allows to center or align the text. Possible values are:<ul><li>L : left align</li><li>C : center</li><li>R : right align</li><li>'' : empty string : left for LTR or right for RTL</li></ul>
-                    true,              // $autopadding (boolean) if true, uses internal padding and automatically adjust it to account for line width.
-                );
-                if ($this->pdf->getLastH() > $max) {
-                    $max = $this->pdf->getLastH();
-                }
-                $i++;
-            } else {
-                break;
-            }
+        /* compute max cell height */
+        if (min(count($msgs), count($this->cols)) > 1) {
+            $max = $this->computeRowHeight($msgs, $miny);
         }
-        $this->pdf = $this->pdf->rollbackTransaction();
 
         /* real run */
         $i = 0;
@@ -309,6 +286,81 @@ class PluginPdfSimplePDF
             }
         }
         $this->pdf->SetY($this->pdf->GetY() + 1);
+    }
+
+    /**
+     * Compute the height of a multi-column row
+     *
+     * @param array $msgs strings to display, one per column
+     * @param float $miny minimum size of the row (mm)
+     *
+     * @return float
+    **/
+    private function computeRowHeight(array $msgs, $miny)
+    {
+        $max        = $miny;
+        $html_cells = [];
+        foreach (array_slice(array_values($msgs), 0, count($this->cols)) as $i => $msg) {
+            $msg = (string) $msg;
+            if ($this->isSingleLinePlainText($msg, $this->colsw[$i])) {
+                $height = $this->pdf->getStringHeight($this->colsw[$i], $msg);
+                if ($height > $max) {
+                    $max = $height;
+                }
+            } else {
+                $html_cells[$i] = $msg;
+            }
+        }
+
+        if ($html_cells === []) {
+            return $max;
+        }
+
+        /* dry run */
+        $this->pdf->startTransaction();
+        foreach ($html_cells as $i => $msg) {
+            $this->pdf->writeHTMLCell(
+                $this->colsw[$i],
+                $miny,
+                '',
+                '',
+                $msg,
+                0,
+                0,
+                1,
+                true,
+                self::LEFT,
+                true,
+            );
+            if ($this->pdf->getLastH() > $max) {
+                $max = $this->pdf->getLastH();
+            }
+        }
+        $this->pdf = $this->pdf->rollbackTransaction();
+
+        return $max;
+    }
+
+    /**
+     * Whether a cell content is plain text fitting on a single line of the column
+     *
+     * @param string $msg
+     * @param float  $width column width (mm)
+     *
+     * @return bool
+    **/
+    private function isSingleLinePlainText(string $msg, $width): bool
+    {
+        if (
+            $msg === ''
+            || $msg !== trim($msg)
+            || preg_match('/[<>&\r\n\t]| {2}/', $msg)
+        ) {
+            return false;
+        }
+        $paddings = $this->pdf->getCellPaddings();
+
+        return $this->pdf->GetStringWidth($msg) < ($width - $paddings['L'] - $paddings['R'] - 0.01);
     }
 
     /**

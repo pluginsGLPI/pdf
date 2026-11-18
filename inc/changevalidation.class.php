@@ -44,8 +44,6 @@ class PluginPdfChangeValidation extends PluginPdfCommon
         /** @var DBmysql $DB */
         global $DB;
 
-        $dbu = new DbUtils();
-
         $pdf->setColumnsSize(100);
         $pdf->displayTitle('<b>' . __s('Approvals for the change', 'pdf') . '</b>');
 
@@ -91,10 +89,10 @@ class PluginPdfChangeValidation extends PluginPdfCommon
                 $pdf->displayLine(
                     TicketValidation::getStatus($row['status']),
                     Html::convDateTime($row['submission_date']),
-                    $dbu->getUserName($row['users_id']),
+                    PluginPdfCommon::getUserNameCached($row['users_id']),
                     trim(html_entity_decode($row['comment_submission'] ?? '', ENT_QUOTES, 'UTF-8')),
                     Html::convDateTime($row['validation_date']),
-                    $dbu->getUserName($row['users_id_validate']),
+                    PluginPdfCommon::getUserNameCached($row['users_id_validate']),
                     trim(html_entity_decode($row['comment_validation'] ?? '', ENT_QUOTES, 'UTF-8')),
                 );
             }

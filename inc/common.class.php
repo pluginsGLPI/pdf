@@ -450,6 +450,46 @@ abstract class PluginPdfCommon extends CommonGLPI
     }
 
     /**
+     * Get the name of a user, memoized for the current request
+     *
+     * @param int $users_id
+     *
+     * @return string
+     */
+    public static function getUserNameCached($users_id): string
+    {
+        static $names = [];
+
+        $users_id = (int) $users_id;
+        if (!array_key_exists($users_id, $names)) {
+            $dbu              = new DbUtils();
+            $names[$users_id] = $dbu->getUserName($users_id);
+        }
+
+        return $names[$users_id];
+    }
+
+    /**
+     * Get the name of a dropdown value, memoized for the current request
+     *
+     * @param string $table
+     * @param int    $id
+     *
+     * @return string
+     */
+    public static function getDropdownNameCached(string $table, $id): string
+    {
+        static $names = [];
+
+        $key = $table . '#' . (int) $id;
+        if (!array_key_exists($key, $names)) {
+            $names[$key] = (string) Dropdown::getDropdownName($table, $id);
+        }
+
+        return $names[$key];
+    }
+
+    /**
      * Get the groups ids of several items of the same type, indexed by item id
      *
      * @param string $itemtype

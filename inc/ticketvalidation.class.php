@@ -44,8 +44,6 @@ class PluginPdfTicketValidation extends PluginPdfCommon
         /** @var DBmysql $DB */
         global $DB;
 
-        $dbu = new DbUtils();
-
         $pdf->setColumnsSize(100);
         $pdf->displayTitle('<b>' . __s('Approvals for the ticket', 'pdf') . '</b>');
 
@@ -76,9 +74,9 @@ class PluginPdfTicketValidation extends PluginPdfCommon
                 $pdf->displayLine(
                     TicketValidation::getStatus($row['status']),
                     Html::convDateTime($row['submission_date']),
-                    $dbu->getUserName($row['users_id']),
+                    PluginPdfCommon::getUserNameCached($row['users_id']),
                     Html::convDateTime($row['validation_date']),
-                    $dbu->getUserName($row['users_id_validate']),
+                    PluginPdfCommon::getUserNameCached($row['users_id_validate']),
                 );
                 $tmp = trim(html_entity_decode($row['comment_submission'] ?? '', ENT_QUOTES, 'UTF-8'));
                 $pdf->displayText('<b><i>' . sprintf(
