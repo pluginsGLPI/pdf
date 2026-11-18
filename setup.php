@@ -115,6 +115,7 @@ function plugin_version_pdf()
         'license'        => 'GPLv3+',
         'homepage'       => 'https://github.com/pluginsGLPI/pdf',
         'minGlpiVersion' => PLUGIN_PDF_MIN_GLPI,
+        'csp_compliant'  => true,
         'requirements'   => [
             'glpi' => [
                 'min' => PLUGIN_PDF_MIN_GLPI,
