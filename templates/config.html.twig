@@ -55,7 +55,7 @@
                     {{ use_branding_logo ? 'checked' : '' }} />
             </label>
             <span hidden data-pdf-branding-logo></span>
-            {{ call('Html::script', ['/plugins/pdf/js/config.js', {}, false])|raw }}
+            {{ call('Html::script', ['/plugins/pdf/js/config.js', {'version': constant('PLUGIN_PDF_VERSION')}, false])|raw }}
         {% else %}
             <label class="form-switch mt-1" style="padding-left: 1rem;"
                 data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-trigger="hover"

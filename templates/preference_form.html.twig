@@ -166,4 +166,4 @@
 </form>
 
 <span hidden data-pdf-form-id="{{ form_id }}"></span>
-{{ call('Html::script', ['/plugins/pdf/js/preference_form.js', {}, false])|raw }}
+{{ call('Html::script', ['/plugins/pdf/js/preference_form.js', {'version': constant('PLUGIN_PDF_VERSION')}, false])|raw }}
