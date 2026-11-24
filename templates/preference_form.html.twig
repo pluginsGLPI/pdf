@@ -55,11 +55,11 @@
                         </legend>
 
                         <div class="mb-3 d-flex flex-wrap gap-2">
-                            <button type="button" class="btn btn-sm btn-outline-success" onclick="selectAllCheckboxes('{{ form_id }}')">
+                            <button type="button" class="btn btn-sm btn-outline-success" id="select_all_{{ form_id }}">
                                 <i class="ti ti-check me-1"></i>
                                 {{ __('Check all') }}
                             </button>
-                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="selectNoCheckboxes('{{ form_id }}')">
+                            <button type="button" class="btn btn-sm btn-outline-secondary" id="select_none_{{ form_id }}">
                                 <i class="ti ti-x me-1"></i>
                                 {{ __('Uncheck all') }}
                             </button>
@@ -165,78 +165,5 @@
     </div>
 </form>
 
-<script>
-    function selectAllCheckboxes(formId) {
-        $('#' + formId + ' input[type="checkbox"][name^="item["]').each(function () {
-            $(this).prop('checked', true);
-            $(this).closest('.card').addClass('border-success');
-        });
-        updateSelectionCount(formId);
-    }
-
-    function selectNoCheckboxes(formId) {
-        $('#' + formId + ' input[type="checkbox"][name^="item["]').each(function () {
-            $(this).prop('checked', false);
-            $(this).closest('.card').removeClass('border-success');
-        });
-        updateSelectionCount(formId);
-    }
-
-    function updateSelectionCount(formId) {
-        var checkedCount = $('#' + formId + ' input[type="checkbox"][name^="item["]:checked').length;
-        $('#selected-count-' + formId).text(checkedCount);
-    }
-
-    $(document).ready(function () {
-        var formId = '{{ form_id }}';
-
-        $('#' + formId + ' input[type="checkbox"][name^="item["]').each(function () {
-            if ($(this).is(':checked')) {
-                $(this).closest('.card').addClass('border-success');
-            }
-
-            $(this).on('change', function () {
-                var card = $(this).closest('.card');
-                if ($(this).is(':checked')) {
-                    card.addClass('border-success');
-                } else {
-                    card.removeClass('border-success');
-                } updateSelectionCount(formId);
-            });
-        });
-
-        updateSelectionCount(formId);
-
-        function refreshCsrfToken(formId) {
-            fetch(window.location.href, { credentials: 'same-origin' })
-                .then(r => r.text())
-                .then(html => {
-                    try {
-                        const newTokenInput = new DOMParser()
-                            .parseFromString(html, 'text/html')
-                            .querySelector('input[name="_glpi_csrf_token"]');
-                        if (!newTokenInput) return;
-
-                        const currentTokenInput = document.querySelector(`#${formId} input[name="_glpi_csrf_token"]`);
-                        if (currentTokenInput) {
-                            currentTokenInput.value = newTokenInput.value;
-                        }
-                    } catch (e) {
-                        // Ignore errors silently
-                    }
-                })
-                .catch(() => {
-                    // Ignore errors silently
-                });
-        }
-
-        // Schedule a CSRF token refresh after form submission
-        const form = document.getElementById(formId);
-        if (form) {
-            form.addEventListener('submit', () => {
-                // Delay to allow server-side AJAX handlers to complete; full navigation will reload everything
-                setTimeout(() => refreshCsrfToken(formId), 800);
-            });
-        }
-    });
-</script>
+<span hidden data-pdf-form-id="{{ form_id }}"></span>
+{{ call('Html::script', ['/plugins/pdf/js/preference_form.js', {'version': constant('PLUGIN_PDF_VERSION')}, false])|raw }}

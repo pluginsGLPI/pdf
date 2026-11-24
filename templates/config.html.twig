@@ -54,11 +54,8 @@
                 <input type="checkbox" class="form-check-input ms-0 me-1 mt-0" id="use_branding_logo_checkbox"
                     {{ use_branding_logo ? 'checked' : '' }} />
             </label>
-            <script>
-                document.getElementById("use_branding_logo_checkbox").addEventListener("change", function () {
-                    document.getElementById("use_branding_logo_hidden").value = this.checked ? 1 : 0;
-                });
-            </script>
+            <span hidden data-pdf-branding-logo></span>
+            {{ call('Html::script', ['/plugins/pdf/js/config.js', {'version': constant('PLUGIN_PDF_VERSION')}, false])|raw }}
         {% else %}
             <label class="form-switch mt-1" style="padding-left: 1rem;"
                 data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-trigger="hover"
